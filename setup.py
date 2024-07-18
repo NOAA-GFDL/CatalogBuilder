@@ -15,7 +15,8 @@ setup(
         'xarray',
         'pandas',
         'boto3',
-        'botocore'
+        'botocore',
+        'pyyaml'
     ]
 )
 
