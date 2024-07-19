@@ -2,7 +2,8 @@ name: publish_conda
 on:
   pull_request:
     branches:
-    - main
+    #for testing the restructuring, put back to main and on push only later.
+    - subpkgtest
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
