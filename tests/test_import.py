@@ -13,6 +13,7 @@ def check_import():
        print("Unable to adjust sys.path")
        raise ImportError('Error importing intakebuilder and other packages')
        return -97
+ return True
      
 def test_import():
     assert check_import() == True
