@@ -1,5 +1,5 @@
 package:
-  name: intakebuilder
+  name: catalogbuilder
   version: 2.0.1
 
 source:
@@ -24,8 +24,6 @@ requirements:
     - jsondiff
 test:
   imports:
-    - intakebuilder 
-    - scripts.gen_intake_gfdl
-
+    - catalogbuilder
 about:
   home:
