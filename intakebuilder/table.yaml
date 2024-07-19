@@ -1,9 +1,0 @@
-Amon:
-    frequency: mon
-    realm: atmos
-Omon:
-    frequency: mon
-    realm: ocean
-3hr:
-    frequency: 3hr
-    realm: na
