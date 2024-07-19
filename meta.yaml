@@ -25,5 +25,7 @@ requirements:
 test:
   imports:
     - catalogbuilder
+    - catalogbuilder.scripts
+    - catalogbuilder.cats
 about:
   home:
