@@ -3,7 +3,7 @@ package:
   version: 2.0.1
 
 source:
-  git_url: https://github.com/NOAA-GFDL/CatalogBuilder/CatalogBuilder.git
+  git_url: https://github.com/NOAA-GFDL/CatalogBuilder.git
   path: .
 
 build:
