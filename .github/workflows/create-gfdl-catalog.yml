@@ -50,5 +50,5 @@ jobs:
         $CONDA/envs/catalogbuilder/bin/pytest -v --runxfail
     - name: Test for completeness
       run: | 
-        $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/test_catalog.py -tf gfdl_autotest.json cats/gfdl_template.json
-        $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/test_catalog.py -tf cats/gfdl_autotest_from_yaml.json 
+        $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/test_catalog.py -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
+        $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/test_catalog.py -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json 
