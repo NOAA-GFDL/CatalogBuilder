@@ -16,7 +16,7 @@ def check_import():
         print("Imported, and relied on sys.path")
         return True
     except ModuleNotFoundError:
-        sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
+        print("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
         raise ImportError('Error importing intakebuilder and other packages')
         return -97
      
