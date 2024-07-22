@@ -10,6 +10,7 @@ import logging
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 
+import catalogbuilder
 try:
    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
 except ModuleNotFoundError as exc:
