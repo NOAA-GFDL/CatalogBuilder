@@ -28,12 +28,14 @@ jobs:
         pip install .
     - name: Make sample data
       run: python tests/make_sample_data.py
-    - name: 'Generate catalog'
+    - name: Generate catalog
       run: |
+        pip install .
         $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/gen_intake_gfdl.py archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
-    - name: 'Generate catalog with yaml'
+    - name: Generate catalog with yaml
       run: |
-         $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/gen_intake_gfdl.py --config tests/test_config.yaml
+        pip install .
+        $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/gen_intake_gfdl.py --config tests/test_config.yaml
     - name: upload-artifacts1
       uses: actions/upload-artifact@v4
       with:
@@ -50,6 +52,7 @@ jobs:
         conda install pytest
         $CONDA/envs/catalogbuilder/bin/pytest -v --runxfail
     - name: Test for completeness
-      run: | 
+      run: |
+        pip install .
         $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/test_catalog.py -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
         $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/test_catalog.py -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json 
