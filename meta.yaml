@@ -17,12 +17,13 @@ requirements:
     - pip 
   run:
     - python
-    - click
-    - pandas
-    - xarray
     - pytest
-    - conda-forge::intake-esm=2023.7.7
+    - click
+    - xarray
+    - pandas
     - jsondiff
+    - conda-forge::intake-esm=2023.7.7
+    - boto3
 test:
   imports:
     - catalogbuilder
