@@ -3,23 +3,11 @@ channels:
   - conda-forge 
   - default
 dependencies:
-  - conda
   - python
-  - conda-env
-  - conda-build
-  - conda-verify
-  - _ipyw_jlab_nb_ext_conf
-  - anaconda==2020.02=py37_0
-  - anaconda-navigator
-  - navigator-updater
-  - gcsfs
-  - zarr
-  - cftime
-  - cartopy
-  - xgcm
-  - pandas
-  - xarray
+  - pytest
   - click
-  - intake-esm 
-  - pyyaml
+  - xarray
+  - pandas
   - jsondiff
+  - intake-esm
+  - boto3
