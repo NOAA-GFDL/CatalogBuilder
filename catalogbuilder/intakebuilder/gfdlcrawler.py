@@ -1,5 +1,5 @@
 import os
-from . import getinfo, builderconfig
+from intakebuilder import getinfo, builderconfig
 import sys
 import re
 import operator as op

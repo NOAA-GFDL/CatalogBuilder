@@ -10,16 +10,23 @@ import logging
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 
-import catalogbuilder
 try:
-   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
-except ModuleNotFoundError as exc:
-   raise Exception(f"import problems!!!") from exc
+   from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
+except ModuleNotFoundError:
+    print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
+    print("Attempting again with adjusted sys.path ")
+    try:
+       sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    except:
+       print("Unable to adjust sys.path")
+    #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    try:
+        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
+    except ModuleNotFoundError:
+        sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
-
-import catalogbuilder.cats
-template_path = catalogbuilder.cats.__path__[0] + '/gfdl_template.json'
+template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
 #Setting up argument parsing/flags
 @click.command()
@@ -28,8 +35,7 @@ template_path = catalogbuilder.cats.__path__[0] + '/gfdl_template.json'
 #,help='The directory path with the datasets to be cataloged. E.g a GFDL PP path till /pp')
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
-@click.option('--config',required=False,type=click.Path(exists=True),nargs=1,
-              help='Path to your yaml config, Use the config_template in intakebuilder repo')
+@click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)

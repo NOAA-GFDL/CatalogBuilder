@@ -15,8 +15,8 @@ def main():
     ######### SEARCH FILTERS ###########################
     dictFilter = {}
     dictFilter["source_prefix"]= 'CMIP6/' #/CMIP/NOAA-GFDL/GFDL-ESM4/' #Must specify something here, at least the project level
-    #COMMENT  dictFilter["miptable"] = "Amon" #Remove this if you don't want to filter by miptable
-    #COMMENT dictFilter["varname"] = "tas"   #Remove this if you don't want to filter by variable name
+   #COMMENT  dictFilter["miptable"] = "Amon" #Remove this if you don't want to filter by miptable
+   #COMMENT dictFilter["varname"] = "tas"   #Remove this if you don't want to filter by variable name
     #######################################################
     project_bucket = project_root.split("/")[1].lstrip("/")
     project_name = project_root.split("/")[2]

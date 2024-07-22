@@ -4,7 +4,7 @@ import csv
 from csv import writer
 import os
 import xarray as xr
-from . import builderconfig, configparser 
+from intakebuilder import builderconfig, configparser 
 
 
 '''

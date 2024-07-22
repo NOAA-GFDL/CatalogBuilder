@@ -1,7 +1,7 @@
 import os.path
 import csv
 from csv import writer
-from . import builderconfig, configparser 
+from intakebuilder import builderconfig, configparser 
 
 def getHeader(configyaml):
     '''
