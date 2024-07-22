@@ -12,6 +12,8 @@ on:
 jobs:
   catalog-upload:
     runs-on: ubuntu-latest
+    container:
+      image: continuumio/miniconda3:latest    
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
@@ -29,12 +31,12 @@ jobs:
         conda env create -f environment.yml --name catalogbuilder
         
     - name: Make sample data
-      run: python tests/make_sample_data.py
+      run: |
+        python tests/make_sample_data.py
       
     - name: Generate catalog
+      activate-environment: catalogbuilder
       run: |
-        conda init
-        conda activate catalogbuilder
         pip install .
         python catalogbuilder/scripts/gen_intake_gfdl.py archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
         
