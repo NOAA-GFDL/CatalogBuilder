@@ -4,7 +4,7 @@ channels:
   - default
 dependencies:
   - conda
-  - python=3.7
+  - python
   - conda-env
   - conda-build
   - conda-verify
