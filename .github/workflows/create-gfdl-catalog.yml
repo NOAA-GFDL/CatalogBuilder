@@ -33,8 +33,9 @@ jobs:
       
     - name: Generate catalog
       run: |
-        $CONDA/envs/catalogbuilder/bin/python -m pip install .
-        $CONDA/envs/catalogbuilder/bin/python catalogbuilder/scripts/gen_intake_gfdl.py archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
+        conda activate catalogbuilder
+        pip install .
+        python catalogbuilder/scripts/gen_intake_gfdl.py archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
         
     - name: Generate catalog with yaml
       run: |
