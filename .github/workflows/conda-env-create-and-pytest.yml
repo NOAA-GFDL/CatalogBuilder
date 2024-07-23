@@ -32,7 +32,7 @@ jobs:
         which python
         python --version
         $CONDA/envs/catalogbuilder/bin/python --version
-        which pytest
+        # which pytest
         $CONDA/envs/catalogbuilder/bin/pytest
 
     - name: Make sample data
