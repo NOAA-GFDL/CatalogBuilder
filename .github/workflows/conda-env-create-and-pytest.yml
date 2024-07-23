@@ -1,4 +1,4 @@
-name: conda-env-create-pip-install-pytest
+name: conda-env-create-and-pytest
 
 on: [push]
 
