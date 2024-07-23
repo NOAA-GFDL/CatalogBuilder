@@ -5,7 +5,7 @@ on:
     # for testing conda package build, no upload, during PR/MRs
     - main
 jobs:
-  build_and_publish:
+  build:
     runs-on: ubuntu-latest
     container:
       image: continuumio/miniconda3:latest
