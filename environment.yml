@@ -2,7 +2,7 @@ name: catalogbuilder
 channels:
   - conda-forge 
   - noaa-gfdl
-  - default
+  - defaults
 dependencies:
   - python
   - pytest
@@ -10,5 +10,5 @@ dependencies:
   - xarray
   - pandas
   - jsondiff
-  - instake-esm
+  - intake-esm
   - boto3
