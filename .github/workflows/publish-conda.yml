@@ -1,4 +1,4 @@
-name: publish-conda
+name: publish_conda
 on:
   push:
     branches:
