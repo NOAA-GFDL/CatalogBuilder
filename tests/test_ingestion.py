@@ -21,7 +21,7 @@ def load_cat(catspec=None):
   return cat
 def test_loadcat():
   #TODO generate csv on the fly, check if its readable etc
-  catspec = pathlib.Path(os.path.dirname(__file__)).parent / 'cats/gfdl_template.json'
+  catspec = pathlib.Path(os.path.dirname(__file__)).parent / 'catalogbuilder/cats/gfdl_template.json'
   #TODO generate test catalog on the fly, push spec to the test directory
   cat = load_cat((str(catspec)))
   try:

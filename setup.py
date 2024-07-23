@@ -14,8 +14,9 @@ setup(
         'click',
         'xarray',
         'pandas',
-        'boto3',
-        'botocore'
+        'jsondiff',
+        'intake-esm',
+        'boto3'
     ]
 )
 

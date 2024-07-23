@@ -23,7 +23,7 @@ def main(json_path,json_template_path,test_failure):
     if json_template_path:
         json_template = json.load(open(json_template_path))
     else:
-        json_template = json.load(open('cats/gfdl_template.json'))
+        json_template = json.load(open('catalogbuilder/cats/gfdl_template.json'))
 
     #Validate JSON against JSON template
     comp = (diff(j,json_template))

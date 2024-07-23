@@ -1,7 +1,8 @@
 name: publish_conda
 on:
-  push:
+  pull_request:
     branches:
+    #for testing the restructuring, back on push only later.
     - main
 jobs:
   build_and_publish:
