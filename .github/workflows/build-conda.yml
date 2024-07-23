@@ -1,0 +1,21 @@
+name: build_conda
+on:
+  pull_request:
+    branches:
+    # for testing conda package build, no upload, during PR/MRs
+    - main
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    container:
+      image: continuumio/miniconda3:latest
+    steps:
+    - name: Checkout Files
+      uses: actions/checkout@v3
+    - name: Run Docker to Build
+      run: |
+        conda config --append channels conda-forge
+        conda config --append channels noaa-gfdl
+        conda install conda-build conda-verify
+        conda config --set anaconda_upload no
+        conda build .
