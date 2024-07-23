@@ -27,7 +27,8 @@ requirements:
 test:
   imports:
     - catalogbuilder
-    - catalogbuilder.scripts
     - catalogbuilder.cats
+    - catalogbuilder.scripts
+    - catalogbuilder.scripts.gen_intake_gfdl
 about:
   home:
