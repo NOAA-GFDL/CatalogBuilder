@@ -4,7 +4,6 @@ package:
 
 source:
   git_url: https://github.com/NOAA-GFDL/CatalogBuilder.git
-  git_branch: subpkgtest
   path: .
 
 build:
