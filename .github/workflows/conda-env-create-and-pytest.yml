@@ -35,12 +35,12 @@ jobs:
         python --version
         $CONDA/envs/catalogbuilder/bin/python --version
         # which pytest
-        $CONDA/envs/catalogbuilder/bin/pytest
+        $CONDA/envs/catalogbuilder/bin/pytest catalogbuilder
 
     - name: Make sample data
       run: |
         which python
-        python tests/make_sample_data.py
+        python catalogbuilder/tests/make_sample_data.py
 
     - name: Generate catalog
       run: |
@@ -50,7 +50,7 @@ jobs:
     - name: Generate catalog with yaml
       run: |
         which python
-        python catalogbuilder/scripts/gen_intake_gfdl.py --config tests/test_config.yaml
+        python catalogbuilder/scripts/gen_intake_gfdl.py --config catalogbuilder/tests/test_config.yaml
   
     - name: upload-artifacts
       uses: actions/upload-artifact@v4
@@ -67,7 +67,7 @@ jobs:
 
     - name: Run pytest with downloaded artifacts
       run: |
-        $CONDA/envs/catalogbuilder/bin/pytest -v --runxfail
+        $CONDA/envs/catalogbuilder/bin/pytest -v --runxfail catalogbuilder
 
     - name: Test for completeness
       run: | 
