@@ -9,9 +9,9 @@ jobs:
       max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4\
     - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
@@ -24,8 +24,10 @@ jobs:
       run: |
         # create environment catalogbuilder will be installed into
         conda env create -f environment.yml --name catalogbuilder
+        # put conda env binaries in GITHUB_PATH
+        echo $CONDA/envs/catalogbuilder/bin >> $GITHUB_PATH
         # install catalogbuilder
-        pip install .
+        $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder/bin .
 
     - name: Run pytest in catalogbuilder environment
       run: |
@@ -37,14 +39,17 @@ jobs:
 
     - name: Make sample data
       run: |
+        which python
         python tests/make_sample_data.py
 
     - name: Generate catalog
       run: |
+        which python
         python catalogbuilder/scripts/gen_intake_gfdl.py archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
 
     - name: Generate catalog with yaml
       run: |
+        which python
         python catalogbuilder/scripts/gen_intake_gfdl.py --config tests/test_config.yaml
   
     - name: upload-artifacts
@@ -66,5 +71,6 @@ jobs:
 
     - name: Test for completeness
       run: | 
+        which python
         python catalogbuilder/scripts/test_catalog.py -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
         python catalogbuilder/scripts/test_catalog.py -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json
