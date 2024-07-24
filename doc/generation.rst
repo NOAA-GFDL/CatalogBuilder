@@ -6,11 +6,11 @@ There are a few ways to use the catalog builder.
 Installation
 ------------
 
-Recommended approach: Install as a `conda package <https://anaconda.org/NOAA-GFDL/intakebuilder>`_
+Recommended approach: Install as a `conda package <https://anaconda.org/NOAA-GFDL/catalogbuilder>`_
 
 .. code-block:: console
 
-  conda install intakebuilder -c noaa-gfdl
+  conda install catalogbuilder -c noaa-gfdl
 
 Alternatively, you may clone the `git repository <https://github.com/aradhakrishnanGFDL/CatalogBuilder.git>`_
 and create your conda environment using the `environment.yml <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/environment.yml>`_ in the git repository. 
@@ -33,7 +33,7 @@ Using conda package
 
 .. code-block:: console
 
-  conda install intakebuilder -c noaa-gfdl
+  conda install catalogbuilder -c noaa-gfdl
 
 This package contains all dependencies needed to run the catalog builder.
 
@@ -115,7 +115,7 @@ Optional Configuration
 
 If you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented: 
 
-Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data. Both can be configured by editing intakebuilder/builderconfig.py.
+Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data. Both can be configured by editing catalogbuilder/intakebuilder/builderconfig.py.
 
 .. code-block:: python
    
