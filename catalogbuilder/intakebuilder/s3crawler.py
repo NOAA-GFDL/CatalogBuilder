@@ -1,7 +1,8 @@
 import re
 import boto3
 import botocore
-from intakebuilder import getinfo
+#from intakebuilder import getinfo
+from . import getinfo
 
 '''
 s3 crawler crawls through the S3 bucket, passes the bucket path to the helper functions to getinfo.
