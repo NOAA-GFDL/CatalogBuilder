@@ -1,4 +1,4 @@
-name: conda-env-create-and-pytest
+name: conda-env-create-run-pytest
 
 on: [pull_request]
 
@@ -20,16 +20,16 @@ jobs:
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
 
-    - name: Create catalogbuilder environment
+    - name: Create catalogbuilder conda environment
       run: |
         # create environment catalogbuilder will be installed into
         conda env create -f environment.yml --name catalogbuilder
         # put conda env binaries in GITHUB_PATH
         echo $CONDA/envs/catalogbuilder/bin >> $GITHUB_PATH
-        # install catalogbuilder
-        $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder/bin .
+        # install catalogbuilder to conda env directories
+        $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder .
 
-    - name: Run pytest in catalogbuilder environment
+    - name: Run pytest in catalogbuilder conda environment
       run: |
         which python
         python --version
