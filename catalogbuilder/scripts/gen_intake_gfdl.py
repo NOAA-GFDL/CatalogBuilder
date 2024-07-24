@@ -12,7 +12,7 @@ logger.setLevel(logging.INFO)
 
 try:
    #from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
-   from . import gfdlcrawler, CSVwriter, builderconfig, configparser
+   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
 except ModuleNotFoundError:
     print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     print("Attempting again with adjusted sys.path ")
