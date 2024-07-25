@@ -3,9 +3,9 @@ package:
   version: 2.0.1
 
 source:
-  git_url: https://github.com/NOAA-GFDL/CatalogBuilder.git
-  git_branch: subpkgtest
   path: .
+# thank you bennet- the git url messes with conda build, which 
+# automatically checks out the default branch when given a URL
 
 build:
       script: "{{ PYTHON }} -m pip install . -vv"
@@ -27,7 +27,8 @@ requirements:
 test:
   imports:
     - catalogbuilder
-    - catalogbuilder.scripts
     - catalogbuilder.cats
+    - catalogbuilder.scripts
+    - catalogbuilder.scripts.gen_intake_gfdl
 about:
   home:

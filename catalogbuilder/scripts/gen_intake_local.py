@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import os
-from intakebuilder import localcrawler, CSVwriter
+#from intakebuilder import localcrawler, CSVwriter
+from . import localcrawler, CSVwriter
 import logging
 logger = logging.getLogger('local')
-hdlr = logging.FileHandler('/nbhome/a1r/logs/local.log')
+hdlr = logging.FileHandler('/nbhome/a1r/logs/local.log') #TODO this will break
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 

@@ -1,2 +1,2 @@
-recursive-include cats *
+recursive-include catalogbuilder/cats *
 
