@@ -1,5 +1,6 @@
 import os
-from intakebuilder import getinfo
+#from intakebuilder import getinfo
+from . import getinfo
 import re
 '''
 localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.

@@ -1,11 +1,11 @@
 name: publish_conda
 on:
-  pull_request:
+  push:
     branches:
-    #for testing the restructuring, back on push only later.
+    # only upload upon MR acceptance.
     - main
 jobs:
-  build_and_publish:
+  publish:
     runs-on: ubuntu-latest
     container:
       image: continuumio/miniconda3:latest

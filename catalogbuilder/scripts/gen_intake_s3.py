@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
-from intakebuilder import getinfo, s3crawler, CSVwriter
+#from intakebuilder import getinfo, s3crawler, CSVwriter
+from . import getinfo, s3crawler, CSVwriter
 import logging
 logger = logging.getLogger('local')
 hdlr = logging.FileHandler('/Users/ar46/logs/local.log')
