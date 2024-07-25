@@ -18,3 +18,8 @@ jobs:
         conda config --append channels noaa-gfdl
         conda install conda-build conda-verify
         conda build .
+    - name: Import Test with pytest
+      run: |
+        conda create catalogbuildertest 
+        conda install -n catalogbuildertest catalogbuilder --use-local
+        $CONDA/envs/catalogbuildertest/bin/pytest 
