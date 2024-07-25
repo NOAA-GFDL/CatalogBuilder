@@ -22,4 +22,5 @@ jobs:
       run: |
         conda create --name catalogbuildertest 
         conda install -n catalogbuildertest catalogbuilder --use-local
-        $CONDA/envs/catalogbuildertest/bin/pytest 
+        conda install -n catalogbuildertest pytest -c conda-forge
+        $CONDA/envs/catalogbuildertest/bin/pytest catalogbuilder
