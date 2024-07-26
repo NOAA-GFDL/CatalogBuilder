@@ -22,4 +22,5 @@ jobs:
       run: |
         conda create --name catalogbuildertest 
         conda install -n catalogbuildertest catalogbuilder --use-local
+        /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/tests/make_sample_data.py
         /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner.py
