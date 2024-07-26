@@ -187,6 +187,7 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     :return: dictInfo with institution_id version realm frequency and product
     '''
     filexra = return_xr(fname)
+    print(filexra)
     if dictInfo["institute"] == "NA":
       try:
           institute = filexra["institution_id"]
@@ -204,4 +205,11 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     frequency = filexra["frequency"]
     dictInfo["frequency"] = frequency
     return dictInfo
-
+def getInfoFromFileObject(filepath,dictInfo):
+    filexra = return_xr(filepath)
+    #print(dictInfo[variable_id])
+    #dictInfo["standard_name"] = filexra[dictInfo["variable_id"]]["standard_name"]
+    #try: 
+    #    dictInfo["standard_name"] = filexra[variable_id]["standard_name"]
+    #except:
+        #sys.exit("Unable to retrieve standard name")
