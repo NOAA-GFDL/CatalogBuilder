@@ -28,21 +28,8 @@ except ModuleNotFoundError:
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
 template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
-
-#Setting up argument parsing/flags
-@click.command()
-#TODO arguments dont have help message. So consider changing arguments to options?
-@click.argument('input_path',required=False,nargs=1)
-#,help='The directory path with the datasets to be cataloged. E.g a GFDL PP path till /pp')
-@click.argument('output_path',required=False,nargs=1)
-#,help='Specify output filename suffix only. e.g. catalog')
-@click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
-@click.option('--filter_realm', nargs=1)
-@click.option('--filter_freq', nargs=1)
-@click.option('--filter_chunk', nargs=1)
-@click.option('--overwrite', is_flag=True, default=False)
-@click.option('--append', is_flag=True, default=False)
-def main(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
+   
+def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False):
 
     configyaml = None
@@ -108,6 +95,24 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     print("CSV generated at:", os.path.abspath(csv_path))
     logger.info("CSV generated at" + os.path.abspath(csv_path))
 
+#Setting up argument parsing/flags
+@click.command()
+#TODO arguments dont have help message. So consider changing arguments to options?
+@click.argument('input_path',required=False,nargs=1)
+#,help='The directory path with the datasets to be cataloged. E.g a GFDL PP path till /pp')
+@click.argument('output_path',required=False,nargs=1)
+#,help='Specify output filename suffix only. e.g. catalog')
+@click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
+@click.option('--filter_realm', nargs=1)
+@click.option('--filter_freq', nargs=1)
+@click.option('--filter_chunk', nargs=1)
+@click.option('--overwrite', is_flag=True, default=False)
+@click.option('--append', is_flag=True, default=False)
 
+def create_catalog_cli(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
+         overwrite=False, append=False):
+    return create_catalog((input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
+         overwrite=False, append=False)
+                          
 if __name__ == '__main__':
-    main()
+    create_catalog_cli()
