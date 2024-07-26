@@ -6,6 +6,10 @@ from catalogbuilder.scripts import gen_intake_gfdl
 #from . import gen_intake_gfdl
 import sys
 
+#the following 2 lines are to generate sample data, remove it as needed in your runscript
+import make_sample_data
+make_sample_data.make_sample_data()
+
 input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
 output_path = "test"
 try:
