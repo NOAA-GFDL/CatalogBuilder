@@ -1,4 +1,4 @@
-name: build_conda
+name: conda-pkg-extra-tests
 on:
   pull_request:
     branches:
