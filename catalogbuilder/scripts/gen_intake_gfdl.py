@@ -114,7 +114,7 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
                       print("standard name from look-up table-", dictVarCF)
                       for k, v in dictVarCF.items():
                          #if(df['variable_id'].eq(k)).any():
-                         df['standard_name'].loc[(df['variable_id'].eq(k)).any()] = v
+                         df['standard_name'].loc[(df['variable_id'] == k)] = v
                              #df['standard_name'] = v 
     with open(csv_path, 'w') as csvfile:
        df.to_csv(csvfile)
