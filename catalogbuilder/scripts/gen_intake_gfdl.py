@@ -42,8 +42,9 @@ template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 @click.option('--filter_chunk', nargs=1)
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
+click.option('--slow','-s', is_flag=True, default=False)
 def main(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
-         overwrite=False, append=False):
+         overwrite=False, append=False, slow = False):
 
     configyaml = None
     # TODO error catching
@@ -89,7 +90,7 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.info("Calling gfdlcrawler.crawlLocal")
-    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, logger, configyaml)
+    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, logger, configyaml,slow)
     #Grabbing data from template JSON, changing CSV path to match output path, and dumping data in new JSON
     with open(template_path, "r") as jsonTemplate:
         data = json.load(jsonTemplate)
