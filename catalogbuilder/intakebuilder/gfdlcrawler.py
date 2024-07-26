@@ -1,17 +1,16 @@
 import os
 #from intakebuilder import getinfo, builderconfig
-from . import getinfo, builderconfig
+from . import getinfo, builderconfig, CSVwriter
 import sys
 import re
 import operator as op
 '''
 localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
 It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
-
 '''
-def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml):
+def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     '''
-    Craw through the local directory and run through the getInfo.. functions
+    crawl through the local directory and run through the getInfo.. functions
     :param projectdir:
     :return:listfiles which has a dictionary of all key/value pairs for each file to be added to the csv
     '''
@@ -74,6 +73,16 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml):
                rmkeys = list(set(rmkeys))
 
                for k in rmkeys: dictInfo.pop(k,None)
+               # todo do the reverse if slow is on. Open file no matter what and populate dictionary values and if there is something missed out
+               # we can scan filenames or config etc 
+               #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
+               if (slow == True) & (bool(dictInfo) == True) :
+                    print("Slow option turned on.. lets open some files using xarray and lookup atts",filename)
+                    headers = CSVwriter.getHeader(configyaml)
+                    if "standard_name" in headers:
+                        dictInfo["standard_name"] = "na"
+                        getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
  
                listfiles.append(dictInfo)
+
     return listfiles

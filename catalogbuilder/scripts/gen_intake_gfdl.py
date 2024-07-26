@@ -11,7 +11,6 @@ logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 
 try:
-   #from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
 except ModuleNotFoundError:
     print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
@@ -23,6 +22,7 @@ except ModuleNotFoundError:
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
         from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
+        print(gfdlcrawler.__file__)
     except ModuleNotFoundError:
         sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
 
@@ -42,7 +42,7 @@ template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 @click.option('--filter_chunk', nargs=1)
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
-click.option('--slow','-s', is_flag=True, default=False)
+@click.option('--slow','-s', is_flag=True, default=False)
 def main(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False, slow = False):
 

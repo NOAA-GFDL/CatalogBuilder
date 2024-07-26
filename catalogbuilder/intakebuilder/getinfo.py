@@ -178,7 +178,25 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
 def return_xr(fname):
     filexr = (xr.open_dataset(fname))
     filexra = filexr.attrs
-    return filexra
+    return filexr,filexra
+def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
+    '''
+    Returns info from the filename and xarray dataset object
+    :param fname: filename
+    :param filexr: Xarray dataset object
+    :return: dictInfo with all variable atts 
+    '''
+    #try:
+    filexr,filexra = return_xr(fname)
+    print("Variable atts from file:",filexr[variable_id])
+    if (dictInfo[att] == "na"):
+      try:
+          cfname = filexr[variable_id].attrs["standard_name"]
+      except KeyError:
+          cfname = "NA"
+      dictInfo["standard_name"] = cfname 
+      print("standard_name found",dictInfo["standard_name"])
+    return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
     Returns info from the filename and xarray dataset object
