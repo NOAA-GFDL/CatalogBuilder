@@ -223,11 +223,12 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     dictInfo["frequency"] = frequency
     return dictInfo
 
-def getStandardName(variable_id):
+def getStandardName(list_variable_id):
   '''
-  Returns standard name for the variable in question
+  Returns dict standard name for the variable in question
   ''' 
   unique_cf = "na"
+  dictCF = {}
   try:
       url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/b5e7916c203f3ba0b53e9e40fb8dc78ecc2cf5c3/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
       df = pd.read_csv(url, sep=",", header=0,index_col=False)
@@ -235,13 +236,14 @@ def getStandardName(variable_id):
             print("Unable to open file")
             sys.exit(1)
   #search for variable and its cf name
-  cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
-  #cfname.to_string(index=False).tolist()
-  list_cfname = cfname.tolist()
-  if not list_cfname:
-    print("what if the names correspond to CMOR_varname")
-    cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
-  list_cfname = cfname.tolist()
-  if len(list_cfname) > 0:
-      unique_cf = list(set(list_cfname))[0]
-  return (unique_cf)
+  for variable_id in list_variable_id:
+     cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
+     list_cfname = cfname.tolist()
+     if not list_cfname:
+        print("what if the names correspond to CMOR_varname")
+        cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
+        list_cfname = cfname.tolist()
+     if len(list_cfname) > 0:
+       unique_cf = list(set(list_cfname))[0]
+     dictCF[variable_id] = unique_cf
+  return (dictCF)

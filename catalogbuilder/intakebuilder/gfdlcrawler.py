@@ -88,11 +88,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                       rmkeys.append(dkeys) 
                rmkeys = list(set(rmkeys))
                for k in rmkeys: dictInfo.pop(k,None)
-               if (bool(dictInfo)) & ("standard_name" in missingcols) & (slow == False):
-               #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
-                   cfname = getinfo.getStandardName(dictInfo["variable_id"])
-                   dictInfo["standard_name"] = cfname
-                   print("standard name from look-up table-", cfname)
                # todo do the reverse if slow is on. Open file no matter what and populate dictionary values and if there is something missed out
                # we can scan filenames or config etc 
                #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
@@ -104,5 +99,4 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                         getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
  
                listfiles.append(dictInfo)
-
     return listfiles
