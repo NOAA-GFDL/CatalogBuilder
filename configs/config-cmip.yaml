@@ -13,9 +13,9 @@
 #with the ESM collection specification standards and the appropriate workflows.
 
 headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
-                  "frequency", "modeling_realm", "table_id",
+                  "frequency", "realm", "table_id",
                   "member_id", "grid_label", "variable_id","version_id",
-                  "temporal_subset", "chunk_freq","platform","dimensions","cell_methods","path"]
+                  "time_range", "chunk_freq","platform","dimensions","cell_methods","path"]
 
 #what kind of directory structure to expect?
 #For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
@@ -30,7 +30,7 @@ headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
 #/uda/CMIP6/CMIP/NOAA-GFDL/GFDL-ESM4/1pctCO2/r1i1p1f1/Amon/tas/gr1/v20180701/tas_Amon_GFDL-ESM4_1pctCO2_r1i1p1f1_gr1_000101-010012.nc
 output_path_template: ['NA','activity_id','NA','institution_id','source_id','experiment_id','member_id','table_id','variable_id','grid_label','version_id']
 
-output_file_template: ['variable_id','table_id','source_id','experiment_id','member_id','grid_label','temporal_subset']
+output_file_template: ['variable_id','table_id','source_id','experiment_id','member_id','grid_label','time_range']
 
 #OUTPUT FILE INFO is currently passed as command-line argument.
 #We will revisit adding a csvfile, jsonfile and logfile configuration to the builder configuration file in the future.
