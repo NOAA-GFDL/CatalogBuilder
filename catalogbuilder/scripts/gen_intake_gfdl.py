@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import json
-import sys
+import sys,pandas as pd
 import click
 import os
 from pathlib import Path
@@ -11,7 +11,7 @@ logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 
 try:
-   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
+   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
 except ModuleNotFoundError:
     print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     print("Attempting again with adjusted sys.path ")
@@ -21,7 +21,7 @@ except ModuleNotFoundError:
        print("Unable to adjust sys.path")
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
-        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser
+        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
         print(gfdlcrawler.__file__)
     except ModuleNotFoundError:
         sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
@@ -104,7 +104,21 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     # so we check if it's a directory first
     if os.path.isdir(os.path.dirname(csv_path)):
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
-    CSVwriter.listdict_to_csv(list_files, headers, csv_path, overwrite, append)
+    CSVwriter.listdict_to_csv(list_files, headers, csv_path, overwrite, append,slow)
+    if(slow == False):
+               #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
+                      df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
+                      list_variable_id = []
+                      list_variable_id = df["variable_id"].tolist()
+                      dictVarCF = getinfo.getStandardName(list_variable_id)
+                      print("standard name from look-up table-", dictVarCF)
+                      for k, v in dictVarCF.items():
+                         #if(df['variable_id'].eq(k)).any():
+                         df['standard_name'].loc[(df['variable_id'].eq(k)).any()] = v
+                             #df['standard_name'] = v 
+    with open(csv_path, 'w') as csvfile:
+       df.to_csv(csvfile)
+
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
     logger.info("CSV generated at" + os.path.abspath(csv_path))
