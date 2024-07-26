@@ -109,9 +109,8 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
 
-def create_catalog_cli(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
-         overwrite=False, append=False):
-    return create_catalog(input_path,output_path,config,filter_realm,filter_freq,filter_chunk,overwrite,append)
+def create_catalog_cli(**kwargs):
+    return create_catalog(**kwargs)
                           
 if __name__ == '__main__':
     create_catalog_cli()
