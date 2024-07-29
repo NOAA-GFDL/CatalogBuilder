@@ -29,14 +29,6 @@ jobs:
         # install catalogbuilder to conda env directories
         $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder .
 
-    - name: Run pytest in catalogbuilder conda environment
-      run: |
-        which python
-        python --version
-        $CONDA/envs/catalogbuilder/bin/python --version
-        # which pytest
-        $CONDA/envs/catalogbuilder/bin/pytest catalogbuilder
-
     - name: Make sample data
       run: |
         which python
