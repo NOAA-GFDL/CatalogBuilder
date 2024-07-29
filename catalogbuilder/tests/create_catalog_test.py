@@ -1,12 +1,8 @@
-#!/usr/bin/env python
-
-import catalogbuilder
-from catalogbuilder.scripts import gen_intake_gfdl
-import sys
-#the following line is to generate sample data, remove it as needed in your runscript
-
 @pytest.mark.skip
 def create_catalog(sample=True):
+  import catalogbuilder
+  from catalogbuilder.scripts import gen_intake_gfdl
+  import sys
   if(sample == True): #create sample data 
       import make_sample_data
       make_sample_data.make_sample_data()
