@@ -105,6 +105,7 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     if os.path.isdir(os.path.dirname(csv_path)):
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     CSVwriter.listdict_to_csv(list_files, headers, csv_path, overwrite, append,slow)
+    df = None
     if(slow == False) & ('standard_name' in headers ):
                #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
                       df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
@@ -116,8 +117,11 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
                          #if(df['variable_id'].eq(k)).any():
                          df['standard_name'].loc[(df['variable_id'] == k)] = v
                              #df['standard_name'] = v 
-    with open(csv_path, 'w') as csvfile:
-       df.to_csv(csvfile)
+   
+   if(slow == False) & ('standard_name' in headers ):
+       if ((df is not None) & (len(df) != 0) ):
+           with open(csv_path, 'w') as csvfile:
+               df.to_csv(csvfile)
 
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
