@@ -6,7 +6,8 @@ import os
 import xarray as xr
 #from intakebuilder import builderconfig, configparser
 from . import builderconfig, configparser 
-
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 '''
 getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
