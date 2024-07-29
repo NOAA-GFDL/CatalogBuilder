@@ -21,6 +21,6 @@ def create_catalog(sample=True):
         create_data_catalog(path)
         json, csv = Path(f"{output}.json").resolve(), Path(f"{output}.csv").resolve()
 
- try:
+  try:
        assert not None in [csv,json]
 
