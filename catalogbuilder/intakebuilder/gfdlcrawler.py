@@ -29,10 +29,13 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     #For those columns that we cannot find in output path template or output file template from config yaml, we have hooks
     #now to look up the netcdf dataset if slow option is True
     #todo catch exceptions upon furhter testing
-    list_ptemplate = configyaml.output_path_template
-    list_ftemplate = configyaml.output_file_template
-    set_ptemplate = set(list_ptemplate)
-    set_ftemplate = set(list_ftemplate)
+    list_ptemplate = []
+    list_ftemplate = []
+    if( configyaml.output_path_template is not None) & (configyaml.output_file_template is not None) :
+        list_ptemplate = configyaml.output_path_template
+        list_ftemplate = configyaml.output_file_template
+        set_ptemplate = set(list_ptemplate)
+        set_ftemplate = set(list_ftemplate)
     #print(headerlist)
     #print(list_ptemplate)
     #print(list_ftemplate)
