@@ -105,7 +105,7 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     if os.path.isdir(os.path.dirname(csv_path)):
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     CSVwriter.listdict_to_csv(list_files, headers, csv_path, overwrite, append,slow)
-    if(slow == False):
+    if(slow == False) & ('standard_name' in headers ):
                #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
                       df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
                       list_variable_id = []
