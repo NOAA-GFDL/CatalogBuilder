@@ -6,7 +6,8 @@ import os
 import xarray as xr
 #from intakebuilder import builderconfig, configparser
 from . import builderconfig, configparser 
-
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 '''
 getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
@@ -178,7 +179,25 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
 def return_xr(fname):
     filexr = (xr.open_dataset(fname))
     filexra = filexr.attrs
-    return filexra
+    return filexr,filexra
+def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
+    '''
+    Returns info from the filename and xarray dataset object
+    :param fname: filename
+    :param filexr: Xarray dataset object
+    :return: dictInfo with all variable atts 
+    '''
+    #try:
+    filexr,filexra = return_xr(fname)
+    #print("Variable atts from file:",filexr[variable_id])
+    if (dictInfo[att] == "na"):
+      try:
+          cfname = filexr[variable_id].attrs["standard_name"]
+      except KeyError:
+          cfname = "NA"
+      dictInfo["standard_name"] = cfname 
+      print("standard_name found",dictInfo["standard_name"])
+    return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
     Returns info from the filename and xarray dataset object
@@ -205,3 +224,27 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     dictInfo["frequency"] = frequency
     return dictInfo
 
+def getStandardName(list_variable_id):
+  '''
+  Returns dict standard name for the variable in question
+  ''' 
+  unique_cf = "na"
+  dictCF = {}
+  try:
+      url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/b5e7916c203f3ba0b53e9e40fb8dc78ecc2cf5c3/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
+      df = pd.read_csv(url, sep=",", header=0,index_col=False)
+  except IOError:
+            print("Unable to open file")
+            sys.exit(1)
+  #search for variable and its cf name
+  for variable_id in list_variable_id:
+     cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
+     list_cfname = cfname.tolist()
+     if not list_cfname:
+        #print("what if the names correspond to CMOR_varname")
+        cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
+        list_cfname = cfname.tolist()
+     if len(list_cfname) > 0:
+       unique_cf = list(set(list_cfname))[0]
+     dictCF[variable_id] = unique_cf
+  return (dictCF)

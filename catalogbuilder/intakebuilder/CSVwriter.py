@@ -1,5 +1,6 @@
 import os.path
 import csv
+import pandas as pd
 from csv import writer
 #from intakebuilder import builderconfig, configparser
 from . import builderconfig, configparser 
@@ -40,7 +41,7 @@ def file_appender(dictinputs, csvfile):
         # add contents of list as last row in the csv file
         csv_writer.writerow(dictinputs)
 
-def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append):
+def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
     try:
         #Open the CSV file in write mode and add any data with atleast 3 values associated with it
         if overwrite:
@@ -95,5 +96,6 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append):
                     for data in dict_info:
                         if len(data.keys()) > 2:
                             writer.writerow(data)
+     
     except IOError:
         print("I/O error")
