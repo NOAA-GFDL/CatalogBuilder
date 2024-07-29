@@ -87,6 +87,8 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger):
         ncfilename = filename.split(".")
         varname = ncfilename[-2]
         dictInfo["variable_id"] = varname
+        timerange = ncfilename[-3]
+        dictInfo["time_range"] = timerange
         #miptable = "" #ncfilename[1]
         #dictInfo["mip_table"] = miptable
         #modelname = ncfilename[2]
