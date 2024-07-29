@@ -188,7 +188,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     '''
     #try:
     filexr,filexra = return_xr(fname)
-    print("Variable atts from file:",filexr[variable_id])
+    #print("Variable atts from file:",filexr[variable_id])
     if (dictInfo[att] == "na"):
       try:
           cfname = filexr[variable_id].attrs["standard_name"]
@@ -240,7 +240,7 @@ def getStandardName(list_variable_id):
      cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
      list_cfname = cfname.tolist()
      if not list_cfname:
-        print("what if the names correspond to CMOR_varname")
+        #print("what if the names correspond to CMOR_varname")
         cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
         list_cfname = cfname.tolist()
      if len(list_cfname) > 0:

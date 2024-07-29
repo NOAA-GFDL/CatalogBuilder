@@ -111,7 +111,7 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
                       list_variable_id = []
                       list_variable_id = df["variable_id"].tolist()
                       dictVarCF = getinfo.getStandardName(list_variable_id)
-                      print("standard name from look-up table-", dictVarCF)
+                      #print("standard name from look-up table-", dictVarCF)
                       for k, v in dictVarCF.items():
                          #if(df['variable_id'].eq(k)).any():
                          df['standard_name'].loc[(df['variable_id'] == k)] = v
