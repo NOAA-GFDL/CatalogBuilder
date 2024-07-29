@@ -31,6 +31,9 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     #todo catch exceptions upon furhter testing
     list_ptemplate = []
     list_ftemplate = []
+    set_ptemplate = set()
+    set_ftemplate = set()
+
     if( configyaml is not None):
         if (configyaml.output_path_template is not None) & (configyaml.output_file_template is not None) :
           list_ptemplate = configyaml.output_path_template
