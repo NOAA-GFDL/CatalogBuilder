@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+__author__ = "A.Radhakrishnan"
 
 from catalogbuilder.scripts import gen_intake_gfdl
-#from . import gen_intake_gfdl
 import sys
 #the following line is to generate sample data, remove it as needed in your runscript
 import make_sample_data
