@@ -18,9 +18,20 @@ jobs:
         conda config --append channels noaa-gfdl
         conda install conda-build conda-verify
         conda build .
-    - name: Import Test with pytest
+    - name: Run additional utilities as tests
       run: |
         conda create --name catalogbuildertest 
         conda install -n catalogbuildertest catalogbuilder --use-local
         /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/tests/make_sample_data.py
         /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner.py
+        #we will save the output from following alone as manifest
+        /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner_config.py
+    - name: upload-artifacts
+      uses: actions/upload-artifact@v4
+      with:
+          name: workflow-artifacts1 
+          path: |
+            sample-mdtf-catalog.csv
+            sample-mdtf-catalog.json
+    - name: Download all workflow run artifacts
+      uses: actions/download-artifact@v4
