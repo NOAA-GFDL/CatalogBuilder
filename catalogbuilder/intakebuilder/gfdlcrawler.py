@@ -40,10 +40,12 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     #print(headerlist)
     #print(list_ptemplate)
     #print(list_ftemplate)
-    diffcols  = [x for x in headerlist  if x not in set_ptemplate]
-    missingcols = [col for col in diffcols if col not in set_ftemplate]
-    missingcols.remove("path") #because we get this anyway
-    print("Missing cols from metadata sources:", missingcols)
+    if (len(set_ptemplate) > 0):
+       diffcols  = [x for x in headerlist  if x not in set_ptemplate]
+    if ( len(set_ftemplate) > 0 ):
+      missingcols = [col for col in diffcols if col not in set_ftemplate]
+      missingcols.remove("path") #because we get this anyway
+      print("Missing cols from metadata sources:", missingcols)
 
    
     #TODO INCLUDE filter in traversing through directories at the top
