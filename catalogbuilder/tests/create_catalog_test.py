@@ -20,7 +20,6 @@ def create_catalog(sample=True):
            sys.exit("Exception occured calling gen_intake_gfdl.create_catalog")
         create_data_catalog(path)
         json, csv = Path(f"{output}.json").resolve(), Path(f"{output}.csv").resolve()
-
-  try:
-       assert not None in [csv,json]
+    
+  assert not None in [csv,json]
 
