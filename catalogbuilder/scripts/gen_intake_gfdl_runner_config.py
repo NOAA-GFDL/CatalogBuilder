@@ -3,10 +3,19 @@
 from catalogbuilder.scripts import gen_intake_gfdl
 import sys
 
-#input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-#output_path = "cftest"
-configyaml = "configs/config-example.yml"
+#This is an example call to run catalog builder using a yaml config file.
+
+configyaml = os.path.join(package_dir, '../configs/config-example.yml')"
 gen_intake_gfdl.create_catalog(config=configyaml)
-#except:
-#  sys.exit("Exception occured calling gen_intake_gfdl.create_catalog")
-  
+
+#to output success/failure 
+
+csv = "/home/runner/work/forkCatalogBuilder-/sample-mdtf-catalog.csv"
+json = "/home/runner/work/forkCatalogBuilder-/sample-mdtf-catalog.json"
+
+csvpath = Path(csv)
+jsonpath = Path(json)
+
+assert csvpath.is_file()
+assert csvpath.is_file()
+
