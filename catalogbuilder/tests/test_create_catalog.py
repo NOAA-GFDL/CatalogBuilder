@@ -1,4 +1,3 @@
-@pytest.mark.skip
 def test_create_catalog():
       import catalogbuilder
       from catalogbuilder.scripts import gen_intake_gfdl_runner_config
