@@ -1,4 +1,3 @@
-@pytest.mark.xfail
 def create_catalog(sample=True):
   import catalogbuilder
   from catalogbuilder.scripts import gen_intake_gfdl
