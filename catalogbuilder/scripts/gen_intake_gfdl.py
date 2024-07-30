@@ -110,6 +110,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
     logger.info("CSV generated at" + os.path.abspath(csv_path))
+    return(os.path.abspath(csv_path),os.path.abspath(json_path))
 
 #Setting up argument parsing/flags
 @click.command()
