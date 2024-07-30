@@ -26,6 +26,7 @@ def make_sample_data():
     except:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         import subdirs
+    from subdirs import *
     realm_ctr = (len(subdirs.realm))
     i = 0
     for j in range(0, realm_ctr):
