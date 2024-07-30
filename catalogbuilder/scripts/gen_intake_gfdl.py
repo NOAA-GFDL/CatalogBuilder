@@ -101,7 +101,6 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                          #if(df['variable_id'].eq(k)).any():
                          df['standard_name'].loc[(df['variable_id'] == k)] = v
                              #df['standard_name'] = v 
-   
     if(slow == False) & ('standard_name' in headers):
        if ((df is not None) & (len(df) != 0) ):
            with open(csv_path, 'w') as csvfile:
@@ -110,7 +109,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
     logger.info("CSV generated at" + os.path.abspath(csv_path))
-    return(os.path.abspath(csv_path),os.path.abspath(json_path))
+    return(csv_path,json_path)
 
 #Setting up argument parsing/flags
 @click.command()
