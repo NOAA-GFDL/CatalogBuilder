@@ -245,12 +245,14 @@ def getStandardName(list_variable_id):
   #search for variable and its cf name
   for variable_id in list_variable_id:
      cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
+     #print(cfname,variable_id)
      list_cfname = cfname.tolist()
-     if not list_cfname:
+     if(len(list_cfname) == 0):
         #print("what if the names correspond to CMOR_varname")
         cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
         list_cfname = cfname.tolist()
+        #print(list_cfname)
      if len(list_cfname) > 0:
        unique_cf = list(set(list_cfname))[0]
-     dictCF[variable_id] = unique_cf
+       dictCF[variable_id] = unique_cf
   return (dictCF)
