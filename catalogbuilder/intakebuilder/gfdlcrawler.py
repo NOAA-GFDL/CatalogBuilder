@@ -106,6 +106,15 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                     if "standard_name" in missingcols: 
                         dictInfo["standard_name"] = "na"
                         getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
- 
+               #replace frequency as needed 
+               if 'frequency' in dictInfo.keys():
+                      package_dir = os.path.dirname(os.path.abspath(__file__))
+                      yamlfile = os.path.join(package_dir, 'dat/gfdlcmipfreq.yaml')
+                      cmipfreq = None
+                      gfdlfreq = dictInfo['frequency']  
+                      cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
+                      if(cmipfreq is not None):
+                          dictInfo['frequency'] = cmipfreq 
+                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq)  
                listfiles.append(dictInfo)
     return listfiles

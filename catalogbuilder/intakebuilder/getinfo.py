@@ -42,6 +42,19 @@ def getinfoFromYAML(dictInfo,yamlfile,miptable=None):
                 dictInfo["realm"]  = "NA"
     return(dictInfo)
 
+def getFreqFromYAML(yamlfile,gfdlfreq=None):
+    #returns cmip freq for gfdl pp freq 
+    import yaml
+    cmipfreq = None
+    with open(yamlfile) as f:
+        mappings = yaml.load(f, Loader=yaml.FullLoader)
+        if(gfdlfreq):
+            try:
+                cmipfreq = mappings[gfdlfreq]["frequency"]
+            except KeyError:
+                cmipfreq = None 
+    return(cmipfreq)
+
 def getStem(dirpath,projectdir):
     '''
     return stem from the project directory passed and the files crawled within
