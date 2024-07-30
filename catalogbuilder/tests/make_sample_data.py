@@ -12,8 +12,6 @@ Date: Nov 15, 2023
 
 """
 import os
-import subdirs
-from subdirs import *
 from pathlib import Path
 
 realm_mapping = [realm]
