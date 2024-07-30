@@ -38,4 +38,4 @@ output_file_template: ['realm','time_range','variable_id']
 #######################################################
 
 input_path:  "/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/"
-output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)
+output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip30" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)

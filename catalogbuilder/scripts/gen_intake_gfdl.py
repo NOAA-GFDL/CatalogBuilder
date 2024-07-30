@@ -117,7 +117,7 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
                          #if(df['variable_id'].eq(k)).any():
                          df['standard_name'].loc[(df['variable_id'] == k)] = v
                              #df['standard_name'] = v 
-   
+    print(headers) 
     if(slow == False) & ('standard_name' in headers):
        if ((df is not None) & (len(df) != 0) ):
            with open(csv_path, 'w') as csvfile:

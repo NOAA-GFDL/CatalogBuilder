@@ -81,29 +81,35 @@ def getInfoFromFilename(filename,dictInfo,logger):
     return dictInfo
 
 #adding this back to trace back some old errors
-def getInfoFromGFDLFilename(filename,dictInfo,logger):
+def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-    if(filename.endswith(".nc")): #and not filename.startswith(".")):
-        ncfilename = filename.split(".")
-        varname = ncfilename[-2]
-        dictInfo["variable_id"] = varname
-        #miptable = "" #ncfilename[1]
-        #dictInfo["mip_table"] = miptable
-        #modelname = ncfilename[2]
-        #dictInfo["model"] = modelname
-        #expname = ncfilename[3]
-        #dictInfo["experiment_id"] = expname
-        #ens = ncfilename[4]
-        #dictInfo["ensemble_member"] = ens
-        #grid = ncfilename[5]
-        #dictInfo["grid_label"] = grid
-        try:
-           tsubset = ncfilename[1]
-        except IndexError:
-           tsubset = "null" #For fx fields
-        dictInfo["temporal_subset"] = tsubset
+  if ( (filename.endswith(".nc"))): # & ("static" not in filename)) ): 
+    stemdir = filename.split(".")
+    #lets go backwards and match given input directory to the template, add things to dictInfo
+    j = -2
+    cnt = 1 #'variable_id': 'static', 'time_range': 'land'}
+    if configyaml:
+        output_file_template = configyaml.output_file_template
     else:
-        logger.debug("Filename not compatible with this version of the builder:"+filename)
+        try:
+            output_file_template = builderconfig.output_file_template
+        except:
+            sys.exit("No output_path_template found. Check configuration.")
+    #output_file_template.reverse()
+    nlen = len(output_file_template)
+    for i in range(nlen-1,-1,-1): #nlen = 3
+      try:
+          if(output_file_template[i] != "NA"):
+              try:
+                  #print(output_file_template[i], "=" , stemdir[(j)])
+                  dictInfo[output_file_template[i]] = stemdir[(j)]
+              except IndexError:
+                  #print("Check configuration. Is output file template set correctly?")
+                  dictInfo[output_file_template[i]] = ""
+      except IndexError:
+          sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
+      j = j - 1
+    cnt = cnt + 1
     return dictInfo
 
 def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
