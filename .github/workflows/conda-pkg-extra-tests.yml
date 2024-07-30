@@ -22,16 +22,17 @@ jobs:
       run: |
         conda create --name catalogbuildertest 
         conda install -n catalogbuildertest catalogbuilder --use-local
-        /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/tests/make_sample_data.py
-        /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner.py
+        /opt/conda/envs/catalogbuildertest/bin/pytest catalogbuilder/tests/test_create_catalog.py
+        #/opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/tests/make_sample_data.py
+        #/opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner.py
         #we will save the output from following alone as manifest
-        /opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner_config.py
+        #/opt/conda/envs/catalogbuildertest/bin/python catalogbuilder/scripts/gen_intake_gfdl_runner_config.py
     - name: upload-artifacts
       uses: actions/upload-artifact@v4
       with:
           name: workflow-artifacts1 
           path: |
-            sample-mdtf-catalog.csv
-            sample-mdtf-catalog.json
+            /home/runner/work/forkCatalogBuilder-/sample-mdtf-catalog.csv
+            /home/runner/work/forkCatalogBuilder-/sample-mdtf-catalog.json
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v4
