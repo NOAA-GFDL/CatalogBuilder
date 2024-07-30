@@ -1,5 +1,5 @@
 @pytest.mark.skip
-def create_catalog(sample=True):
+def test_create_catalog(sample=True):
   import catalogbuilder
   from catalogbuilder.scripts import gen_intake_gfdl
   import sys
