@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from catalogbuilder.scripts import gen_intake_gfdl
-import sys
+import sys, os 
 
 #This is an example call to run catalog builder using a yaml config file.
 
