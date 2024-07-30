@@ -1,20 +1,18 @@
 @pytest.mark.skip
 def test_create_catalog(sample=True):
   import catalogbuilder
-  from catalogbuilder.scripts import gen_intake_gfdl
+  from catalogbuilder.scripts import gen_intake_gfdl_runner_config
   import sys
   if(sample == True): #create sample data 
       import make_sample_data
       make_sample_data.make_sample_data()
-  with TemporaryDirectory() as tmp:
-        chdir(Path(tmp))
-        input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-        output_path = "test"
-        try:
-           json, csv = gen_intake_gfdl.create_catalog(input_path,output_path)
-        except:
-           sys.exit("Exception occured calling gen_intake_gfdl.create_catalog")
-        json, csv = Path(f"{output}.json").resolve(), Path(f"{output}.csv").resolve()
-    
-  assert not None in [csv,json]
+      json, csv = gen_intake_gfdl_runner_config.create_catalog_from_config()
+      #to output success/failure in pytest run with conda pkg local install in extra-tests CI workflow#
+      csv = "/home/runner/work/forkCatalogBuilder-/sample-mdtf-catalog.csv"
+      json = "/home/runner/work/forkCatalogBuilder-/sample-mdtf-catalog.json"
+      csvpath = Path(csv)
+      jsonpath = Path(json)
+      assert csvpath.is_file()
+      assert jsonpath.is_file()
+  
 
