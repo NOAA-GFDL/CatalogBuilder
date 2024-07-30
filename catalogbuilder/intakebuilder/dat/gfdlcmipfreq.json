@@ -1,0 +1,20 @@
+{
+    "frequency":{
+        "1hr":"1hr",
+        "1hrCM":"1hrCM",
+        "1hrPt":"1hrPt",
+        "3hr":"3hr",
+        "3hrPt":"3hrPt",
+        "6hr":"6hr",
+        "6hrPt":"6hrPt",
+        "daily":"day",
+        "dec":"dec",
+        "fx":"fx",
+        "monthly":"mon"
+        "monC":"monC",
+        "monPt":"monPt",
+        "subhrPt":"subhrPt",
+        "yr":"yr",
+        "yrPt":"yrPt"
+    }
+}
