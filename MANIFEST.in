@@ -1,2 +1,2 @@
 recursive-include catalogbuilder/cats *
-
+recursive-include catalogbuilder/intakebuilder/dat *
