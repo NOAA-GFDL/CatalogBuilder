@@ -35,7 +35,25 @@ Using conda package
 
   conda install catalogbuilder -c noaa-gfdl
 
-This package contains all dependencies needed to run the catalog builder.
+If you're trying these steps from GFDL, likely that you may need to do additional things to get it to work. See below
+  
+Add these to your ~/.condarc file 
+
+whitelist_channels:
+  - noaa-gfdl
+  - conda-forge
+  - anaconda
+channels:
+  - noaa-gfdl
+  - conda-forge
+  - anaconda
+
+(and try: conda config --add channels noaa-gfdl conda config --append channels conda-forge)
+
+If you encounter issues "ChecksumMismatchError: Conda detected a mismatch between the expected.." , do the following:
+
+conda config --add pkgs_dirs /local2/home/conda/pkgs
+conda config --add envs_dirs /local2/home/conda/envs
 
 **2. Add conda environment's site packages to PATH**
 
@@ -63,28 +81,38 @@ This would create a catalog.csv and catalog.json in the user's home directory.
 
 See `Flags`_ here.
 
+From a Python script
+---------------------
+
+See example `here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/mdtf-support/catalogbuilder/scripts/gen_intake_gfdl_runner_config.py>`_
+
+
+Here is another example
+
+.. code-block:: console
+
+ #!/usr/bin/env python
+
+ #TODO test after conda pkg is published and make changes as needed 
+ from catalogbuilder.scripts import gen_intake_gfdl
+ import sys
+
+ input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
+ output_path = "test"
+ try:
+  gen_intake_gfdl.create_catalog(input_path,output_path)
+ except:
+  sys.exit("Exception occured calling gen_intake_gfdl.create_catalog")
+
 From Jupyter Notebook
 ---------------------
 
 Refer to this `notebook <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/scripts/gen_intake_gfdl_notebook.ipynb>`_ to see how you can generate catalogs from a Jupyter Notebook
 
+
 .. image:: _static/catalog_generation.png
   :alt: Screenshot of a notebook showing catalog generation
 
-You may also run a simple `python script <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/scripts/gen_intake_gfdl_runner.py>`_ and generate the catalogs.
-`Here <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/scripts/gen_intake_gfdl_runner_config.py>`_ is another example of a runner script that uses a configuration file. 
-
-
-.. code-block:: console
-
-  #!/usr/bin/env python
-  from scripts import gen_intake_gfdl
-  import sys
-  input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
-  output_path = "$HOME/catalog"
-  sys.argv = ['INPUT_PATH', input_path, output_path]
-  print(sys.argv)
-  gen_intake_gfdl.main()
 
 Using FRE-CLI (GFDL only)
 -------------------------
