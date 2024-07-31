@@ -15,7 +15,7 @@
 headerlist = ["activity_id", "institution_id", "source_id", "experiment_id",
                   "frequency", "realm", "table_id",
                   "member_id", "grid_label", "variable_id",
-                  "temporal_subset", "chunk_freq","grid_label","platform","dimensions","cell_methods","path"]
+                  "time_range", "chunk_freq","grid_label","platform","dimensions","cell_methods","path"]
 
 #what kind of directory structure to expect?
 #For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
@@ -29,7 +29,7 @@ headerlist = ["activity_id", "institution_id", "source_id", "experiment_id",
 
 
 output_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','realm','cell_methods','frequency','chunk_freq']
-output_file_template = ['realm','temporal_subset','variable_id']
+output_file_template = ['realm','time_range','variable_id']
 
 #OUTPUT FILE INFO is currently passed as command-line argument.
 #We will revisit adding a csvfile, jsonfile and logfile configuration to the builder configuration file in the future.
