@@ -35,7 +35,25 @@ Using conda package
 
   conda install catalogbuilder -c noaa-gfdl
 
-This package contains all dependencies needed to run the catalog builder.
+If you're trying these steps from GFDL, likely that you may need to do additional things to get it to work. See below
+  
+Add these to your ~/.condarc file 
+
+whitelist_channels:
+  - noaa-gfdl
+  - conda-forge
+  - anaconda
+channels:
+  - noaa-gfdl
+  - conda-forge
+  - anaconda
+
+(and try: conda config --add channels noaa-gfdl conda config --append channels conda-forge)
+
+If you encounter issues "ChecksumMismatchError: Conda detected a mismatch between the expected.." , do the following:
+
+conda config --add pkgs_dirs /local2/home/conda/pkgs
+conda config --add envs_dirs /local2/home/conda/envs
 
 **2. Add conda environment's site packages to PATH**
 
@@ -63,28 +81,77 @@ This would create a catalog.csv and catalog.json in the user's home directory.
 
 See `Flags`_ here.
 
+Using a configuration file
+--------------------------
+
+We recommend the use of a configuration file to provide input to the catalog builder. This is necessary and useful if you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented.
+
+`Here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml>`_ is an example configuration file.
+
+Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
+
+.. code-block:: yaml
+   
+ #Catalog Headers
+ headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
+                  "frequency", "realm", "table_id",
+                  "member_id", "grid_label", "variable_id",
+                  "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
+
+The headerlist is expected column names in your catalog/csv file. This is usually determined by the users in conjuction
+with the ESM collection specification standards and the appropriate workflows.
+
+.. code-block:: yaml
+
+ #Directory structure information
+ output_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','modeling_realm','cell_methods','frequency','chunk_freq']
+
+For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
+the output_path_template is set as above. We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we
+simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply NA in output_path_template for the fourth value. We have NA in values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. #The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply set NA in output_path_template for the fourth value.
+
+.. code-block:: yaml
+
+ #Filename information
+  output_file_template = ['modeling_realm','temporal_subset','variable_id']
+
+.. code-block:: yaml
+
+ #Input directory and output info
+  input_path:  "/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/"
+  output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can  be an absolute or a relative path
+
+From a Python script
+---------------------
+Do you have a python script or a notebook where you could also include steps to generate a data catalog? 
+See example `here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/scripts/gen_intake_gfdl_runner_config.py>`_
+
+Here is another example
+
+.. code-block:: console
+
+ #!/usr/bin/env python
+
+ #TODO test after conda pkg is published and make changes as needed 
+ from catalogbuilder.scripts import gen_intake_gfdl
+ import sys
+
+ input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
+ output_path = "test"
+ try:
+  gen_intake_gfdl.create_catalog(input_path,output_path)
+ except:
+  sys.exit("Exception occured calling gen_intake_gfdl.create_catalog")
+
 From Jupyter Notebook
 ---------------------
 
 Refer to this `notebook <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/scripts/gen_intake_gfdl_notebook.ipynb>`_ to see how you can generate catalogs from a Jupyter Notebook
 
+
 .. image:: _static/catalog_generation.png
   :alt: Screenshot of a notebook showing catalog generation
 
-You may also run a simple `python script <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/scripts/gen_intake_gfdl_runner.py>`_ and generate the catalogs.
-`Here <https://github.com/aradhakrishnanGFDL/CatalogBuilder/blob/main/scripts/gen_intake_gfdl_runner_config.py>`_ is another example of a runner script that uses a configuration file. 
-
-
-.. code-block:: console
-
-  #!/usr/bin/env python
-  from scripts import gen_intake_gfdl
-  import sys
-  input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
-  output_path = "$HOME/catalog"
-  sys.argv = ['INPUT_PATH', input_path, output_path]
-  print(sys.argv)
-  gen_intake_gfdl.main()
 
 Using FRE-CLI (GFDL only)
 -------------------------
@@ -109,39 +176,6 @@ Catalogs are generated by the following command: *fre catalog buildcatalog <INPU
 See `Flags`_ here.
 
 See `Fre-CLI Documentation here <https://ciheim.github.io/fre-cli/>`_
-
-Optional Configuration
-----------------------
-
-If you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented: 
-
-Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data. Both can be configured by editing catalogbuilder/intakebuilder/builderconfig.py.
-
-.. code-block:: python
-   
- #Catalog Headers
-
-
- #The headerlist is expected column names in your catalog/csv file. This is usually determined by the users in conjuction
- #with the ESM collection specification standards and the appropriate workflows.
-
- headerlist = ["activity_id", "institution_id", "source_id", "experiment_id",
-                   "frequency", "modeling_realm", "table_id",
-                   "member_id", "grid_label", "variable_id",
-                   "temporal_subset", "chunk_freq","grid_label","platform","dimensions","cell_methods","path"]
-
-
- #Expected Directory Structure
- 
- #For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp the output_path_template is set as follows:
-
- #We have NA in values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well.
-
- #The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply set NA in output_path_template for the fourth value.
-
- output_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','modeling_realm','cell_methods','frequency','chunk_freq']
-
- output_file_template = ['modeling_realm','temporal_subset','variable_id']
 
 
 Flags

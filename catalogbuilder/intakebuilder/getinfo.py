@@ -108,7 +108,6 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
             output_file_template = builderconfig.output_file_template
         except:
             sys.exit("No output_path_template found. Check configuration.")
-    #output_file_template.reverse()
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
