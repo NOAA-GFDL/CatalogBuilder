@@ -42,6 +42,19 @@ def getinfoFromYAML(dictInfo,yamlfile,miptable=None):
                 dictInfo["realm"]  = "NA"
     return(dictInfo)
 
+def getFreqFromYAML(yamlfile,gfdlfreq=None):
+    #returns cmip freq for gfdl pp freq 
+    import yaml
+    cmipfreq = None
+    with open(yamlfile) as f:
+        mappings = yaml.load(f, Loader=yaml.FullLoader)
+        if(gfdlfreq):
+            try:
+                cmipfreq = mappings[gfdlfreq]["frequency"]
+            except KeyError:
+                cmipfreq = None 
+    return(cmipfreq)
+
 def getStem(dirpath,projectdir):
     '''
     return stem from the project directory passed and the files crawled within
@@ -81,29 +94,35 @@ def getInfoFromFilename(filename,dictInfo,logger):
     return dictInfo
 
 #adding this back to trace back some old errors
-def getInfoFromGFDLFilename(filename,dictInfo,logger):
+def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-    if(filename.endswith(".nc")): #and not filename.startswith(".")):
-        ncfilename = filename.split(".")
-        varname = ncfilename[-2]
-        dictInfo["variable_id"] = varname
-        #miptable = "" #ncfilename[1]
-        #dictInfo["mip_table"] = miptable
-        #modelname = ncfilename[2]
-        #dictInfo["model"] = modelname
-        #expname = ncfilename[3]
-        #dictInfo["experiment_id"] = expname
-        #ens = ncfilename[4]
-        #dictInfo["ensemble_member"] = ens
-        #grid = ncfilename[5]
-        #dictInfo["grid_label"] = grid
-        try:
-           tsubset = ncfilename[1]
-        except IndexError:
-           tsubset = "null" #For fx fields
-        dictInfo["temporal_subset"] = tsubset
+  if ( (filename.endswith(".nc"))): # & ("static" not in filename)) ): 
+    stemdir = filename.split(".")
+    #lets go backwards and match given input directory to the template, add things to dictInfo
+    j = -2
+    cnt = 1 #'variable_id': 'static', 'time_range': 'land'}
+    if configyaml:
+        output_file_template = configyaml.output_file_template
     else:
-        logger.debug("Filename not compatible with this version of the builder:"+filename)
+        try:
+            output_file_template = builderconfig.output_file_template
+        except:
+            sys.exit("No output_path_template found. Check configuration.")
+    #output_file_template.reverse()
+    nlen = len(output_file_template)
+    for i in range(nlen-1,-1,-1): #nlen = 3
+      try:
+          if(output_file_template[i] != "NA"):
+              try:
+                  #print(output_file_template[i], "=" , stemdir[(j)])
+                  dictInfo[output_file_template[i]] = stemdir[(j)]
+              except IndexError:
+                  #print("Check configuration. Is output file template set correctly?")
+                  dictInfo[output_file_template[i]] = ""
+      except IndexError:
+          sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
+      j = j - 1
+    cnt = cnt + 1
     return dictInfo
 
 def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
@@ -239,12 +258,14 @@ def getStandardName(list_variable_id):
   #search for variable and its cf name
   for variable_id in list_variable_id:
      cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
+     #print(cfname,variable_id)
      list_cfname = cfname.tolist()
-     if not list_cfname:
+     if(len(list_cfname) == 0):
         #print("what if the names correspond to CMOR_varname")
         cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
         list_cfname = cfname.tolist()
+        #print(list_cfname)
      if len(list_cfname) > 0:
        unique_cf = list(set(list_cfname))[0]
-     dictCF[variable_id] = unique_cf
+       dictCF[variable_id] = unique_cf
   return (dictCF)
