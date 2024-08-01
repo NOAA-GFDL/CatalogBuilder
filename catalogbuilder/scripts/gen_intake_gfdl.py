@@ -29,23 +29,8 @@ except ModuleNotFoundError:
 package_dir = os.path.dirname(os.path.abspath(__file__))
 template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
-#Setting up argument parsing/flags
-@click.command()
-#TODO arguments dont have help message. So consider changing arguments to options?
-@click.argument('input_path',required=False,nargs=1)
-#,help='The directory path with the datasets to be cataloged. E.g a GFDL PP path till /pp')
-@click.argument('output_path',required=False,nargs=1)
-#,help='Specify output filename suffix only. e.g. catalog')
-@click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
-@click.option('--filter_realm', nargs=1)
-@click.option('--filter_freq', nargs=1)
-@click.option('--filter_chunk', nargs=1)
-@click.option('--overwrite', is_flag=True, default=False)
-@click.option('--append', is_flag=True, default=False)
-@click.option('--slow','-s', is_flag=True, default=False)
-def main(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
+def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False, slow = False):
-
     configyaml = None
     # TODO error catching
     #print("input path: ",input_path, " output path: ", output_path)
@@ -86,7 +71,6 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     dictFilter["chunk_freq"] = "5yr"
     dictFilterIgnore["remove"]= 'DO_NOT_USE'
     '''
-    #########################################################
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.info("Calling gfdlcrawler.crawlLocal")
@@ -117,7 +101,6 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
                          #if(df['variable_id'].eq(k)).any():
                          df['standard_name'].loc[(df['variable_id'] == k)] = v
                              #df['standard_name'] = v 
-   
     if(slow == False) & ('standard_name' in headers):
        if ((df is not None) & (len(df) != 0) ):
            with open(csv_path, 'w') as csvfile:
@@ -126,7 +109,25 @@ def main(input_path=None, output_path=None, config=None, filter_realm=None, filt
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
     logger.info("CSV generated at" + os.path.abspath(csv_path))
+    return(csv_path,json_path)
 
+#Setting up argument parsing/flags
+@click.command()
+#TODO arguments dont have help message. So consider changing arguments to options?
+@click.argument('input_path',required=False,nargs=1)
+#,help='The directory path with the datasets to be cataloged. E.g a GFDL PP path till /pp')
+@click.argument('output_path',required=False,nargs=1)
+#,help='Specify output filename suffix only. e.g. catalog')
+@click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
+@click.option('--filter_realm', nargs=1)
+@click.option('--filter_freq', nargs=1)
+@click.option('--filter_chunk', nargs=1)
+@click.option('--overwrite', is_flag=True, default=False)
+@click.option('--append', is_flag=True, default=False)
+@click.option('--slow','-s', is_flag=True, default=False)
 
+def create_catalog_cli(**kwargs):
+    return create_catalog(**kwargs)
+                          
 if __name__ == '__main__':
-    main()
+    create_catalog_cli()

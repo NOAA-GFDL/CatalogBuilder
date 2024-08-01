@@ -77,7 +77,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                if (op.countOf(filename,".") == 1):
                  dictInfo = getinfo.getInfoFromFilename(filename,dictInfo, logger)
                else:
-                 dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger)
+                 dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger,configyaml)
                dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
@@ -106,6 +106,15 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                     if "standard_name" in missingcols: 
                         dictInfo["standard_name"] = "na"
                         getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
- 
+               #replace frequency as needed 
+               if 'frequency' in dictInfo.keys():
+                      package_dir = os.path.dirname(os.path.abspath(__file__))
+                      yamlfile = os.path.join(package_dir, 'dat/gfdlcmipfreq.yaml')
+                      cmipfreq = None
+                      gfdlfreq = dictInfo['frequency']  
+                      cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
+                      if(cmipfreq is not None):
+                          dictInfo['frequency'] = cmipfreq 
+                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq)  
                listfiles.append(dictInfo)
     return listfiles

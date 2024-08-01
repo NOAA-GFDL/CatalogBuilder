@@ -1,0 +1,35 @@
+name: conda-pkg-extra-tests
+on:
+  pull_request:
+    branches:
+    # for testing conda build w no upload during PRs
+    - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: continuumio/miniconda3:latest
+    steps:
+    - name: Checkout Files
+      uses: actions/checkout@v4
+    - name: Run Docker to Build
+      run: |
+        conda config --append channels conda-forge
+        conda config --append channels noaa-gfdl
+        conda install conda-build conda-verify
+        conda build .
+    - name: Run additional utilities as tests
+      run: |
+        conda create --name catalogbuildertest 
+        conda install -n catalogbuildertest catalogbuilder --use-local
+        /opt/conda/envs/catalogbuildertest/bin/pytest catalogbuilder/tests/test_create_catalog.py
+        #we will save the output from following alone as manifest
+    - name: upload-artifacts
+      uses: actions/upload-artifact@v4
+      with:
+          name: workflow-artifacts1 
+          path: |
+            sample-mdtf-catalog.csv
+            sample-mdtf-catalog.json
+    - name: Download all workflow run artifacts
+      uses: actions/download-artifact@v4

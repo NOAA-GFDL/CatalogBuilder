@@ -29,14 +29,6 @@ jobs:
         # install catalogbuilder to conda env directories
         $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder .
 
-    - name: Run pytest in catalogbuilder conda environment
-      run: |
-        which python
-        python --version
-        $CONDA/envs/catalogbuilder/bin/python --version
-        # which pytest
-        $CONDA/envs/catalogbuilder/bin/pytest catalogbuilder
-
     - name: Make sample data
       run: |
         which python
@@ -57,11 +49,8 @@ jobs:
       with:
           name: workflow-artifacts1 
           path: |
-            gfdl_autotest.csv
-            gfdl_autotest.json
-            cats/gfdl_autotest_from_yaml.csv
-            cats/gfdl_autotest_from_yaml.json
-
+            catalogbuilder/cats/gfdl_autotest_from_yaml.json
+            catalogbuilder/cats/gfdl_autotest_from_yaml.csv 
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v4
 
