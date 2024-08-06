@@ -43,7 +43,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         input_path = configyaml.input_path
         output_path = configyaml.output_path
         
-    if configyaml.schema is None or not configyaml.schema:
+    if not configyaml.schema:
             print("We will use catalog builder catalogbuilder/cats/gfdl_template.json as your json schema")
             template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
     else:
