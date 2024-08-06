@@ -111,7 +111,8 @@
       "grid_label", 
       "realm",
       "member_id",
-      "chunk_freq"
+      "chunk_freq",
+      "time_range"
     ],
     "aggregations": [
       {
