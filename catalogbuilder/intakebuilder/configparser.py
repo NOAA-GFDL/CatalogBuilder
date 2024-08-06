@@ -34,5 +34,6 @@ class Config:
             self.schema = configfile['schema']
             print("schema:", self.schema)
         except:
-            raise KeyError("schema does not exist in config")
+            self.schema = None
+            pass
 
