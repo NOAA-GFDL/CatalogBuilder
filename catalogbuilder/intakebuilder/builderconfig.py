@@ -29,7 +29,7 @@ headerlist = ["activity_id", "institution_id", "source_id", "experiment_id",
 
 
 output_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','realm','cell_methods','frequency','chunk_freq']
-output_file_template = ['realm','temporal_subset','variable_id']
+output_file_template = ['realm','time_range','variable_id']
 
 #OUTPUT FILE INFO is currently passed as command-line argument.
 #We will revisit adding a csvfile, jsonfile and logfile configuration to the builder configuration file in the future.
