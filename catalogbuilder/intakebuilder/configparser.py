@@ -30,4 +30,10 @@ class Config:
             print("output_file_template :", self.output_file_template)
         except:
             raise KeyError("output_file_template does not exist in config")
+        try:
+            self.schema = configfile['schema']
+            print("schema:", self.schema)
+        except:
+            self.schema = None
+            pass
 

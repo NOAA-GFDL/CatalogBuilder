@@ -27,7 +27,7 @@ except ModuleNotFoundError:
         sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
-template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+#template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
 def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False, slow = False):
@@ -42,7 +42,13 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             
         input_path = configyaml.input_path
         output_path = configyaml.output_path
-
+        
+    if config is None or not configyaml.schema:
+            print("We will use catalog builder catalogbuilder/cats/gfdl_template.json as your json schema")
+            template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+    else:
+            template_path = configyaml.schema
+            print("Using schema from config file", template_path)
     if not os.path.exists(input_path):
         sys.exit("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
