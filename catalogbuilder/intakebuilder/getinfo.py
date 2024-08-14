@@ -251,15 +251,13 @@ def getStandardName(list_variable_id,list_realm):
   try:
       url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/b5e7916c203f3ba0b53e9e40fb8dc78ecc2cf5c3/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
       df = pd.read_csv(url, sep=",", header=0,index_col=False)
-
-      print(df)
   except IOError:
             print("Unable to open file")
             sys.exit(1)
   #search for variable and its cf name
   for variable_id in list_variable_id:
    for realm in list_realm: 
-     cfname = df[(df['GFDL_varname'] == variable_id) & (df['modeling_realm'] == realm)]["standard_name"]
+     cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
      #cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
      #print(cfname,variable_id)
      list_cfname = cfname.tolist()
@@ -270,5 +268,7 @@ def getStandardName(list_variable_id,list_realm):
         #print(list_cfname)
      if len(list_cfname) > 0:
        unique_cf = list(set(list_cfname))[0]
-       dictCF[variable_id,realm] = unique_cf
+       varrealm = "{0},{1}".format(variable_id,realm)
+       dictCF[varrealm] = unique_cf
+       #print(varrealm,unique_cf)
   return (dictCF)
