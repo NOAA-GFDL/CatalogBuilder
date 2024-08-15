@@ -100,13 +100,22 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
                       df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
                       list_variable_id = []
-                      list_variable_id = df["variable_id"].tolist()
-                      dictVarCF = getinfo.getStandardName(list_variable_id)
+                      list_variable_id = df["variable_id"].unique().tolist()
+                      list_realm = df["realm"].unique().tolist()
+                      dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
                       #print("standard name from look-up table-", dictVarCF)
                       for k, v in dictVarCF.items():
-                         #if(df['variable_id'].eq(k)).any():
-                         df['standard_name'].loc[(df['variable_id'] == k)] = v
-                             #df['standard_name'] = v 
+                        try:
+                           var = k.split(",")[0]
+                        except ValueError:
+                           continue
+                        try:
+                           realm = k.split(",")[1]
+                        except ValueError:
+                           continue 
+                        if(var is not None) & (realm is not None):
+                            df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
+                        #df['standard_name'].loc[(df['variable_id'] == k)] = v
     if(slow == False) & ('standard_name' in headers):
        if ((df is not None) & (len(df) != 0) ):
            with open(csv_path, 'w') as csvfile:
