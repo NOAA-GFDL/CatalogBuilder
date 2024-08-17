@@ -250,7 +250,11 @@ def getStandardName(list_variable_id):
   dictCF = {}
   try:
       url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/b5e7916c203f3ba0b53e9e40fb8dc78ecc2cf5c3/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
-      df = pd.read_csv(url, sep=",", header=0,index_col=False)
+      url2 = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/b5e7916c203f3ba0b53e9e40fb8dc78ecc2cf5c3/data/gfdl-cmor-tables/gfdl_to_cmip6_vars.csv"
+      df1 = pd.read_csv(url, sep=",", header=0,index_col=False)
+      df2 = pd.read_csv(url2, sep=",", header=0,index_col=False)
+      #TODO Add try catch except for concat operation if concat fails for some reason 
+      df = pd.concat([df1,df2]).drop_duplicates().reset_index(drop=True)
   except IOError:
             print("Unable to open file")
             sys.exit(1)
