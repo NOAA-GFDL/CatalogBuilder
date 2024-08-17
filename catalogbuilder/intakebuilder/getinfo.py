@@ -74,7 +74,6 @@ def getInfoFromFilename(filename,dictInfo,logger):
         ncfilename = filename.split(".")[0].split("_")
         varname = ncfilename[0]
         dictInfo["variable"] = varname
-        miptable = ncfilename[1]
         dictInfo["mip_table"] = miptable
         modelname = ncfilename[2]
         dictInfo["model"] = modelname
