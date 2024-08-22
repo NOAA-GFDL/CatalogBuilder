@@ -27,7 +27,7 @@ except ModuleNotFoundError:
         sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
-template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+#template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
 def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False, slow = False):
@@ -42,7 +42,13 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             
         input_path = configyaml.input_path
         output_path = configyaml.output_path
-
+        
+    if config is None or not configyaml.schema:
+            print("We will use catalog builder catalogbuilder/cats/gfdl_template.json as your json schema")
+            template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+    else:
+            template_path = configyaml.schema
+            print("Using schema from config file", template_path)
     if not os.path.exists(input_path):
         sys.exit("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
@@ -94,13 +100,22 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
                       df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
                       list_variable_id = []
-                      list_variable_id = df["variable_id"].tolist()
-                      dictVarCF = getinfo.getStandardName(list_variable_id)
+                      list_variable_id = df["variable_id"].unique().tolist()
+                      list_realm = df["realm"].unique().tolist()
+                      dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
                       #print("standard name from look-up table-", dictVarCF)
                       for k, v in dictVarCF.items():
-                         #if(df['variable_id'].eq(k)).any():
-                         df['standard_name'].loc[(df['variable_id'] == k)] = v
-                             #df['standard_name'] = v 
+                        try:
+                           var = k.split(",")[0]
+                        except ValueError:
+                           continue
+                        try:
+                           realm = k.split(",")[1]
+                        except ValueError:
+                           continue 
+                        if(var is not None) & (realm is not None):
+                            df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
+                        #df['standard_name'].loc[(df['variable_id'] == k)] = v
     if(slow == False) & ('standard_name' in headers):
        if ((df is not None) & (len(df) != 0) ):
            with open(csv_path, 'w') as csvfile:
