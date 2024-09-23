@@ -7,12 +7,12 @@ class Config:
             configfile = yaml.safe_load(file)
         try:
             self.input_path = configfile['input_path']
-            print("input_path :",self.input_path)
+            #print("input_path :",self.input_path)
         except:
             raise KeyError("input_path does not exist in config")
         try:
             self.output_path = configfile['output_path']
-            print("output_path :",self.output_path)
+            #print("output_path :",self.output_path)
         except:
             raise KeyError("output_path does not exist in config")
         try:
