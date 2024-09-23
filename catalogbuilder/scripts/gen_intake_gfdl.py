@@ -33,16 +33,16 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
          overwrite=False, append=False, slow = False):
     configyaml = None
     # TODO error catching
-    #print("input path: ",input_path, " output path: ", output_path)
-    if input_path is None or output_path is None:
-        print("No paths given, using yaml configuration")
+    if (config is not None):
         configyaml = configparser.Config(config)
         if configyaml.input_path is None or not configyaml.input_path :
             sys.exit("Can't find paths, is yaml configured?")
-            
-        input_path = configyaml.input_path
-        output_path = configyaml.output_path
-        
+        if(input_path is None):     
+            input_path = configyaml.input_path
+        if(output_path is None):
+            output_path = configyaml.output_path
+    if((input_path is None) or (output_path is None)):
+       sys.exit("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")     
     if config is None or not configyaml.schema:
             print("We will use catalog builder catalogbuilder/cats/gfdl_template.json as your json schema")
             template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
@@ -53,6 +53,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         sys.exit("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
         sys.exit("Output path parent directory does not exist. Adjust configuration.")
+    print("input path: ",input_path, " output path: ", output_path)
     project_dir = input_path
     csv_path = "{0}.csv".format(output_path)
     json_path = "{0}.json".format(output_path) 
