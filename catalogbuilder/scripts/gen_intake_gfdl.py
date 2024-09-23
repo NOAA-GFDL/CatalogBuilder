@@ -120,7 +120,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     if(slow == False) & ('standard_name' in headers):
        if ((df is not None) & (len(df) != 0) ):
            with open(csv_path, 'w') as csvfile:
-               df.to_csv(csvfile)
+               df.to_csv(csvfile,index=False)
 
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
