@@ -35,8 +35,6 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     # TODO error catching
     if (config is not None):
         configyaml = configparser.Config(config)
-        if configyaml.input_path is None or not configyaml.input_path :
-            sys.exit("Can't find paths, is yaml configured?")
         if(input_path is None):     
             input_path = configyaml.input_path
         if(output_path is None):
