@@ -15,7 +15,7 @@
 headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
                   "frequency", "realm", "table_id",
                   "member_id", "grid_label", "variable_id",
-                  "time_range", "chunk_freq","platform","dimensions","cell_methods","path"]
+                  "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
 
 #what kind of directory structure to expect?
 #For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
@@ -37,5 +37,5 @@ output_file_template: ['realm','time_range','variable_id']
 
 #######################################################
 
-input_path: "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/" #"ENTER INPUT PATH HERE" #Example: /Users/ar46/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
-output_path: "catalog" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)
+input_path:  "/archive/Eric.Stofferahn/CMIP7/ESM4/DEV/ESM4.5v01_om5b04_piC/gfdl.ncrc5-intel23-prod-openmp/pp/" 
+output_path: "/home/a1r/github/noaa-gfdl/catalogs/ESM4.5v01_om5b04_piC" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)
