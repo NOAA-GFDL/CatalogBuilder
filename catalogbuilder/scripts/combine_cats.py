@@ -61,7 +61,6 @@ def combine_cats(inputfiles,output_path):
 
     df_concat = pd.concat([pd.read_csv(f) for f in cat_csvs], ignore_index = True)
     #df_concat = pd.concat([pd.read_csv(f) for f in cat_csvs])
-    df_concat = df_concat.drop(['Unnamed: 0'],axis=1)
     df_concat.to_csv(combined_csv, index=False)
 
     #Write out a catalog specification 
