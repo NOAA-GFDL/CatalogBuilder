@@ -25,7 +25,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
        headerlist = configyaml.headerlist
     else:
        headerlist = builderconfig.headerlist
-
     #For those columns that we cannot find in output path template or output file template from config yaml, we have hooks
     #now to look up the netcdf dataset if slow option is True
     #todo catch exceptions upon furhter testing
@@ -38,8 +37,18 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
         if (configyaml.output_path_template is not None) & (configyaml.output_file_template is not None) :
           list_ptemplate = configyaml.output_path_template
           list_ftemplate = configyaml.output_file_template
-        set_ptemplate = set(list_ptemplate)
-        set_ftemplate = set(list_ftemplate)
+    else:
+        #if it is none, the user is likely using default config which may be phased out, or redesigned to use a config template json rather than builderconfig
+        try:
+           list_ptemplate = builderconfig.output_path_template
+        except:
+           sys.exit("output_path_template is not set. Check your configuration")
+        try:
+           list_ftemplate = builderconfig.output_file_template
+        except:
+           sys.exit("output_file_template is not set. Check your configuration")
+    set_ptemplate = set(list_ptemplate)
+    set_ftemplate = set(list_ftemplate)
     #print(headerlist)
     #print(list_ptemplate)
     #print(list_ftemplate)
