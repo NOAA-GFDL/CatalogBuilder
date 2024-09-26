@@ -7,14 +7,17 @@ class Config:
             configfile = yaml.safe_load(file)
         try:
             self.input_path = configfile['input_path']
-            #print("input_path :",self.input_path)
         except:
-            raise KeyError("input_path does not exist in config")
+            self.input_path = None
+            print("input_path does not exist in config")
+            pass
         try:
             self.output_path = configfile['output_path']
             #print("output_path :",self.output_path)
         except:
-            raise KeyError("output_path does not exist in config")
+            self.output_path = None
+            print("output_path does not exist in config")
+            pass 
         try:
             self.headerlist = configfile['headerlist']
             print("headerlist :",self.headerlist)
