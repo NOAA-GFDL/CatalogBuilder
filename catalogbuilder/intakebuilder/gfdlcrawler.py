@@ -80,9 +80,9 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if ("static" not in filename):
                  if ((len(filename.split('.'))-1) != len(set_ftemplate)):
-                   print("Skipping ",filename)
+                   logger.debug("Skipping "+filename)
                    continue 
-               logger.info(dirpath+"/"+filename)
+               logger.debug(dirpath+"/"+filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
