@@ -56,7 +56,7 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
         if append:
             with open(csvfile, 'a') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=headerlist)
-                print("writing (without header)..")
+                logger.info("writing (without header)..")
                 for data in dict_info:
                     if len(data.keys()) > 2:
                         writer.writerow(data)
@@ -70,7 +70,7 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
                     if user_input.lower() == 'y':
                         with open(csvfile, 'w') as csvfile:
                             writer = csv.DictWriter(csvfile, fieldnames=headerlist)
-                            print("writing..")
+                            logger.debug("writing..")
                             writer.writeheader()
                             for data in dict_info:
                                 if len(data.keys()) > 2:
@@ -91,7 +91,7 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
             else:
                 with open(csvfile, 'w') as csvfile:
                     writer = csv.DictWriter(csvfile, fieldnames=headerlist)
-                    print("writing..")
+                    logger.debug("writing..")
                     writer.writeheader()
                     for data in dict_info:
                         if len(data.keys()) > 2:
