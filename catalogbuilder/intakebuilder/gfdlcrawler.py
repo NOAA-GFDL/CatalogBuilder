@@ -57,7 +57,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     if ( len(set_ftemplate) > 0 ):
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
-      print("Missing cols from metadata sources:", missingcols)
+      logger.debug("Missing cols from metadata sources:", missingcols)
 
    
     #TODO INCLUDE filter in traversing through directories at the top
@@ -75,7 +75,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                #    logger.debug("Skipping hidden file", filepath)
                #    continue
                if not filename.endswith(".nc"):
-                   logger.debug("FILE does not end with .nc. Skipping", filepath)
+                   logger.debug("FILE does not end with .nc. Skipping "+ filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if ("static" not in filename):
