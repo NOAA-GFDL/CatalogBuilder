@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
+logging.basicConfig(stream=sys.stdout)
 
 try:
    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
@@ -30,11 +31,17 @@ package_dir = os.path.dirname(os.path.abspath(__file__))
 #template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
 def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
-         overwrite=False, append=False, slow = False):
+         overwrite=False, append=False, slow = False, verbose=False):
+    if verbose:
+       logger.setLevel(logging.DEBUG)
+       logger.info("Verbose log activated.")
+    else:
+       logger.setLevel(logging.INFO)
+       logger.info("[Mostly] silent log activated")
     configyaml = None
     # TODO error catching
     if (config is not None):
-        configyaml = configparser.Config(config)
+        configyaml = configparser.Config(config,logger)
         if(input_path is None):     
             input_path = configyaml.input_path
         if(output_path is None):
@@ -42,7 +49,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     if((input_path is None) or (output_path is None)):
        sys.exit("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")     
     if config is None or not configyaml.schema:
-            print("We will use catalog builder catalogbuilder/cats/gfdl_template.json as your json schema")
+            logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
             template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
     else:
             template_path = configyaml.schema
@@ -51,7 +58,8 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         sys.exit("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
         sys.exit("Output path parent directory does not exist. Adjust configuration.")
-    print("input path: ",input_path, " output path: ", output_path)
+    logger.info("input path: "+ input_path)
+    logger.info( " output path: "+ output_path)
     project_dir = input_path
     csv_path = "{0}.csv".format(output_path)
     json_path = "{0}.json".format(output_path) 
@@ -78,7 +86,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     '''
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
-    logger.info("Calling gfdlcrawler.crawlLocal")
+    logger.debug("Calling gfdlcrawler.crawlLocal")
     list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, logger, configyaml,slow)
     #Grabbing data from template JSON, changing CSV path to match output path, and dumping data in new JSON
     with open(template_path, "r") as jsonTemplate:
@@ -139,6 +147,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
 @click.option('--slow','-s', is_flag=True, default=False)
+@click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
 
 def create_catalog_cli(**kwargs):
     return create_catalog(**kwargs)
