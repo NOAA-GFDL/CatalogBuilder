@@ -97,6 +97,7 @@ def getInfoFromFilename(filename,dictInfo,logger):
 def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
   if ( (filename.endswith(".nc"))): # & ("static" not in filename)) ): 
+    print(filename)
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -108,6 +109,12 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
             output_file_template = builderconfig.output_file_template
         except:
             sys.exit("No output_path_template found. Check configuration.")
+    if( "static" in filename ):
+        ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
+        #TODO figure out better ways to set this and use fixed for frequency and table_id
+        output_file_template = ['realm','frequency'] 
+        dictInfo["variable_id"] = "fixed" #TODO verify if variable_id is a key
+    ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
@@ -122,6 +129,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
+    print(dictInfo)
     return dictInfo
 
 def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
@@ -151,7 +159,6 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
             output_path_template = builderconfig.output_path_template 
         except:
             sys.exit("No output_path_template found in builderconfig.py. Check configuration.")
-
     nlen = len(output_path_template) 
     for i in range(nlen-1,0,-1):
       try:
@@ -168,10 +175,18 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
     # WE do not want to work with anythi:1
     # ng that's not time series
     #TODO have verbose option to print message
+    #TODO Make this elegant and intuitive 
+    #TODO logger messages, not print 
     if "cell_methods" in dictInfo.keys():
-      if (dictInfo["cell_methods"] != "ts"):
-         #print("Skipping non-timeseries data")
+      if (dictInfo["cell_methods"] == "av"):
+         print("Skipping time-average data")
          return {}
+      elif (dictInfo["cell_methods"] == "ts"):
+         print("time-series data")
+      else: 
+         print("This is likely static")
+         dictInfo["cell_methods"] = ""
+         dictInfo["member_id"] = "" 
     return dictInfo
 
 def getInfoFromDRS(dirpath,projectdir,dictInfo):
