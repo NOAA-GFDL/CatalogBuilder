@@ -57,7 +57,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     if ( len(set_ftemplate) > 0 ):
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
-      logger.debug("Missing cols from metadata sources:", missingcols)
+      logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
 
    
     #TODO INCLUDE filter in traversing through directories at the top
