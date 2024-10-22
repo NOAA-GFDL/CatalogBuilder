@@ -112,8 +112,10 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     if( "static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO figure out better ways to set this and use fixed for frequency and table_id
-        output_file_template = ['realm','frequency'] 
+        output_file_template = ['realm'] 
         dictInfo["variable_id"] = "fixed" #TODO verify if variable_id is a key
+        dictInfo["frequency"] = "fixed"
+        dictInfo["table_id"] = "fixed"
     ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
@@ -132,11 +134,12 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     print(dictInfo)
     return dictInfo
 
-def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
+def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
     '''
     Returns info from project directory and the DRS path to the file
     :param dirpath:
     :param drsstructure:
+    :param variable_id to check for static
     :return:
     '''
    # we need thise dict keys "project", "institute", "model", "experiment_id",
@@ -159,6 +162,9 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
             output_path_template = builderconfig.output_path_template 
         except:
             sys.exit("No output_path_template found in builderconfig.py. Check configuration.")
+    #If variable_id is fixed, it's a GFDL PP static dataset and the output path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
+    if(variable_id == "fixed"):
+        output_path_template = output_path_template[:-3 or None]
     nlen = len(output_path_template) 
     for i in range(nlen-1,0,-1):
       try:

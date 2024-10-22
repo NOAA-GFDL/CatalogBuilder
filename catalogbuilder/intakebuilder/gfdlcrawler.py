@@ -95,7 +95,12 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                else:
                  dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger,configyaml)
                print("1. ", dictInfo)
-               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml)
+               if "variable_id" in dictInfo.keys():
+                   if dictInfo["variable_id"] is not None:
+                       variable_id = dictInfo["variable_id"] 
+                   else: 
+                       variable_id = ""
+               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                print("2.", dictInfo)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
