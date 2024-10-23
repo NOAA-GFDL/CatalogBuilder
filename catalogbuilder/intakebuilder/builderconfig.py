@@ -15,7 +15,7 @@
 headerlist = ["activity_id", "institution_id", "source_id", "experiment_id",
                   "frequency", "realm", "table_id",
                   "member_id", "grid_label", "variable_id",
-                  "time_range", "chunk_freq","grid_label","platform","dimensions","cell_methods","standard_name","path"]
+                  "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
 
 #what kind of directory structure to expect?
 #For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
