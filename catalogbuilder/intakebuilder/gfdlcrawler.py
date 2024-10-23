@@ -59,7 +59,10 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
       missingcols.remove("path") #because we get this anyway
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
 
-   
+    #Creating a dictionary to track the unique datasets we come across when using slow mode
+    #The keys don't mean much but the values will be lists tracking var_id,realm,etc..
+    unique_datasets = {}
+ 
     #TODO INCLUDE filter in traversing through directories at the top
     for dirpath, dirs, files in os.walk(projectdir):
         searchpath = dirpath
@@ -114,12 +117,25 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                # todo do the reverse if slow is on. Open file no matter what and populate dictionary values and if there is something missed out
                # we can scan filenames or config etc 
                #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
-               if (slow == True) & (bool(dictInfo) == True) :
-                    print("Slow option turned on.. lets open some files using xarray and lookup atts",filename)
-                    #todo we could look at var attributes, but right now we stick to those that are necessary. scope to extend this easily to missngcols or if header info is not in config yaml 
-                    if "standard_name" in missingcols: 
+               if (slow == True) & (bool(dictInfo) == True):
+                    print("Slow option turned on.. lets open some files using xarray and lookup atts")
+                    
+                    #todo we could look at var attributes, but right now we stick to those that are necessary. scope to extend this easily to missngcols or if header info is not in config yaml
+                    if "standard_name" in missingcols:
+
                         dictInfo["standard_name"] = "na"
-                        getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
+
+                        #Check if we've come across a similar dataset
+                        qualities=[dictInfo["variable_id"],dictInfo["realm"]]
+                        for standard_name,quality_list in unique_datasets.items():
+                            if quality_list == qualities:
+                                dictInfo["standard_name"]=standard_name
+
+                        if dictInfo["standard_name"] == "na":
+                            print("Retrieving standard_name from ", filename)
+                            getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
+                            unique_datasets.update({ dictInfo["standard_name"] : qualities})
+
                #replace frequency as needed 
                if 'frequency' in dictInfo.keys():
                       package_dir = os.path.dirname(os.path.abspath(__file__))
