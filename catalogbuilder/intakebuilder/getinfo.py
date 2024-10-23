@@ -114,7 +114,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
         #TODO figure out better ways to set this and use fixed for frequency and table_id
         output_file_template = ['realm'] 
         dictInfo["variable_id"] = "fixed" #TODO verify if variable_id is a key
-        dictInfo["frequency"] = "fixed"
+        dictInfo["frequency"] = "fx"
         dictInfo["table_id"] = "fixed"
     ##
     nlen = len(output_file_template)
