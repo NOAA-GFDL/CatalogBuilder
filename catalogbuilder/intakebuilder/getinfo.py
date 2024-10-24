@@ -111,11 +111,10 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
             sys.exit("No output_path_template found. Check configuration.")
     if( "static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
-        #TODO figure out better ways to set this and use fixed for frequency and table_id
         output_file_template = ['realm'] 
-        dictInfo["variable_id"] = "fixed" #TODO verify if variable_id is a key
-        dictInfo["frequency"] = "fx"
-        dictInfo["table_id"] = "fixed"
+        if "variable_id" in dictInfo.keys(): dictInfo["variable_id"] = "fixed" 
+        if "frequency" in dictInfo.keys(): dictInfo["frequency"] = "fx"
+        if "table_id" in dictInfo.keys(): dictInfo["table_id"] = "fixed"
     ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
