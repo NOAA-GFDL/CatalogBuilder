@@ -97,6 +97,7 @@ def getInfoFromFilename(filename,dictInfo,logger):
 def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
   if ( (filename.endswith(".nc"))): # & ("static" not in filename)) ): 
+    print(filename)
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -108,6 +109,13 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
             output_file_template = builderconfig.output_file_template
         except:
             sys.exit("No output_path_template found. Check configuration.")
+    if( "static" in filename ):
+        ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
+        output_file_template = ['realm'] 
+        if "variable_id" in dictInfo.keys(): dictInfo["variable_id"] = "fixed" 
+        if "frequency" in dictInfo.keys(): dictInfo["frequency"] = "fx"
+        if "table_id" in dictInfo.keys(): dictInfo["table_id"] = "fixed"
+    ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
@@ -122,13 +130,15 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
+    print(dictInfo)
     return dictInfo
 
-def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
+def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
     '''
     Returns info from project directory and the DRS path to the file
     :param dirpath:
     :param drsstructure:
+    :param variable_id to check for static
     :return:
     '''
    # we need thise dict keys "project", "institute", "model", "experiment_id",
@@ -151,7 +161,9 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
             output_path_template = builderconfig.output_path_template 
         except:
             sys.exit("No output_path_template found in builderconfig.py. Check configuration.")
-
+    #If variable_id is fixed, it's a GFDL PP static dataset and the output path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
+    if(variable_id == "fixed"):
+        output_path_template = output_path_template[:-3 or None]
     nlen = len(output_path_template) 
     for i in range(nlen-1,0,-1):
       try:
@@ -168,10 +180,18 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml):
     # WE do not want to work with anythi:1
     # ng that's not time series
     #TODO have verbose option to print message
+    #TODO Make this elegant and intuitive 
+    #TODO logger messages, not print 
     if "cell_methods" in dictInfo.keys():
-      if (dictInfo["cell_methods"] != "ts"):
-         #print("Skipping non-timeseries data")
+      if (dictInfo["cell_methods"] == "av"):
+         print("Skipping time-average data")
          return {}
+      elif (dictInfo["cell_methods"] == "ts"):
+         print("time-series data")
+      else: 
+         print("This is likely static")
+         dictInfo["cell_methods"] = ""
+         dictInfo["member_id"] = "" 
     return dictInfo
 
 def getInfoFromDRS(dirpath,projectdir,dictInfo):

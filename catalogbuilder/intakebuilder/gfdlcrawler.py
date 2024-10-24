@@ -82,6 +82,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                  if ((len(filename.split('.'))-1) != len(set_ftemplate)):
                    logger.debug("Skipping "+filename)
                    continue 
+               else: 
+                  print("tmp debugging static", filename)
                logger.debug(dirpath+"/"+filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
@@ -92,7 +94,14 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                  dictInfo = getinfo.getInfoFromFilename(filename,dictInfo, logger)
                else:
                  dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger,configyaml)
-               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml)
+               print("1. ", dictInfo)
+               if "variable_id" in dictInfo.keys():
+                   if dictInfo["variable_id"] is not None:
+                       variable_id = dictInfo["variable_id"] 
+                   else: 
+                       variable_id = ""
+               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
+               print("2.", dictInfo)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
                if "source_id" in dictInfo: 
@@ -129,6 +138,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                       cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
                       if(cmipfreq is not None):
                           dictInfo['frequency'] = cmipfreq 
-                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq)  
+                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq) 
                listfiles.append(dictInfo)
     return listfiles
