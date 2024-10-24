@@ -79,7 +79,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if ("static" not in filename):
-                 splitchar = "_" if "/uda" in filename else "."
+                 splitchar = "_" if "/uda" in filepath else "."
                  if ((len(filename.split(splitchar))-1) != len(set_ftemplate)):
                    logger.debug("Skipping "+filename)
                    continue 
