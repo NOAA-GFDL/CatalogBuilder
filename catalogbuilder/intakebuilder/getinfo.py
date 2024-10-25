@@ -115,7 +115,6 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
         dictInfo["variable_id"] = "fixed" 
         dictInfo["frequency"] = "fx"
         dictInfo["table_id"] = "fx"
-    ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
