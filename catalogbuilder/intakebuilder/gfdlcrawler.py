@@ -33,7 +33,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     set_ptemplate = set()
     set_ftemplate = set()
 
-    if( configyaml is not None):
+    if(configyaml is not None):
         if (configyaml.output_path_template is not None) & (configyaml.output_file_template is not None) :
           list_ptemplate = configyaml.output_path_template
           list_ftemplate = configyaml.output_file_template
@@ -60,8 +60,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
 
     #Creating a dictionary to track the unique datasets we come across when using slow mode
-    #The keys don't mean much but the values will be lists tracking var_id,realm,etc..
-    unique_datasets = {}
+    #The keys are the standard names and the values are lists tracking var_id,realm,etc..
+    unique_datasets = {'':''}
  
     #TODO INCLUDE filter in traversing through directories at the top
     for dirpath, dirs, files in os.walk(projectdir):
@@ -118,23 +118,24 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                # we can scan filenames or config etc 
                #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
                if (slow == True) & (bool(dictInfo) == True):
-                    print("Slow option turned on.. lets open some files using xarray and lookup atts")
+                    #print("Slow option turned on.. lets open some files using xarray and lookup atts")
                     
                     #todo we could look at var attributes, but right now we stick to those that are necessary. scope to extend this easily to missngcols or if header info is not in config yaml
                     if "standard_name" in missingcols:
 
+                        # Set standard_name as na to avoid error from getInfoFromVarAtts
                         dictInfo["standard_name"] = "na"
 
-                        #Check if we've come across a similar dataset
-                        qualities=[dictInfo["variable_id"],dictInfo["realm"]]
-                        for standard_name,quality_list in unique_datasets.items():
-                            if quality_list == qualities:
-                                dictInfo["standard_name"]=standard_name
+                        # qualities define the uniqueness and help us determine when to open files. here, we define uniqueness by realm and var_id combinations. we store the realm/var_id pairs + their standard_names in unique_datasets{} and the current pair being checked as a tuple list called 'qualities'. if a pair stored in unique_datasets aligns with the current pair being checked, we won't open the file and will instead use the standard_name already found
+                        qualities=(dictInfo["variable_id"],dictInfo["realm"])
+                        if qualities in unique_datasets.keys():
+                            standard_name=unique_datasets[qualities]
+                            dictInfo["standard_name"]=standard_name
 
-                        if dictInfo["standard_name"] == "na":
+                        else:
                             print("Retrieving standard_name from ", filename)
                             getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
-                            unique_datasets.update({ dictInfo["standard_name"] : qualities})
+                            unique_datasets.update({ qualities : dictInfo["standard_name"] })
 
                #replace frequency as needed 
                if 'frequency' in dictInfo.keys():
