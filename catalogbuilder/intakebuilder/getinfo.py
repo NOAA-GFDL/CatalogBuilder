@@ -97,7 +97,6 @@ def getInfoFromFilename(filename,dictInfo,logger):
 def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
   if ( (filename.endswith(".nc"))): # & ("static" not in filename)) ): 
-    print(filename)
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -111,11 +110,11 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
             sys.exit("No output_path_template found. Check configuration.")
     if( "static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
-        #TODO figure out better ways to set this and use fixed for frequency and table_id
+        #TODO error checking as needed
         output_file_template = ['realm'] 
-        dictInfo["variable_id"] = "fixed" #TODO verify if variable_id is a key
+        dictInfo["variable_id"] = "fixed" 
         dictInfo["frequency"] = "fx"
-        dictInfo["table_id"] = "fixed"
+        dictInfo["table_id"] = "fx"
     ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
