@@ -114,7 +114,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
         output_file_template = ['realm'] 
         if "variable_id" in dictInfo.keys(): dictInfo["variable_id"] = "fixed" 
         if "frequency" in dictInfo.keys(): dictInfo["frequency"] = "fx"
-        if "table_id" in dictInfo.keys(): dictInfo["table_id"] = "fixed"
+        if "table_id" in dictInfo.keys(): dictInfo["table_id"] = "fx"
     ##
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
