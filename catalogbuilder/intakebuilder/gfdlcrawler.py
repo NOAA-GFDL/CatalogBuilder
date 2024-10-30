@@ -79,19 +79,22 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if ("static" not in filename):
-                 if ((len(filename.split('.'))-1) != len(set_ftemplate)):
+                 #splitchar = "_" if "/uda" in filepath else "."
+                 if ((len(filename.split('.'))) != len(set_ftemplate)):
                    logger.debug("Skipping "+filename)
-                   continue 
+                   continue
                logger.debug(dirpath+"/"+filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
+               if "/uda" in filepath:
+                   dictInfo["activity_id"] = "UDA"
                # get info from filename
                #filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
                dictInfo["path"]=filepath
-               if (op.countOf(filename,".") == 1):
-                 dictInfo = getinfo.getInfoFromFilename(filename,dictInfo, logger)
-               else:
-                 dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger,configyaml)
+               #if (op.countOf(filename,".") == 1):
+               #  dictInfo = getinfo.getInfoFromFilename(filename,dictInfo, logger)
+               #else:
+               #  dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger,configyaml)
                dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
