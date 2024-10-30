@@ -117,6 +117,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                # todo do the reverse if slow is on. Open file no matter what and populate dictionary values and if there is something missed out
                # we can scan filenames or config etc 
                #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
+               # TODO: Possibly use slow option if lookup table can't find standard_name
                if (slow == True) & (bool(dictInfo) == True):
                     #print("Slow option turned on.. lets open some files using xarray and lookup atts")
                     
@@ -127,13 +128,14 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                         dictInfo["standard_name"] = "na"
 
                         # qualities define the uniqueness and help us determine when to open files. here, we define uniqueness by realm and var_id combinations. we store the realm/var_id pairs + their standard_names in unique_datasets{} and the current pair being checked as a tuple list called 'qualities'. if a pair stored in unique_datasets aligns with the current pair being checked, we won't open the file and will instead use the standard_name already found
+                        # TODO: Extended qualities to determine uniquness from more... qualities
                         qualities=(dictInfo["variable_id"],dictInfo["realm"])
                         if qualities in unique_datasets.keys():
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
 
                         else:
-                            print("Retrieving standard_name from ", filename)
+                            logger.info("Retrieving standard_name from ", filename)
                             getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
                             unique_datasets.update({ qualities : dictInfo["standard_name"] })
 
