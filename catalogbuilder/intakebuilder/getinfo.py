@@ -108,7 +108,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
             output_file_template = builderconfig.output_file_template
         except:
             sys.exit("No output_path_template found. Check configuration.")
-    if( "static" in filename ):
+    if( ".static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO error checking as needed
         output_file_template = ['realm'] 
