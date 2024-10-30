@@ -111,25 +111,27 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     if( ".static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO error checking as needed
-        output_file_template = ['realm'] 
+        output_file_template = ['realm','NA'] 
         dictInfo["variable_id"] = "fixed" 
         dictInfo["frequency"] = "fx"
-        dictInfo["table_id"] = "fx"
     nlen = len(output_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
           if(output_file_template[i] != "NA"):
               try:
-                  #print(output_file_template[i], "=" , stemdir[(j)])
                   dictInfo[output_file_template[i]] = stemdir[(j)]
               except IndexError:
-                  #print("Check configuration. Is output file template set correctly?")
                   dictInfo[output_file_template[i]] = ""
       except IndexError:
           sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
-    print(dictInfo)
+    print(dictInfo["realm"], filename)
+    if (".static" in filename):
+        if ("ocean" in dictInfo["realm"]):
+          dictInfo["table_id"] = "Ofx"
+        else:
+          dictInfo["table_id"] = "fx"
     return dictInfo
 
 def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
