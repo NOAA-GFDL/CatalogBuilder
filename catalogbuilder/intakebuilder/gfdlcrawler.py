@@ -86,6 +86,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                logger.debug(dirpath+"/"+filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
+               if "/uda" in filepath:
+                   dictInfo["activity_id"] = "UDA"
                # get info from filename
                #filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
                dictInfo["path"]=filepath
