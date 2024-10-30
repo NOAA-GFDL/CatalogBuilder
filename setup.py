@@ -15,7 +15,7 @@ setup(
         'xarray',
         'pandas',
         'jsondiff',
-        'intake-esm',
+        'intake-esm==2023.7.7',
         'boto3'
     ]
 )
