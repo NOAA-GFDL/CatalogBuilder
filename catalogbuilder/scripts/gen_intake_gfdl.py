@@ -146,7 +146,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--filter_chunk', nargs=1)
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
-@click.option('--slow','-s', is_flag=True, default=False)
+@click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
 @click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
 
 def create_catalog_cli(**kwargs):
