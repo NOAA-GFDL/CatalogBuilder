@@ -119,6 +119,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
                # TODO: Possibly use slow option if lookup table can't find standard_name
                if (slow == True) & (bool(dictInfo) == True):
+                    #TODO Possibly improvement: get a list of all files to be opened, dmget the files at once or in logical batches before examining with xarray
                     #print("Slow option turned on.. lets open some files using xarray and lookup atts")
                     
                     #todo we could look at var attributes, but right now we stick to those that are necessary. scope to extend this easily to missngcols or if header info is not in config yaml
