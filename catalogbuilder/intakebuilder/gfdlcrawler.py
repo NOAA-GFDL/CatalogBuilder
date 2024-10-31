@@ -129,6 +129,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
 
                         # qualities define the uniqueness and help us determine when to open files. here, we define uniqueness by realm and var_id combinations. we store the realm/var_id pairs + their standard_names in unique_datasets{} and the current pair being checked as a tuple list called 'qualities'. if a pair stored in unique_datasets aligns with the current pair being checked, we won't open the file and will instead use the standard_name already found
                         # TODO: Extended qualities to determine uniquness from more... qualities
+                        #TODO extend this to append other qualities later
                         qualities=(dictInfo["variable_id"],dictInfo["realm"])
                         if qualities in unique_datasets.keys():
                             standard_name=unique_datasets[qualities]
