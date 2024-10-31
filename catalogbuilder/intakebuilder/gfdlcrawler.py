@@ -77,17 +77,21 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                if not filename.endswith(".nc"):
                    logger.debug("FILE does not end with .nc. Skipping "+ filepath)
                    continue
-               #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
-               if ("static" not in filename):
-                 #splitchar = "_" if "/uda" in filepath else "."
-                 if ((len(filename.split('.'))) != len(set_ftemplate)):
-                   logger.debug("Skipping "+filename)
-                   continue
-               logger.debug(dirpath+"/"+filename)
                dictInfo = {}
-               dictInfo = getinfo.getProject(projectdir, dictInfo)
                if "/uda" in filepath:
+                   if len(filename.split('.')) != len(set_ftemplate):
+                       logger.debug("Skipping "+filename)
+                       continue
                    dictInfo["activity_id"] = "UDA"
+               #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
+               else:
+                   if ("static" not in filename):
+                       if ((len(filename.split('.'))-1) != len(set_ftemplate)):
+                           logger.debug("Skipping "+filename)
+                           continue
+
+               logger.debug(dirpath+"/"+filename)
+               dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
                #filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
                dictInfo["path"]=filepath
