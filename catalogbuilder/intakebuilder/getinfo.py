@@ -126,7 +126,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
-    print(dictInfo["realm"], filename)
+    #print(dictInfo["realm"], filename)
     if (".static" in filename):
         if ("ocean" in dictInfo["realm"]):
           dictInfo["table_id"] = "Ofx"
@@ -134,7 +134,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           dictInfo["table_id"] = "fx"
     return dictInfo
 
-def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
+def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger):
     '''
     Returns info from project directory and the DRS path to the file
     :param dirpath:
@@ -188,7 +188,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
          print("Skipping time-average data")
          return {}
       elif (dictInfo["cell_methods"] == "ts"):
-         print("time-series data")
+         logger.debug("time-series data")
       else: 
          print("This is likely static")
          dictInfo["cell_methods"] = ""
