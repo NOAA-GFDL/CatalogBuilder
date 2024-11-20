@@ -79,7 +79,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if ("static" not in filename):
-                 if ((len(filename.split('.'))-1) != len(set_ftemplate)):
+                 #set removes duplicates and orders them. Does not serve the purpose when there is more one NA as in CESM
+                 if ((len(filename.split('.'))-1) != len(list_ftemplate)):
                    logger.debug("Skipping "+filename)
                    continue 
                logger.debug(dirpath+"/"+filename)
