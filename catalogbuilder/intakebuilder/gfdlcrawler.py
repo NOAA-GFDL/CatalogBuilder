@@ -58,7 +58,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
-
     #Creating a dictionary to track the unique datasets we come across when using slow mode
     #The keys are the standard names and the values are lists tracking var_id,realm,etc..
     unique_datasets = {'':''}
@@ -156,6 +155,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                       cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
                       if(cmipfreq is not None):
                           dictInfo['frequency'] = cmipfreq 
-                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq) 
+                          print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq) 
                listfiles.append(dictInfo)
     return listfiles

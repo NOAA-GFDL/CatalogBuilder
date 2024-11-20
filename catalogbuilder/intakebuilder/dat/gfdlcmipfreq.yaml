@@ -1,5 +1,7 @@
 monthly:
     frequency: mon
+h0:
+    frequency: mon
 daily:
     frequency: day 
 hourly:
