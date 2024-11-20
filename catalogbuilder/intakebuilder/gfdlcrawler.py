@@ -141,7 +141,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                         if qualities in unique_datasets.keys():
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
-
+                            print("test..",qualities,standard_name)
                         else:
                             logger.info("Retrieving standard_name from "+ (str)(filename))
                             getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)

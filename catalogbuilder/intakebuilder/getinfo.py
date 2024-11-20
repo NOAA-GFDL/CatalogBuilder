@@ -227,8 +227,9 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     :return: dictInfo with all variable atts 
     '''
     #try:
+     
     filexr,filexra = return_xr(fname)
-    #print("Variable atts from file:",filexr[variable_id])
+    #print("look up Variable atts from file:",filexr[variable_id])
     if (dictInfo[att] == "na"):
       try:
           cfname = filexr[variable_id].attrs["standard_name"]
