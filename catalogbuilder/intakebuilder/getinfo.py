@@ -234,6 +234,11 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
           cfname = filexr[variable_id].attrs["standard_name"]
       except KeyError:
           cfname = "NA"
+          try:
+              long_name = filexr[variable_id].attrs["long_name"]
+          except KeyError:
+              long_name = "NA"
+          cfname = long_name.replace(" ", "_")
       dictInfo["standard_name"] = cfname 
       print("standard_name found",dictInfo["standard_name"])
     return dictInfo
