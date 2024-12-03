@@ -98,7 +98,7 @@ Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUT
                   "member_id", "grid_label", "variable_id",
                   "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
 
-The headerlist is expected column names in your catalog/csv file. This is usually determined by the users in conjuction
+The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
 with the ESM collection specification standards and the appropriate workflows.
 
 .. code-block:: yaml
@@ -183,5 +183,6 @@ _____
 
 .. Reference `Flags`_.
 
-- overwrite - Overwrite an existing catalog at the given output path
-- append - Append (without headerlist) to an existing catalog at the given output path
+- --overwrite - Overwrite an existing catalog at the given output path
+- --append - Append (without headerlist) to an existing catalog at the given output path
+- --slow - Activates slow mode which retrieves standard_name `(or long_name) where possible. **"Standard_name" must be in your output_path_template**
