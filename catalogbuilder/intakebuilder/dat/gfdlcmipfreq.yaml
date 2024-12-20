@@ -2,6 +2,8 @@ monthly:
     frequency: mon
 h0:
     frequency: mon
+h2:
+    frequency: day    
 daily:
     frequency: day 
 hourly:
