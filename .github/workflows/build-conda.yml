@@ -17,4 +17,5 @@ jobs:
         conda config --append channels conda-forge
         conda config --append channels noaa-gfdl
         conda install conda-build conda-verify
+        conda remove --name base conda-anaconda-telemetry
         conda build .
