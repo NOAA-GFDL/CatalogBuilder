@@ -37,12 +37,12 @@ jobs:
     - name: Generate catalog
       run: |
         which python
-        python catalogbuilder/scripts/gen_intake_gfdl.py archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
+        python -m catalogbuilder.scripts.gen_intake_gfdl archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp gfdl_autotest
 
     - name: Generate catalog with yaml
       run: |
         which python
-        python catalogbuilder/scripts/gen_intake_gfdl.py --config catalogbuilder/tests/test_config.yaml
+        python -m catalogbuilder.scripts.gen_intake_gfdl --config catalogbuilder/tests/test_config.yaml
   
     - name: upload-artifacts
       uses: actions/upload-artifact@v4
