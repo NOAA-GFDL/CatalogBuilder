@@ -190,7 +190,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
       elif (dictInfo["cell_methods"] == "ts"):
          logger.debug("time-series data")
       else: 
-         print("This is likely static")
+         logger.debug("This is likely static")
          dictInfo["cell_methods"] = ""
          dictInfo["member_id"] = "" 
     return dictInfo
