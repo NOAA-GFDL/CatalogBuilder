@@ -22,7 +22,7 @@ requirements:
     - xarray
     - pandas
     - jsondiff
-    - conda-forge::intake-esm=2023.7.7
+    - conda-forge::intake-esm
     - boto3
 test:
   imports:
