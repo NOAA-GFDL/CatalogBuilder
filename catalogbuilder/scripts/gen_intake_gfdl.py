@@ -12,7 +12,7 @@ logger.setLevel(logging.INFO)
 logging.basicConfig(stream=sys.stdout)
 
 try:
-   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
+   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 except ModuleNotFoundError:
     print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     print("Attempting again with adjusted sys.path ")
@@ -39,7 +39,6 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
        logger.setLevel(logging.INFO)
        logger.info("[Mostly] silent log activated")
     configyaml = None
-    # TODO error catching
     if (config is not None):
         configyaml = configparser.Config(config,logger)
     else:
@@ -47,15 +46,15 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         #
          try:
                   pkg = importlib_resources.files("catalogbuilder.scripts")
-                  config_path = pkg / "configs" / "config.yaml"
+                  config = pkg / "configs" / "config.yaml"
                   logger.info("Default config path activated from package resources configs/config.yaml")
          except:
                  try:
-                    config_path = os.path.join(package_dir, 'configs/config.yaml')
+                    config = os.path.join(package_dir, 'configs/config.yaml')
                     logger.info("Default config path activated from path configs/config.yaml")
                  except:
                     sys.exit("Can't locate or read config, check --config ")
-         configyaml = configparser.Config(config,logger) 
+         configyaml = configparser.Config(config,logger)
          if(input_path is None):     
             input_path = configyaml.input_path
          if(output_path is None):
