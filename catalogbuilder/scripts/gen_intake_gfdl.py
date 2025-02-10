@@ -6,26 +6,11 @@ import click
 import os
 from pathlib import Path
 import logging
+from ..intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 logging.basicConfig(stream=sys.stdout)
-
-try:
-   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
-except ModuleNotFoundError:
-    print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
-    print("Attempting again with adjusted sys.path ")
-    try:
-       sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    except:
-       print("Unable to adjust sys.path")
-    #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    try:
-        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
-        print(gfdlcrawler.__file__)
-    except ModuleNotFoundError:
-        sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
 #template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
