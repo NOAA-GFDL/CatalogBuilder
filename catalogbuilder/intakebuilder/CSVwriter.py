@@ -2,30 +2,20 @@ import os.path
 import csv
 import pandas as pd
 from csv import writer
-#from intakebuilder import builderconfig, configparser
-from . import builderconfig, configparser 
+#from intakebuilder import configparser
+from . import configparser 
 
 def getHeader(configyaml):
     '''
-    returns header that is the first line in the csv file, refers builderconfig.py
+    returns header that is the first line in the csv file, refers default or user passed config yaml 
     :return: headerlist with all columns
     '''
     if configyaml:
         return configyaml.headerlist
     else:
-        return builderconfig.headerlist
+        logger.debug("Can't getHeader() from config. Check header in config yaml or open an issue with error details.")
+        sys.exit(-1)
 
-def writeHeader(csvfile):
-  '''
-  writing header for the csv
-  :param csvfile: pass csvfile absolute path
-  :return: csv writer object
-  '''
-  # list containing header values
-  # inputting these headers into a csv
-  with open(csvfile, "w+", newline="") as f:
-        writerobject = csv.writer(f)
-        writerobject.writerow(builderconfig.headerlist)
 
 def file_appender(dictinputs, csvfile):
     '''

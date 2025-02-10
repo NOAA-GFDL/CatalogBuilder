@@ -5,8 +5,8 @@ import csv
 from csv import writer
 import os
 import xarray as xr
-#from intakebuilder import builderconfig, configparser
-from . import builderconfig, configparser 
+#from intakebuilder import configparser
+from . import configparser 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -104,10 +104,8 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     if configyaml:
         output_file_template = configyaml.output_file_template
     else:
-        try:
-            output_file_template = builderconfig.output_file_template
-        except:
-            sys.exit("No output_path_template found. Check configuration.")
+            logger.debug("No output_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
+            sys.exit("No output_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
     if( ".static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO error checking as needed
@@ -149,7 +147,6 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
  
    #Grab values based on their expected position in path 
     stemdir = dirpath.split("/")
-   # adding back older versions to ensure we get info from builderconfig
     stemdir = dirpath.split("/")
 
     #lets go backwards and match given input directory to the template, add things to dictInfo
@@ -158,10 +155,8 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
     if configyaml:
         output_path_template = configyaml.output_path_template
     else:
-        try:
-            output_path_template = builderconfig.output_path_template 
-        except:
-            sys.exit("No output_path_template found in builderconfig.py. Check configuration.")
+            logger.debug("No output_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
+            sys.exit("No output_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
     #If variable_id is fixed, it's a GFDL PP static dataset and the output path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
     if(variable_id == "fixed"):
         output_path_template = output_path_template[:-3 or None]
