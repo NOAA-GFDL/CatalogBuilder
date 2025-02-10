@@ -22,7 +22,7 @@ except ModuleNotFoundError:
        print("Unable to adjust sys.path")
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
-        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
+        from intakebuilder import gfdlcrawler, CSVwriter, configparser,getinfo
         print(gfdlcrawler.__file__)
     except ModuleNotFoundError:
         sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
