@@ -14,7 +14,7 @@ except:
 '''
 #This is an example call to run catalog builder using a default yaml config file without explicit specifications
 input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-output_path = "sample-mdtf-catalog"
+output_path = "default-mdtf-catalog"
 
 def create_catalog_default(input_path=input_path,output_path=output_path):
     csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path)
