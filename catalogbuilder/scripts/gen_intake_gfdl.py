@@ -41,6 +41,10 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     configyaml = None
     if (config is not None):
         configyaml = configparser.Config(config,logger)
+        if(input_path is None):
+            input_path = configyaml.input_path
+        if(output_path is None):
+            output_path = configyaml.output_path
     else:
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
         #
