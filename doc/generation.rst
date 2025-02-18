@@ -149,7 +149,7 @@ Here is another example *with a custom configuration*:
    #NOTE: If your input_path does not look like the above in general, you will need to pass a --config which is custom 
 
    #This is an example call to run catalog builder using a yaml config file.
-   configyaml = os.path.join(git_package_dir, 'catalogbuilder/scripts/configs/config-example2.yml')
+   configyaml = os.path.join(git_package_dir, 'catalogbuilder/scripts/configs/config_default.yaml')
    #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
    #output_path = "sample-mdtf-catalog"
 
