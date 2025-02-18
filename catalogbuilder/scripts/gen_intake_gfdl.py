@@ -54,8 +54,8 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                   logger.info("Default config path activated from package resources configs/config.yaml")
          except:
                  try:
-                    config = os.path.join(package_dir, 'configs/config.yaml')
-                    logger.info("Default config path activated from path configs/config.yaml")
+                    config = os.path.join(package_dir, 'configs/config_default.yaml')
+                    logger.info("Default config path activated from path configs/config_default.yaml")
                  except:
                     sys.exit("Can't locate or read config, check --config ")
          configyaml = configparser.Config(config,logger)
