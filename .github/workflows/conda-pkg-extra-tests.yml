@@ -31,14 +31,6 @@ jobs:
           path: |
             sample-mdtf-catalog.csv
             sample-mdtf-catalog.json
-    - name: Download all workflow run artifacts
-      uses: actions/download-artifact@v4
-    #upload default run artifacts
-    - name: upload-artifacts
-      uses: actions/upload-artifact@v4
-      with:
-          name: workflow-artifacts1 
-          path: |
             default-mdtf-catalog.csv
             default-mdtf-catalog.json
     - name: Download all workflow run artifacts
