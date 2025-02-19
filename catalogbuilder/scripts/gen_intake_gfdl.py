@@ -6,6 +6,7 @@ import click
 import os
 from pathlib import Path
 import logging
+import git
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
@@ -31,7 +32,7 @@ package_dir = os.path.dirname(os.path.abspath(__file__))
 #template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
 def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
-         overwrite=False, append=False, slow = False, verbose=False):
+         overwrite=False, append=False, slow = False, strict = False, verbose=False):
     if verbose:
        logger.setLevel(logging.DEBUG)
        logger.info("Verbose log activated.")
@@ -134,6 +135,33 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
            with open(csv_path, 'w') as csvfile:
                df.to_csv(csvfile,index=False)
 
+    if(strict == True):
+
+        #Do imports and neatly handle exceptions
+        try:
+            from catalogbuilder.tests.compval import main as cv
+        except:
+            print("Couldn't import validation script. Catalog will not be validated")
+        try:
+            import shutil
+        except:
+            print("Couldn't import shutil, can't remove temp dir")
+
+        #Make sure there isn't an old temp dir
+        temp = "./temp"
+        if os.path.exists(temp):
+            shutil.rmtree(temp)
+
+        #Get CV's and store in temp directory to be cleaned later
+        url = "https://github.com/WCRP-CMIP/CMIP6_CVs.git"
+        repo = git.Repo.clone_from(url, to_path=temp)
+
+        #Validate
+        cv([json_path,temp])
+
+        #Clean up
+        shutil.rmtree(temp)
+
     print("JSON generated at:", os.path.abspath(json_path))
     print("CSV generated at:", os.path.abspath(csv_path))
     logger.info("CSV generated at" + os.path.abspath(csv_path))
@@ -153,6 +181,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
 @click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
+@click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CMIP standards')
 @click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
 
 def create_catalog_cli(**kwargs):
