@@ -17,7 +17,12 @@ setup(
         'jsondiff',
         'intake-esm',
         'boto3'
-    ]
+    ],
+
+    entry_points={
+        'console_scripts': [
+            'gen_intake_gfdl = catalogbuilder.scripts.gen_intake_gfdl:create_catalog_cli'
+        ],
+    }
+
 )
-
-
