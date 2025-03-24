@@ -3,7 +3,7 @@ Background
 
 The catalog builder project is a “python community package ecosystem” that allows you to generate data catalogs compatible with intake-esm.  Available as a Conda package. 
 
-See our `Github repository here <https://github.com/aradhakrishnanGFDL/CatalogBuilder>`_.
+See our `Github repository here <https://github.com/NOAA-GFDL/CatalogBuilder>`_.
 We have contributing guidelines and code of conduct documented in our GitHub repo. We welcome your contributions. 
 
 Brief overview on data catalogs 

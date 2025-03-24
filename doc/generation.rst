@@ -98,7 +98,7 @@ Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUT
                   "member_id", "grid_label", "variable_id",
                   "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
 
-The headerlist is expected column names in your catalog/csv file. This is usually determined by the users in conjuction
+The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
 with the ESM collection specification standards and the appropriate workflows.
 
 .. code-block:: yaml
@@ -126,28 +126,82 @@ From a Python script
 Do you have a python script or a notebook where you could also include steps to generate a data catalog? 
 See example `here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/scripts/gen_intake_gfdl_runner_config.py>`_
 
-Here is another example
+Here is another example *with a custom configuration*:
 
 .. code-block:: console
 
- #!/usr/bin/env python
+   import sys, os 
+   git_package_dir = '/home/a1r/git/forkCatalogBuilder-/'
+   sys.path.append(git_package_dir)
 
- #TODO test after conda pkg is published and make changes as needed 
- from catalogbuilder.scripts import gen_intake_gfdl
- import sys
+   import catalogbuilder
+   from catalogbuilder.scripts import gen_intake_gfdl
+   ######USER input begins########
 
- input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
- output_path = "test"
- try:
-  gen_intake_gfdl.create_catalog(input_path,output_path)
- except:
-  sys.exit("Exception occured calling gen_intake_gfdl.create_catalog")
+   #User provides the input directory for which a data catalog needs to be generated.
 
+   input_path = "/archive/John.Krasting/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/"
+   #/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
+
+   #USER inputs the output path. Based on the following setting, user can expect to see /home/a1r/mycatalog.csv and /home/a1r/mycatalog.json generated as output.
+
+   output_path = "/home/a1r/tests/mycatalog-jpk-def"
+   #NOTE: If your input_path does not look like the above in general, you will need to pass a --config which is custom 
+
+   #This is an example call to run catalog builder using a yaml config file.
+   configyaml = os.path.join(git_package_dir, 'catalogbuilder/scripts/configs/config_default.yaml')
+   #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
+   #output_path = "sample-mdtf-catalog"
+
+   def create_catalog_from_config(input_path=input_path,output_path=output_path,configyaml=configyaml):
+    csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path,config=configyaml)
+       return(csv,json)
+
+   if __name__ == '__main__':
+       create_catalog_from_config(input_path,output_path) #,configyaml)
+
+And an example *with a default configuration*:
+
+.. code-block:: console
+
+   import sys, os 
+   git_package_dir = '/home/a1r/git/forkCatalogBuilder-/'
+   sys.path.append(git_package_dir)
+
+   import catalogbuilder
+   from catalogbuilder.scripts import gen_intake_gfdl
+   print(gen_intake_gfdl.__file__)
+
+   ######USER input begins########
+
+   #User provides the input directory for which a data catalog needs to be generated.
+
+   input_path = "/archive/a1r/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/"
+   #/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
+
+   #USER inputs the output path. Based on the following setting, user can expect to see /home/a1r/mycatalog.csv and /home/a1r/mycatalog.json generated as output.
+
+   output_path = "/home/a1r/tests/static-catalog"
+   #NOTE: If your input_path does not look like the above in general, you will need to pass a --config which is custom 
+    ####END OF user input ##########
+
+   #This is an example call to run catalog builder using a yaml config file.
+
+   configyaml = os.path.join(git_package_dir, 'configs/config-template.yaml')
+   #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
+   #output_path = "sample-mdtf-catalog"
+
+   def create_catalog_from_config(input_path=input_path,output_path=output_path): #,configyaml=configyaml):
+       csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path)#,verbose=True,config=configyaml)
+        return(csv,json)
+
+   if __name__ == '__main__':
+       csv,json = create_catalog_from_config(input_path,output_path)#,configyaml)
+    
 From Jupyter Notebook
 ---------------------
 
-Refer to this `notebook <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/scripts/gen_intake_gfdl_notebook.ipynb>`_ to see how you can generate catalogs from a Jupyter Notebook
-
+Refer to this `notebook <https://github.com/aradhakrishnanGFDL/canopy-cats/blob/main/notebooks/cm4_default.ipynb>`_ to see how you can generate catalogs from a Jupyter Notebook
 
 .. image:: _static/catalog_generation.png
   :alt: Screenshot of a notebook showing catalog generation
@@ -178,10 +232,23 @@ See `Flags`_ here.
 See `Fre-CLI Documentation here <https://noaa-gfdl.github.io/fre-cli/>`_
 
 
-Flags
+Arguments/Options
 _____
+
+**Input/Output paths can be passed directly to catalog builder tool through calling command**
+
+All methods of catalog builder generation support direct input/output path passing.
+
+Input path must be the 1st argument. Output path must be the 2nd.
+
+Ex. gen_intake_gfdl.py /archive/Some.User/input-path ./output_path
+
 
 .. Reference `Flags`_.
 
-- overwrite - Overwrite an existing catalog at the given output path
-- append - Append (without headerlist) to an existing catalog at the given output path
+- --config - Allows for catalogs to be generated with a custom configuration. Requires path to YAML configuration file. (Ex. "--config custom_config.yaml")  
+- --overwrite - Overwrite an existing catalog at the given output path
+- --append - Append (without headerlist) to an existing catalog at the given output path
+- --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your output_path_template**
+- --i - Optional method for passing input path
+- --o - Optional method for passing output path

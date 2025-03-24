@@ -15,9 +15,14 @@ setup(
         'xarray',
         'pandas',
         'jsondiff',
-        'intake-esm==2023.7.7',
+        'intake-esm',
         'boto3'
-    ]
+    ],
+
+    entry_points={
+        'console_scripts': [
+            'gen_intake_gfdl = catalogbuilder.scripts.gen_intake_gfdl:create_catalog_cli'
+        ],
+    }
+
 )
-
-
