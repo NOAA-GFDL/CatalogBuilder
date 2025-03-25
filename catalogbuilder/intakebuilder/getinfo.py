@@ -132,6 +132,13 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           dictInfo["table_id"] = "fx"
     return dictInfo
 
+def getRealm(dictInfo):
+     realm = ""
+     if (dictInfo["source_id"] == "cam"):
+         realm = "atmos"
+         dictInfo["realm"] = realm
+     return(dictInfo)
+
 def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger):
     '''
     Returns info from project directory and the DRS path to the file
@@ -188,6 +195,10 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
          logger.debug("This is likely static")
          dictInfo["cell_methods"] = ""
          dictInfo["member_id"] = "" 
+    #CAM ESM: If realm is empty, ensure if there is a helper utility to populate this
+     
+      if("realm" not in dictInfo.keys()):
+         dictInfo = getRealm(dictInfo)
     return dictInfo
 
 def getInfoFromDRS(dirpath,projectdir,dictInfo):
@@ -222,8 +233,9 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     :return: dictInfo with all variable atts 
     '''
     #try:
+     
     filexr,filexra = return_xr(fname)
-    #print("Variable atts from file:",filexr[variable_id])
+    #print("look up Variable atts from file:",filexr[variable_id])
     if (dictInfo[att] == "na"):
       try:
           cfname = filexr[variable_id].attrs["standard_name"]
