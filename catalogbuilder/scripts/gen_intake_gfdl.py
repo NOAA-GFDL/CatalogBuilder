@@ -15,16 +15,16 @@ logging.basicConfig(stream=sys.stdout)
 try:
    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
 except ModuleNotFoundError:
-    print("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
-    print("Attempting again with adjusted sys.path ")
+    logger.info("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
+    logger.info("Attempting again with adjusted sys.path ")
     try:
        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     except:
-       print("Unable to adjust sys.path")
+       logger.error("Unable to adjust sys.path")
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
         from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
-        print(gfdlcrawler.__file__)
+        logger.info(gfdlcrawler.__file__)
     except ModuleNotFoundError:
         sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
 
@@ -54,7 +54,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
     else:
             template_path = configyaml.schema
-            print("Using schema from config file", template_path)
+            logger.info("Using schema from config file", template_path)
     if not os.path.exists(input_path):
         sys.exit("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
@@ -138,14 +138,8 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     if(strict == True):
 
         #Do imports and neatly handle exceptions
-        try:
-            from catalogbuilder.tests.compval import main as cv
-        except:
-            print("Couldn't import validation script. Catalog will not be validated")
-        try:
-            import shutil
-        except:
-            print("Couldn't import shutil, can't remove temp dir")
+        from catalogbuilder.tests.compval import main as cv
+        import shutil
 
         #Make sure there isn't an old temp dir
         temp = "./temp"
@@ -153,18 +147,24 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             shutil.rmtree(temp)
 
         #Get CV's and store in temp directory to be cleaned later
-        url = "https://github.com/WCRP-CMIP/CMIP6_CVs.git"
+        #url = "https://github.com/WCRP-CMIP/CMIP6_CVs.git"
+        url = "https://github.com/NOAA-GFDL/CMIP6_CVs.git"
         repo = git.Repo.clone_from(url, to_path=temp)
 
         #Validate
-        cv([json_path,temp])
+        try:
+            cv([json_path,temp])
+        except ValueError:
+            logger.error("Error found when validating. Please resolve these issues.")
+            sys.exit()
+            #raise ValueError("Error found when validating. Please resolve these issues.")
+            
 
         #Clean up
         shutil.rmtree(temp)
 
-    print("JSON generated at:", os.path.abspath(json_path))
-    print("CSV generated at:", os.path.abspath(csv_path))
-    logger.info("CSV generated at" + os.path.abspath(csv_path))
+    logger.info("JSON generated at: " + os.path.abspath(json_path))
+    logger.info("CSV generated at: " + os.path.abspath(csv_path))
     return(csv_path,json_path)
 
 #Setting up argument parsing/flags

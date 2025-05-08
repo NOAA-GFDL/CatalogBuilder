@@ -8,6 +8,11 @@ import sys
 import os
 import re
 import math
+import logging
+
+logger = logging.getLogger('local')
+logger.setLevel(logging.INFO)
+logging.basicConfig(stream=sys.stdout)
 
 @click.command()
 @click.argument('json_path',nargs=1,required=True)
@@ -110,12 +115,16 @@ def main(json_path=None, cv_dir_path=None):
                              bad_vocab.append(z)
 
     if nan_list:
-        print("WARNING: NaN's found in: " + str(nan_list))
+        #print("WARNING: NaN's found in: " + str(nan_list))
+        logger.warn("WARNING: NaN's found in: " + str(nan_list))
 
     if bad_vocab:
-        print("Found inconsistent value(s): " + str(bad_vocab))
+        #print("Found inconsistent value(s): " + str(bad_vocab))
+        logger.error("Found inconsistent value(s): " + str(bad_vocab))
+        raise ValueError("Found inconsistent value(s): " + str(bad_vocab))
     else:
         print("Check passed.")
+        return
 
 if __name__ == '__main__':
     main()
