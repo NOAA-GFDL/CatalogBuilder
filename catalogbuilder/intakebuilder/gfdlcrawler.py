@@ -1,6 +1,5 @@
 import os
-#from intakebuilder import getinfo, builderconfig
-from . import getinfo, builderconfig
+from . import getinfo
 import sys
 import re
 import operator as op
@@ -24,7 +23,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     if configyaml:
        headerlist = configyaml.headerlist
     else:
-       headerlist = builderconfig.headerlist
+       logger.debug("Unable to get headerlist from config yaml")
+       sys.exit("Unable to get headerlist from config yaml")
     #For those columns that we cannot find in output path template or output file template from config yaml, we have hooks
     #now to look up the netcdf dataset if slow option is True
     #todo catch exceptions upon furhter testing
@@ -38,15 +38,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
           list_ptemplate = configyaml.output_path_template
           list_ftemplate = configyaml.output_file_template
     else:
-        #if it is none, the user is likely using default config which may be phased out, or redesigned to use a config template json rather than builderconfig
-        try:
-           list_ptemplate = builderconfig.output_path_template
-        except:
-           sys.exit("output_path_template is not set. Check your configuration")
-        try:
-           list_ftemplate = builderconfig.output_file_template
-        except:
-           sys.exit("output_file_template is not set. Check your configuration")
+          logger.debug("output_file_template is not set. Check your configuration")
+          sys.exit("output_file_template is not set. Check your configuration")
     set_ptemplate = set(list_ptemplate)
     set_ftemplate = set(list_ftemplate)
     #print(headerlist)
