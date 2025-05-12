@@ -179,8 +179,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             cv([json_path,temp])
         except ValueError:
             logger.error("Error found when validating. Please resolve these issues.")
-            raise ValueError("Error found when validating. Please resolve these issues.")
-            
+            sys.exit(1)
 
         #Clean up
         shutil.rmtree(temp)
