@@ -18,15 +18,16 @@ except ModuleNotFoundError:
     logger.info("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     logger.info("Attempting again with adjusted sys.path ")
     try:
-       sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     except:
-       logger.error("Unable to adjust sys.path")
+        logger.error("Unable to adjust sys.path")
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
         from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
         logger.info(gfdlcrawler.__file__)
     except ModuleNotFoundError:
-        sys.exit("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
+        logger.error("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
+        raise ImportError("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
 #template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
@@ -34,11 +35,11 @@ package_dir = os.path.dirname(os.path.abspath(__file__))
 def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False, slow = False, strict = False, verbose=False):
     if verbose:
-       logger.setLevel(logging.DEBUG)
-       logger.info("Verbose log activated.")
+        logger.setLevel(logging.DEBUG)
+        logger.info("Verbose log activated.")
     else:
-       logger.setLevel(logging.INFO)
-       logger.info("[Mostly] silent log activated")
+        logger.setLevel(logging.INFO)
+        logger.info("[Mostly] silent log activated")
     configyaml = None
     # TODO error catching
     if (config is not None):
@@ -48,17 +49,20 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         if(output_path is None):
             output_path = configyaml.output_path
     if((input_path is None) or (output_path is None)):
-       sys.exit("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")     
+        logger.error("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
+        raise TypeError("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
     if config is None or not configyaml.schema:
-            logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
-            template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+        logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
+        template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
     else:
-            template_path = configyaml.schema
-            logger.info("Using schema from config file", template_path)
+        template_path = configyaml.schema
+        logger.info("Using schema from config file", template_path)
     if not os.path.exists(input_path):
-        sys.exit("Input path does not exist. Adjust configuration.")
+        logger.error("Input path does not exist. Adjust configuration.")
+        raise FileNotFoundError("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
-        sys.exit("Output path parent directory does not exist. Adjust configuration.")
+        logger.error("Output path parent directory does not exist. Adjust configuration.")
+        raise ValueError("Output path parent directory does not exist. Adjust configuration.")
     logger.info("input path: "+ input_path)
     logger.info( " output path: "+ output_path)
     project_dir = input_path
@@ -105,38 +109,38 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     CSVwriter.listdict_to_csv(list_files, headers, csv_path, overwrite, append,slow)
     df = None
     if(slow == False) & ('standard_name' in headers ):
-               #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
-                      df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
-                      list_variable_id = []
-                      try:
-                          list_variable_id = df["variable_id"].unique().tolist()
-                      except:
-                          print("Having trouble finding 'variable_id'... Be sure to add it to the output_path_template field of your configuration")
-                      try:
-                          list_realm = df["realm"].unique().tolist()
-                      except:
-                          print("Having trouble finding 'realm'... Be sure to add it to the output_path_template field of your configuration")
-                      dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
-                      #print("standard name from look-up table-", dictVarCF)
-                      for k, v in dictVarCF.items():
-                        try:
-                           var = k.split(",")[0]
-                        except ValueError:
-                           continue
-                        try:
-                           realm = k.split(",")[1]
-                        except ValueError:
-                           continue 
-                        if(var is not None) & (realm is not None):
-                            df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
-                        #df['standard_name'].loc[(df['variable_id'] == k)] = v
-    if(slow == False) & ('standard_name' in headers):
-       if ((df is not None) & (len(df) != 0) ):
-           with open(csv_path, 'w') as csvfile:
-               df.to_csv(csvfile,index=False)
+        #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
+        df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
+        list_variable_id = []
+        try:
+            list_variable_id = df["variable_id"].unique().tolist()
+        except:
+            print("Having trouble finding 'variable_id'... Be sure to add it to the output_path_template field of your configuration")
+        try:
+            list_realm = df["realm"].unique().tolist()
+        except:
+            print("Having trouble finding 'realm'... Be sure to add it to the output_path_template field of your configuration")
+        dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
+        #print("standard name from look-up table-", dictVarCF)
+        for k, v in dictVarCF.items():
+            try:
+                var = k.split(",")[0]
+            except ValueError:
+                continue
+            try:
+                realm = k.split(",")[1]
+            except ValueError:
+                continue 
+            if(var is not None) & (realm is not None):
+                df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
+                #df['standard_name'].loc[(df['variable_id'] == k)] = v
 
+        if ((df is not None) & (len(df) != 0) ):
+            with open(csv_path, 'w') as csvfile:
+                df.to_csv(csvfile,index=False)
+
+    # Strict Mode
     if(strict == True):
-
         #Do imports and neatly handle exceptions
         from catalogbuilder.tests.compval import main as cv
         import shutil
@@ -156,8 +160,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             cv([json_path,temp])
         except ValueError:
             logger.error("Error found when validating. Please resolve these issues.")
-            sys.exit()
-            #raise ValueError("Error found when validating. Please resolve these issues.")
+            raise ValueError("Error found when validating. Please resolve these issues.")
             
 
         #Clean up
