@@ -31,11 +31,4 @@ output_path_template: ['NA','NA','source_id','NA','experiment_id','platform','cu
 
 output_file_template: ['realm','time_range','variable_id']
 
-#OUTPUT FILE INFO is currently passed as command-line argument.
-#We will revisit adding a csvfile, jsonfile and logfile configuration to the builder configuration file in the future.
-#csvfile =  #jsonfile =  #logfile =
-
 #######################################################
-
-input_path:  "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-output_path: "sample-mdtf-catalog"  # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)

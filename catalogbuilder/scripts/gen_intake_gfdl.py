@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 logging.basicConfig(stream=sys.stdout)
 
 try:
-   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser, getinfo
+   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 except ModuleNotFoundError:
     logger.info("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     logger.info("Attempting again with adjusted sys.path ")
@@ -23,8 +23,10 @@ except ModuleNotFoundError:
         logger.error("Unable to adjust sys.path")
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
+
         from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
         logger.info(gfdlcrawler.__file__)
+
     except ModuleNotFoundError:
         logger.error("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
         raise ImportError("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
@@ -41,12 +43,29 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         logger.setLevel(logging.INFO)
         logger.info("[Mostly] silent log activated")
     configyaml = None
-    # TODO error catching
     if (config is not None):
         configyaml = configparser.Config(config,logger)
-        if(input_path is None):     
+        if(input_path is None):
             input_path = configyaml.input_path
         if(output_path is None):
+            output_path = configyaml.output_path
+    else:
+            # If user does not pass a config, we will use the default config with the same format to avoid special cases
+        #
+         try:
+                  pkg = importlib_resources.files("catalogbuilder.scripts")
+                  config = pkg / "configs" / "config.yaml"
+                  logger.info("Default config path activated from package resources configs/config.yaml")
+         except:
+                 try:
+                    config = os.path.join(package_dir, 'configs/config_default.yaml')
+                    logger.info("Default config path activated from path configs/config_default.yaml")
+                 except:
+                    sys.exit("Can't locate or read config, check --config ")
+         configyaml = configparser.Config(config,logger)
+         if(input_path is None):     
+            input_path = configyaml.input_path
+         if(output_path is None):
             output_path = configyaml.output_path
     if((input_path is None) or (output_path is None)):
         logger.error("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
