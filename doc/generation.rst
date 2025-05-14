@@ -121,6 +121,11 @@ simply specify the associated header name in the appropriate place. E.g. The thi
   input_path:  "/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/"
   output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can  be an absolute or a relative path
 
+Template
+--------
+
+All data catalogs are generated using a template file. This file defines headerlist, output path template, output file template, and input/output paths.
+
 From a Python script
 ---------------------
 Do you have a python script or a notebook where you could also include steps to generate a data catalog? 
@@ -250,5 +255,6 @@ Ex. gen_intake_gfdl.py /archive/Some.User/input-path ./output_path
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your output_path_template**
+- --strict - Activates strict mode which validates catalogs during generation
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path

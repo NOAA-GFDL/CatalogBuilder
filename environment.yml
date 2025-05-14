@@ -13,4 +13,6 @@ dependencies:
   - jsondiff
   - intake-esm
   - boto3
+  - gitpython
   - importlib_resources
+
