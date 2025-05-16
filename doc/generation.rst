@@ -214,6 +214,7 @@ Using FRE-CLI (GFDL only)
 Setup FRE-CLI through Lmod following `their setup documentation <https://noaa-gfdl.github.io/fre-cli/setup.html#on-gfdl-systems>`_.
 
 .. code-block:: console
+
   # find the most recent version of fre
   module avail fre
   # load the fre module. replace <NN> with the latest version
@@ -222,7 +223,9 @@ Setup FRE-CLI through Lmod following `their setup documentation <https://noaa-gf
 **2. Call the builder**
 
 Generate a catalog by running:
+
 .. code-block:: console
+
   fre catalog builder $INPUT_PATH $OUTPUT_PATH
 
 (OUTPUT_PATH should end with the desired output filename WITHOUT a file ending) See example below.
