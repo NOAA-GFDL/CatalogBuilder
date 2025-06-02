@@ -51,7 +51,7 @@ def main(json_path=None, cv_dir_path=None):
                 try:
                     cv = json.load(open(cv_dir_path+'/CMIP6_'+cv_type+'.json'))
                 except:
-                    sys.exit("Unable to open json: " + cv_type)
+                    raise IOError("Unable to open json: " + cv_type)
 
                 #Ignoring directory structure for now
                 if list(cv.keys())[0] == 'DRS':
@@ -100,7 +100,7 @@ def main(json_path=None, cv_dir_path=None):
                 try:
                     df = pd.read_json(cv_url)
                 except:
-                    sys.exit("Unable to open json: " + list(x.values())[0])
+                    raise IOError("Unable to open json: " + str(list(x.values())[0]))
 
                 #This will probably break if formatting is different. Will adjust if necessary.
                 for y in df[list(x.values())[0]].keys():
@@ -115,15 +115,13 @@ def main(json_path=None, cv_dir_path=None):
                              bad_vocab.append(z)
 
     if nan_list:
-        #print("WARNING: NaN's found in: " + str(nan_list))
         logger.warn("WARNING: NaN's found in: " + str(nan_list))
 
     if bad_vocab:
-        #print("Found inconsistent value(s): " + str(bad_vocab))
         logger.error("Found inconsistent value(s): " + str(bad_vocab))
         raise ValueError("Found inconsistent value(s): " + str(bad_vocab))
     else:
-        print("Check passed.")
+        logger.info("Check passed.")
         return
 
 if __name__ == '__main__':

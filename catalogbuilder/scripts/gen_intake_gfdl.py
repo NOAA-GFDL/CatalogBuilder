@@ -15,8 +15,8 @@ logging.basicConfig(stream=sys.stdout)
 try:
    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 except ModuleNotFoundError:
-    logger.info("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
-    logger.info("Attempting again with adjusted sys.path ")
+    logger.warning("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
+    logger.warning("Attempting again with adjusted sys.path ")
     try:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     except:
@@ -40,7 +40,6 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         logger.setLevel(logging.DEBUG)
         logger.info("Verbose log activated.")
     else:
-        logger.setLevel(logging.INFO)
         logger.info("[Mostly] silent log activated")
     configyaml = None
     if (config is not None):
@@ -61,7 +60,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                 config = os.path.join(package_dir, 'configs/config_default.yaml')
                 logger.info("Default config path activated from path configs/config_default.yaml")
             except:
-                sys.exit("Can't locate or read config, check --config ")
+                raise FileNotFoundError("Can't locate or read config, check --config ")
         configyaml = configparser.Config(config,logger)
         if(input_path is None):
             input_path = configyaml.input_path
@@ -127,18 +126,19 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     CSVwriter.listdict_to_csv(list_files, headers, csv_path, overwrite, append,slow)
     df = None
-    if(slow == False) & ('standard_name' in headers ):
+
+    if not slow and 'standard_name' in headers:
         #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
         df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
         list_variable_id = []
         try:
             list_variable_id = df["variable_id"].unique().tolist()
         except:
-            print("Having trouble finding 'variable_id'... Be sure to add it to the output_path_template field of your configuration")
+            raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the output_path_template field of your configuration")
         try:
             list_realm = df["realm"].unique().tolist()
         except:
-            print("Having trouble finding 'realm'... Be sure to add it to the output_path_template field of your configuration")
+            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the output_path_template field of your configuration")
         dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
         #print("standard name from look-up table-", dictVarCF)
         for k, v in dictVarCF.items():
@@ -159,7 +159,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                 df.to_csv(csvfile,index=False)
 
     # Strict Mode
-    if(strict == True):
+    if strict:
         #Do imports and neatly handle exceptions
         from catalogbuilder.tests.compval import main as cv
         import shutil
@@ -178,7 +178,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         try:
             cv([json_path,temp])
         except ValueError:
-            logger.error("Error found when validating. Please resolve these issues.")
+            logger.error("Error(s) found when validating. Please resolve issues.")
             sys.exit(1)
 
         #Clean up
