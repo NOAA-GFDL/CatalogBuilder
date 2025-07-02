@@ -9,6 +9,7 @@ import os
 import re
 import math
 import logging
+import urllib.request
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
@@ -30,100 +31,72 @@ def main(json_path=None, cv_dir_path=None):
 
          To validate against CMIP CV's: compval <json_path> <cv_dir_path>
          (Must clone WCRP-CMIP/CMIP6_CVs github directory. CV is found automatically given the path to this directory) '''
-    bad_vocab = []
+    bad_vocab = {}
     nan_list = []
     vocab_list = []
+    urls = {}
 
     #Open catalog json
-    j = json.load(open(json_path))
+    try:
+        j = json.load(open(json_path))
+    except:
+        raise IOError("Unable to open file. Is this the generated catalog json file?")
 
     #Get CSV from JSON and open it
     csv_path = str(j["catalog_file"])
     catalog = pd.read_csv(csv_path)
 
-    if cv_dir_path:
-    #Gather all CV's from CMIP6_CV Dir
-        for filename in os.listdir(cv_dir_path):
-            if str(filename).startswith("CMIP6"):
-                cv_type = re.search('CMIP6_(.*).json',str(filename)).group(1)
+    #Parse through the JSON and find which CV is needed
+    for x in j["attributes"]:
 
-                #Open JSON
-                try:
-                    cv = json.load(open(cv_dir_path+'/CMIP6_'+cv_type+'.json'))
-                except:
-                    raise IOError("Unable to open json: " + cv_type)
+        #Checks to see if the vocabulary field is filled out. If so, use the vocab. Also, we avoid chunk_freq because it's currently broken.
+        try:
+            if 'chunk_freq' not in x["column_name"] and x["vocabulary"]:
+                cv_url = x["vocabulary"]
+                logger.info("Validating " + x["column_name"] + " vocabulary")
+            else:
+                continue
+        except KeyError:
+            logger.warn("Missing vocabulary field in catalog schema")
 
-                #Ignoring directory structure for now
-                if list(cv.keys())[0] == 'DRS':
+        try:
+            with urllib.request.urlopen(cv_url) as f:
+                json_data = json.load(f)
+        except:
+            raise IOError("Unable to open json: " + str(list(x.values())[0]))
+
+        #This will probably break if formatting is different. Will adjust if necessary.
+        try:
+            for y in json_data[x['column_name']].keys():
+                vocab_list.append(y)
+        except AttributeError:
+            for y in json_data[x['column_name']]:
+                vocab_list.append(y)
+
+        #Look for "bad vocab" in the CSV
+        for z in catalog[list(x.values())[0]]:
+            if z not in vocab_list and z not in bad_vocab:
+                if not isinstance(z,str) and math.isnan(z):
                     continue
-                    #vals = list(cv.values())
-                    #dir_structure = list(vals[0].values())[2]
-
                 else:
-                    vals = list(cv.values())
-
-                    #Sometimes the CV formats are a little different :)
-                    if isinstance(vals[0],list):
-                        for vocab in vals[0]:
-                            vocab_list.append(vocab)
-
-                    else: 
-                        for vocab in vals[0].keys():
-                            vocab_list.append(vocab)
-                  
-                #Sometimes our catalogs don't include the cv type as a column
-                if cv_type in catalog:
-
-                    for y in catalog[cv_type]:
-
-                        #If there's NaN's this whole thing will break so let's get those out of the way
-                        if not isinstance(y,str) and math.isnan(y):
-                            #Add to the nan list 
-                            if cv_type not in nan_list:
-                                nan_list.append(cv_type)
-                                continue
-                            else:
-                                continue
-
-                        #Check for bad vocab
-                        if y not in vocab_list and y not in bad_vocab:
-                            bad_vocab.append(y)
-
-    else:
-        #Parse through the JSON and find which CV is needed
-
-        for x in j["attributes"]:
-
-            #Checks to see if the vocabulary field is filled out. If so, use the vocab. Also, we avoid chunk_freq because it's currently broken.
-            if list(x.values())[1]:
-                cv_url = list(x.values())[1]
-                try:
-                    df = pd.read_json(cv_url)
-                except:
-                    raise IOError("Unable to open json: " + str(list(x.values())[0]))
-
-                #This will probably break if formatting is different. Will adjust if necessary.
-                for y in df[list(x.values())[0]].keys():
-                    vocab_list.append(y)
-
-                #Look for "bad vocab" in the CSV
-                for z in catalog[list(x.values())[0]]:
-                    if z not in vocab_list and z not in bad_vocab:
-                        if not isinstance(z,str) and math.isnan(z):
-                            continue
-                        else:
-                             bad_vocab.append(z)
+                    #Update the bad vocabulary dictionary (column name has to be value because we can't have duplicate keys)
+                    bad_vocab.update({z:x['column_name']})
+                    #We keep track of all the urls users need to correct their bad vocabulary
+                    if x['column_name'] not in urls:
+                        urls.update({x['column_name']:cv_url})
 
     if nan_list:
         logger.warn("WARNING: NaN's found in: " + str(nan_list))
 
     if bad_vocab:
-        logger.error("Found inconsistent value(s): " + str(bad_vocab))
-        raise ValueError("Found inconsistent value(s): " + str(bad_vocab))
+        for entry in bad_vocab:
+            logger.error("Inconsistent " + bad_vocab[entry] + " value: " + '"' + entry + '"')
+        for entry in urls:
+            logger.info("Compliant " + entry + " vocabulary can be found here: " + urls[entry])
+        raise ValueError("Found inconsistent value(s): ")
     else:
         logger.info("Check passed.")
         return
 
 if __name__ == '__main__':
     main()
-
