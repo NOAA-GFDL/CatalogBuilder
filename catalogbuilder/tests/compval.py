@@ -22,7 +22,6 @@ def main(json_path=None):
     ''' This test validates catalogs against CMIP6 or GFDL controlled vocabulary (CV) as provided by particular JSON schemas per vocabulary type. CMIP6 CV's are found in the WCRP-CMIP/CMIP6_CVs github repository. GFDL CV's are found in the NOAA-GFDL/CMIP6_CVs github repository.
 
      JSON_PATH = Path to generated catalog JSON schema
-     CV_DIR_PATH = Path to CMIP6 CV Repository.
 
      USAGE:
          To validate against GFDL CV's: compval <json_path>
