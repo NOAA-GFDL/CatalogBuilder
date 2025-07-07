@@ -7,13 +7,14 @@ import os
 from pathlib import Path
 import logging
 import git
+from catalogbuilder.tests.compval import main as cv
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 logging.basicConfig(stream=sys.stdout)
 
 try:
-   from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
+    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 except ModuleNotFoundError:
     logger.warning("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     logger.warning("Attempting again with adjusted sys.path ")
@@ -82,10 +83,10 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         logger.error("Output path parent directory does not exist. Adjust configuration.")
         raise ValueError("Output path parent directory does not exist. Adjust configuration.")
     logger.info("input path: "+ input_path)
-    logger.info( " output path: "+ output_path)
+    logger.info("output path: "+ output_path)
     project_dir = input_path
     csv_path = "{0}.csv".format(output_path)
-    json_path = "{0}.json".format(output_path) 
+    json_path = "{0}.json".format(output_path)
 
     ######### SEARCH FILTERS ###########################
 
@@ -149,7 +150,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             try:
                 realm = k.split(",")[1]
             except ValueError:
-                continue 
+                continue
             if(var is not None) & (realm is not None):
                 df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
                 #df['standard_name'].loc[(df['variable_id'] == k)] = v
@@ -160,29 +161,13 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 
     # Strict Mode
     if strict:
-        #Do imports and neatly handle exceptions
-        from catalogbuilder.tests.compval import main as cv
-        import shutil
-
-        #Make sure there isn't an old temp dir
-        temp = "./temp"
-        if os.path.exists(temp):
-            shutil.rmtree(temp)
-
-        #Get CV's and store in temp directory to be cleaned later
-        #url = "https://github.com/WCRP-CMIP/CMIP6_CVs.git"
-        url = "https://github.com/NOAA-GFDL/CMIP6_CVs.git"
-        repo = git.Repo.clone_from(url, to_path=temp)
 
         #Validate
         try:
-            cv([json_path,temp])
+            cv([json_path])
         except ValueError:
             logger.error("Error(s) found when validating. Please resolve issues.")
             sys.exit(1)
-
-        #Clean up
-        shutil.rmtree(temp)
 
     logger.info("JSON generated at: " + os.path.abspath(json_path))
     logger.info("CSV generated at: " + os.path.abspath(csv_path))
@@ -207,6 +192,6 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 
 def create_catalog_cli(**kwargs):
     return create_catalog(**kwargs)
-                          
+
 if __name__ == '__main__':
     create_catalog_cli()
