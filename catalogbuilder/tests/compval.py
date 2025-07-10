@@ -93,15 +93,17 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
 
         if bad_vocab:
             for entry in bad_vocab:
-                logger.error("Inconsistent " + bad_vocab[entry] + " value: " + '"' + entry + '"')
+                if not entry == list(bad_vocab.keys())[-1]:
+                    logger.error("Inconsistent " + bad_vocab[entry] + " value: " + '"' + entry + '"')
+                    continue
+                logger.error("Inconsistent " + bad_vocab[entry] + " value: " + '"' + entry + '"\n')
             for entry in urls:
                 logger.info("Compliant " + entry + " vocabulary can be found here: " + urls[entry])
             if not test_failure:
                 raise ValueError("Found inconsistent value(s)")
-            logger.warning("Found inconsistent value(s)")
+            logger.warning("Found inconsistent value(s)\n")
         else:
             logger.info("Check passed.")
-            #return
 
     if proper_generation:
 
