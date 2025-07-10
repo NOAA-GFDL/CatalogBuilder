@@ -60,7 +60,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
                 else:
                     continue
             except KeyError:
-                logger.warn("Missing vocabulary field in catalog schema")
+                logger.warning("Missing vocabulary field in catalog schema")
 
             try:
                 with urllib.request.urlopen(cv_url) as f:
@@ -89,7 +89,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
                             urls.update({attribute['column_name']:cv_url})
 
         if nan_list:
-            logger.warn("WARNING: NaN's found in: " + str(nan_list))
+            logger.warning("WARNING: NaN's found in: " + str(nan_list))
 
         if bad_vocab:
             for entry in bad_vocab:
@@ -98,7 +98,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
                 logger.info("Compliant " + entry + " vocabulary can be found here: " + urls[entry])
             if not test_failure:
                 raise ValueError("Found inconsistent value(s)")
-            logger.warn("Found inconsistent value(s)")
+            logger.warning("Found inconsistent value(s)")
         else:
             logger.info("Check passed.")
             #return
@@ -115,7 +115,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
         for key in comp.keys():
             if key != 'catalog_file':
                 if test_failure:
-                    logger.warn(key + ' section of JSON does not refect template')
+                    logger.warning(key + ' section of JSON does not refect template')
                 else:
                     raise ValueError(key + ' section of JSON does not refect template')
 
@@ -125,7 +125,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
 
         if len(catalog.index) < 1:
             if test_failure:
-                logger.warn("Catalog has no values")
+                logger.warning("Catalog has no values")
             else:
                 raise ValueError("Catalog has no values")
 
@@ -146,7 +146,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
 
         if errors > 0:
             if test_failure:
-                logger.warn("Found " + str(errors) + " errors.")
+                logger.warning("Found " + str(errors) + " errors.")
             else:
                 raise Exception("Found " + str(errors) + " errors.")
 
