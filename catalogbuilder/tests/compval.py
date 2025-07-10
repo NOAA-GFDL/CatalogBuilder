@@ -38,6 +38,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
     except:
         raise IOError("Unable to open file. Is this the generated catalog json file?")
 
+    # VOCABULARY VALIDATION IS DONE HERE
     if vocab:
 
         bad_vocab = {}
@@ -105,6 +106,7 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
         else:
             logger.info("Check passed.")
 
+    # COMPLETENESS/SCHEMA REFLECTION VALIDATION IS DONE HERE
     if proper_generation:
 
         if json_template_path:
