@@ -146,9 +146,9 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
 
         if errors > 0:
             if test_failure:
-                logger.warn("Found " + errors + " errors.")
+                logger.warn("Found " + str(errors) + " errors.")
             else:
-                raise Exception("Found " + errors + " errors.")
+                raise Exception("Found " + str(errors) + " errors.")
 
     else:
         logger.info("No tests ran. Please use either --vocab or -pg/--proper_generation flags for testing")
