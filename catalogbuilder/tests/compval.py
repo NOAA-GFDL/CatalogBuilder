@@ -169,4 +169,4 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
     return
 
 if __name__ == '__main__':
-    main(json_path,json_template_path, vocab, proper_generation, test_failure)
+    main()
