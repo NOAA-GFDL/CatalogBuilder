@@ -53,7 +53,7 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
             if os.path.isfile(csvfile):
                 user_input = ''
                 while True:
-                    user_input = input('Found existing file! Overwrite? (y/n)')
+                    user_input = input('\nFound existing file! Overwrite? (y/n)\n')
 
                     if user_input.lower() == 'y':
                         with open(csvfile, 'w') as csvfile:

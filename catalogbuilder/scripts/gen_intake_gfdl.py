@@ -2,12 +2,13 @@
 
 import json
 import sys,pandas as pd
+import time
 import click
 import os
 from pathlib import Path
 import logging
 import git
-from catalogbuilder.tests.compval import main as cv
+from catalogbuilder.tests.compval import compval as cv
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
@@ -39,9 +40,12 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
          overwrite=False, append=False, slow = False, strict = False, verbose=False):
     if verbose:
         logger.setLevel(logging.DEBUG)
-        logger.info("Verbose log activated.")
+        logger.info("Verbose log activated.\n")
     else:
-        logger.info("[Mostly] silent log activated")
+        logger.info("[Mostly] silent log activated\n")
+    if strict:
+        logger.warning("!!!!! STRICT MODE IS ACTIVE. CATALOG GENERATION WILL FAIL IF ERRORS ARE FOUND !!!!!\n")
+        time.sleep(10)
     configyaml = None
     if (config is not None):
         configyaml = configparser.Config(config,logger)
@@ -161,13 +165,12 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 
     # Strict Mode
     if strict:
+        vocab = True
+        proper_generation = False
+        test_failure = False
 
         #Validate
-        try:
-            cv([json_path])
-        except ValueError:
-            logger.error("Error(s) found when validating. Please resolve issues.")
-            sys.exit(1)
+        cv(json_path,'',vocab, proper_generation, test_failure)
 
     logger.info("JSON generated at: " + os.path.abspath(json_path))
     logger.info("CSV generated at: " + os.path.abspath(csv_path))
@@ -187,9 +190,11 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--append', is_flag=True, default=False)
 @click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
-@click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CMIP standards')
+@click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
 @click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
 
+#def create_catalog_cli(input_path, output_path, config, filter_realm, filter_freq, filter_chunk , overwrite, append, slow, strict, verbose):
+#    return create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk , overwrite, append, slow, strict, verbose)
 def create_catalog_cli(**kwargs):
     return create_catalog(**kwargs)
 

@@ -22,8 +22,14 @@ logging.basicConfig(stream=sys.stdout)
 @click.option('-pg','--proper_generation', is_flag=True, default = False, help="Validates that catalog has been 'properly generated' (No empty columns, reflects template)")
 @click.option('-tf', '--test_failure', is_flag=True, default = False, help="Errors are only printed. Program will not exit. (ONLY FOR PROPER GENERATION TESTING)")
 
-def main(json_path,json_template_path, vocab, proper_generation, test_failure):
+#def main(json_path,json_template_path, vocab, proper_generation, test_failure):
+#     return compval(json_path,json_template_path, vocab, proper_generation, test_failure)
+def main(**kwargs):
+    return compval(**kwargs)
 
+
+def compval(json_path,json_template_path, vocab, proper_generation, test_failure):
+ 
     ''' This test validates catalogs against CMIP6 or GFDL controlled vocabulary (CV) as provided by particular JSON schemas per vocabulary type. CMIP6 CV's are found in the WCRP-CMIP/CMIP6_CVs github repository. GFDL CV's are found in the NOAA-GFDL/CMIP6_CVs github repository.
 
      JSON_PATH = Path to generated catalog JSON schema
@@ -159,4 +165,4 @@ def main(json_path,json_template_path, vocab, proper_generation, test_failure):
     return
 
 if __name__ == '__main__':
-    main()
+    main(*args, **kwargs)
