@@ -46,13 +46,7 @@ def main(json_path: str,json_template_path: str, vocab: bool, proper_generation:
          compval <json_path> <json_template_path> --proper_generation
          (Checks that catalog is minimally valid. Uses given template path to check for reflection.)
 
-         * Vocab and proper generation tests can be done at the same time! * 
-
-
-    FLAGS:
-        --vocab: Validates catalog vocabulary
-        -pg/--proper_generation: Ensures that catalog has been 'properly generated' (No empty columns, reflects template)
-        -tf/--test_failure: Errors are only printed. Program will not exit '''
+         * Vocab and proper generation tests can be done at the same time! * '''
 
     return compval(json_path,json_template_path, vocab, proper_generation, test_failure)
 
