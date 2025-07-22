@@ -51,7 +51,22 @@ def main(json_path: str,json_template_path: str, vocab: bool, proper_generation:
     return compval(json_path,json_template_path, vocab, proper_generation, test_failure)
 
 def compval(json_path,json_template_path, vocab, proper_generation, test_failure):
- 
+    """ This method is a comprehensive validator for gfdl data catalogs.
+
+     :param json_path: Path to generated catalog json
+     :type json_path: str
+     :param json_template_path: Path to catalog template schema
+     :type json_template_path: str, optional
+     :param vocab: Enables vocabulary validation, defaults to False
+     :type vocab: bool
+     :param proper_generation: Enables proper_generation/completeness checking, defaults to False
+     :type proper_generation: bool
+     :param test_failure: Errors are only logged and do not raise any exceptions
+     :type test_failure: bool
+     :raises IOError: A file is unable to be opened
+     :raises ValueError: An error was found during validation (missing/improper values or lack of schema reflection)
+     :raises Exception: Used to generally report error during validation
+    """
     #Open catalog json
     try:
         j = json.load(open(json_path))

@@ -255,6 +255,6 @@ Ex. gen_intake_gfdl.py /archive/Some.User/input-path ./output_path
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your output_path_template**
-- --strict - Activates strict mode which validates catalogs during generation
+- --strict - Activates strict mode which validates catalog vocabulary during generation
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
