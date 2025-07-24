@@ -193,8 +193,6 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
 @click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
 
-#def create_catalog_cli(input_path, output_path, config, filter_realm, filter_freq, filter_chunk , overwrite, append, slow, strict, verbose):
-#    return create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk , overwrite, append, slow, strict, verbose)
 def create_catalog_cli(**kwargs):
     return create_catalog(**kwargs)
 
