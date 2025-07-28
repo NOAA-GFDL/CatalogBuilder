@@ -7,7 +7,6 @@ import click
 import os
 from pathlib import Path
 import logging
-import git
 from catalogbuilder.tests.compval import compval as cv
 
 logger = logging.getLogger('local')
