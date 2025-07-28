@@ -19,6 +19,7 @@ See our `Github repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_ here.
 
    background
    generation
+   validation
    usage
    presentation 
 
