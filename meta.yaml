@@ -24,7 +24,6 @@ requirements:
     - jsondiff
     - conda-forge::intake-esm
     - boto3
-    - gitpython
 test:
   imports:
     - catalogbuilder
