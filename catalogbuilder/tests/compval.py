@@ -9,6 +9,7 @@ import os
 import re
 import math
 import logging
+from importlib.resources import files
 import urllib.request
 
 logger = logging.getLogger('local')
@@ -147,7 +148,8 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
         if json_template_path:
             json_template = json.load(open(json_template_path))
         else:
-            json_template = json.load(open('catalogbuilder/cats/gfdl_template.json'))
+            jpath = files('catalogbuilder').joinpath('cats/gfdl_template.json')
+            json_template = json.load(open(jpath)) 
 
         #Validate JSON against JSON template
         comp = (diff(j,json_template))
