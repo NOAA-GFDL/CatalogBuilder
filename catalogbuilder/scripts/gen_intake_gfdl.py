@@ -14,6 +14,7 @@ logging.basicConfig(stream=sys.stdout)
 
 try:
     from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
+    from catalogbuilder.tests.compval import compval as cv
 except ModuleNotFoundError:
     logger.warning("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
     logger.warning("Attempting again with adjusted sys.path ")
