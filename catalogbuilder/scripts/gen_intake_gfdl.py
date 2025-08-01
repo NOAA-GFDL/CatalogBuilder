@@ -7,7 +7,6 @@ import click
 import os
 from pathlib import Path
 import logging
-from catalogbuilder.tests.compval import compval as cv
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
@@ -25,7 +24,8 @@ except ModuleNotFoundError:
     #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     try:
 
-        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
+        from intakebuilder import gfdlcrawler, CSVwriter, configparser,getinfo
+        import tests.compval as cv
         logger.info(gfdlcrawler.__file__)
 
     except ModuleNotFoundError:
