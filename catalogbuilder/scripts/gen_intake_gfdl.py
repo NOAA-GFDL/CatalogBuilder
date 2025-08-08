@@ -7,30 +7,12 @@ import click
 import os
 from pathlib import Path
 import logging
-from catalogbuilder.tests.compval import compval as cv
+from catalogbuilder.scripts.compval import compval as cv
+from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 
 logger = logging.getLogger('local')
 logger.setLevel(logging.INFO)
 logging.basicConfig(stream=sys.stdout)
-
-try:
-    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
-except ModuleNotFoundError:
-    logger.warning("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
-    logger.warning("Attempting again with adjusted sys.path ")
-    try:
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    except:
-        logger.error("Unable to adjust sys.path")
-    #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    try:
-
-        from intakebuilder import gfdlcrawler, CSVwriter, builderconfig, configparser,getinfo
-        logger.info(gfdlcrawler.__file__)
-
-    except ModuleNotFoundError:
-        logger.error("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
-        raise ImportError("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
 #template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
@@ -45,16 +27,16 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     if strict:
         logger.warning("!!!!! STRICT MODE IS ACTIVE. CATALOG GENERATION WILL FAIL IF ERRORS ARE FOUND !!!!!\n")
         time.sleep(10)
+
     configyaml = None
-    if (config is not None):
+    if config is not None:
         configyaml = configparser.Config(config,logger)
-        if(input_path is None):
+        if input_path is None:
             input_path = configyaml.input_path
-        if(output_path is None):
+        if output_path is None:
             output_path = configyaml.output_path
     else:
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
-        #
         try:
             pkg = importlib_resources.files("catalogbuilder.scripts")
             config = pkg / "configs" / "config.yaml"
@@ -66,25 +48,29 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             except:
                 raise FileNotFoundError("Can't locate or read config, check --config ")
         configyaml = configparser.Config(config,logger)
-        if(input_path is None):
+
+        if input_path is None:
             input_path = configyaml.input_path
-        if(output_path is None):
+        if output_path is None:
             output_path = configyaml.output_path
-    if((input_path is None) or (output_path is None)):
+    if input_path is None or output_path is None:
         logger.error("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
         raise TypeError("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
+    
     if config is None or not configyaml.schema:
         logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
         template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
     else:
         template_path = configyaml.schema
         logger.info("Using schema from config file", template_path)
+
     if not os.path.exists(input_path):
         logger.error("Input path does not exist. Adjust configuration.")
         raise FileNotFoundError("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
         logger.error("Output path parent directory does not exist. Adjust configuration.")
         raise ValueError("Output path parent directory does not exist. Adjust configuration.")
+
     logger.info("input path: "+ input_path)
     logger.info("output path: "+ output_path)
     project_dir = input_path
