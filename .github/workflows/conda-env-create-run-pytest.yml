@@ -32,7 +32,7 @@ jobs:
     - name: Make sample data
       run: |
         which python
-        python catalogbuilder/tests/make_sample_data.py
+        python catalogbuilder/scripts/make_sample_data.py
 
     - name: Generate catalog
       run: |

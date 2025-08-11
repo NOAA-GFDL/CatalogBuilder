@@ -60,7 +60,7 @@ Using a custom template
 
 A default configuration is used for catalog generation unless a custom configuration is provided. We recommend the use of a custom configuration file if you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented. Configs must be passed to the builder using the ``--config flag``. See `Flags`_ here.
 
-`Here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml>`_ is an example configuration file.
+`Here <https://github.com/NOAA-GFDL/CatalogBuilder/examples/config-cfname.yaml>`_ is an example configuration file.
 
 
 **HEADERLIST**
