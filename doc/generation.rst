@@ -38,6 +38,7 @@ Now that you have a local copy of the source code, you are able to install the p
 .. note::
    This installation method is expected to change slightly when the package is uploaded to the Python Package index.
 
+
 Alternative approach: Install as a `conda package <https://anaconda.org/NOAA-GFDL/catalogbuilder>`_:
 
 .. code-block:: console
