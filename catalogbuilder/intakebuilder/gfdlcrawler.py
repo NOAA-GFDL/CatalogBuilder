@@ -25,7 +25,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     else:
        logger.debug("Unable to get headerlist from config yaml")
        sys.exit("Unable to get headerlist from config yaml")
-    #For those columns that we cannot find in output path template or output file template from config yaml, we have hooks
+    #For those columns that we cannot find in input path template or input file template from config yaml, we have hooks
     #now to look up the netcdf dataset if slow option is True
     #todo catch exceptions upon furhter testing
     list_ptemplate = []

@@ -157,7 +157,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
     else:
             logger.debug("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
             sys.exit("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
-    #If variable_id is fixed, it's a GFDL PP static dataset and the output path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
+    #If variable_id is fixed, it's a GFDL PP static dataset and the input path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
     if(variable_id == "fixed"):
         input_path_template = input_path_template[:-3 or None]
     nlen = len(input_path_template) 
@@ -167,7 +167,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
               try:
                   dictInfo[input_path_template[i]] = stemdir[(j)]
               except IndexError:
-                  print("Check configuration. Is output path template set correctly?")
+                  print("Check configuration. Is input path template set correctly?")
                   exit()
       except IndexError:
           sys.exit("oops in getInfoFromGFDLDRS"+str(i)+str(j)+input_path_template[i]+stemdir[j])
