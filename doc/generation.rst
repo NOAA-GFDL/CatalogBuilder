@@ -61,7 +61,11 @@ A default configuration is used for catalog generation unless a custom configura
 
 `Here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml>`_ is an example configuration file.
 
-Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
+
+**HEADERLIST**
+
+Catalog headers (column names) are set with the *HEADER LIST* variable. The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
+with the ESM collection specification standards and the appropriate workflows. 
 
 .. code-block:: yaml
    
@@ -71,8 +75,10 @@ Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUT
                   "member_id", "grid_label", "variable_id",
                   "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
 
-The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
-with the ESM collection specification standards and the appropriate workflows.
+
+**OUTPUT PATH TEMPLATE**
+
+The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
 
 .. code-block:: yaml
 
@@ -82,20 +88,26 @@ with the ESM collection specification standards and the appropriate workflows.
 For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp the output_path_template is set as above. 
 
 We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we
-simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply add NA in output_path_template for the fourth value. 
+simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory, 'am5f3b1r0', does not map to an existing header value so we simply add NA in output_path_template for the fourth value. 
 
-We have NA in values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well.
+**OUTPUT FILE TEMPLATE**
+
+The *OUTPUT FILE TEMPLATE* variable controls the expected directory structure of the of input data. This is used to navigate within the post-processed (pp) directory where files are stored.
 
 .. code-block:: yaml
 
  #Filename information
   output_file_template = ['realm','temporal_subset','variable_id']
 
+**INPUT/OUTPUT PATH**
+
+The *INPUT/OUTPUT PATH* variables are used by the Catalog Builder to locate input data and store output to the proper location. 
+
 .. code-block:: yaml
 
  #Input directory and output info
   input_path:  "/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/"
-  output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can  be an absolute or a relative path
+  output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can be an absolute or a relative path.
 
 Creating a data catalog
 =======================
