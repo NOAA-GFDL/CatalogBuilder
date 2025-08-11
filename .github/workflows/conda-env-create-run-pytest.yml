@@ -61,5 +61,5 @@ jobs:
     - name: Test for completeness
       run: | 
         which python
-        python catalogbuilder/tests/compval.py --proper_generation -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
-        python catalogbuilder/tests/compval.py --proper_generation -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json
+        python catalogbuilder/scripts/compval.py --proper_generation -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
+        python catalogbuilder/scripts/compval.py --proper_generation -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json
