@@ -1,8 +1,8 @@
 """
 This script generates a sample directory structure with a few PP components and empty netcdf files. 
-There is a subdirs.py in the tests directory that provides info as to how the structure can be, while the root structure is defined in the script below.
+There is a subdirs.py in the scripts directory that provides info as to how the structure can be, while the root structure is defined in the script below.
 In the near future, this will allow us to add more patterns and directory structure expectations, components,different chunks, time series/time average etc and expand
-the following script and the subdirs.py. 
+the following script and subdirs.py. 
 
 Context for this script- We use this in our GitHub Actions workflow to create sample directories on the fly before running the GFDL catalog builder 
 script dynamically.
@@ -13,22 +13,15 @@ Date: Nov 15, 2023
 """
 import os
 from pathlib import Path
+from catalogbuilder.scripts import subdirs
 
 root_dir = 'archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp'
 chunk_freq = '1yr'
 
 def make_sample_data():
     # Create directory
-    try: 
-        import subdirs
-    except:
-        import sys
-        print((os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"tests")))
-        sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"tests"))
-        import subdirs
-    from subdirs import realm, freq, time,vars 
-    realm_mapping = [realm]
-    freq_mapping = [freq]
+    realm_mapping = [subdirs.realm]
+    freq_mapping = [subdirs.freq]
 
     realm_ctr = (len(subdirs.realm))
     i = 0

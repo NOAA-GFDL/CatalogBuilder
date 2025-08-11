@@ -25,7 +25,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     else:
        logger.debug("Unable to get headerlist from config yaml")
        sys.exit("Unable to get headerlist from config yaml")
-    #For those columns that we cannot find in output path template or output file template from config yaml, we have hooks
+    #For those columns that we cannot find in input path template or input file template from config yaml, we have hooks
     #now to look up the netcdf dataset if slow option is True
     #todo catch exceptions upon furhter testing
     list_ptemplate = []
@@ -34,12 +34,12 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
     set_ftemplate = set()
 
     if(configyaml is not None):
-        if (configyaml.output_path_template is not None) & (configyaml.output_file_template is not None) :
-          list_ptemplate = configyaml.output_path_template
-          list_ftemplate = configyaml.output_file_template
+        if (configyaml.input_path_template is not None) & (configyaml.input_file_template is not None) :
+          list_ptemplate = configyaml.input_path_template
+          list_ftemplate = configyaml.input_file_template
     else:
-          logger.debug("output_file_template is not set. Check your configuration")
-          sys.exit("output_file_template is not set. Check your configuration")
+          logger.debug("input_file_template is not set. Check your configuration")
+          sys.exit("input_file_template is not set. Check your configuration")
     set_ptemplate = set(list_ptemplate)
     set_ftemplate = set(list_ftemplate)
     #print(headerlist)

@@ -23,15 +23,15 @@ class Config:
         except:
             raise KeyError("headerlist does not exist in config")
         try:
-            self.output_path_template = configfile['output_path_template']
-            logger.debug("output_path_template :"+(str)(self.output_path_template))
+            self.input_path_template = configfile['input_path_template']
+            logger.debug("input_path_template :"+(str)(self.input_path_template))
         except:
-            raise KeyError("output_path_template does not exist in config")
+            raise KeyError("input_path_template does not exist in config")
         try:
-            self.output_file_template = configfile['output_file_template']
-            logger.debug("output_file_template :"+ (str)(self.output_file_template))
+            self.input_file_template = configfile['input_file_template']
+            logger.debug("input_file_template :"+ (str)(self.input_file_template))
         except:
-            raise KeyError("output_file_template does not exist in config")
+            raise KeyError("input_file_template does not exist in config")
         try:
             self.schema = configfile['schema']
             logger.info("schema:"+ self.schema)
