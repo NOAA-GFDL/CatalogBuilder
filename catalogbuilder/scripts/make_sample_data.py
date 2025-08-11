@@ -13,20 +13,21 @@ Date: Nov 15, 2023
 """
 import os
 from pathlib import Path
+from catalogbuilder.scripts.subdirs import realm, freq, time,vars
 
 root_dir = 'archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp'
 chunk_freq = '1yr'
 
 def make_sample_data():
     # Create directory
-    try: 
-        import subdirs
-    except:
-        import sys
-        print((os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"tests")))
-        sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"tests"))
-        import subdirs
-    from subdirs import realm, freq, time,vars 
+    #try: 
+    #    import subdirs
+    #except:
+    #    import sys
+    #    print((os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"scripts")))
+    #    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"scripts"))
+    #    import subdirs
+    #from subdirs import realm, freq, time,vars 
     realm_mapping = [realm]
     freq_mapping = [freq]
 
