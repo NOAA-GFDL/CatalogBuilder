@@ -20,16 +20,8 @@ chunk_freq = '1yr'
 
 def make_sample_data():
     # Create directory
-    #try: 
-    #    import subdirs
-    #except:
-    #    import sys
-    #    print((os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"scripts")))
-    #    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"scripts"))
-    #    import subdirs
-    #from subdirs import realm, freq, time,vars 
-    realm_mapping = [realm]
-    freq_mapping = [freq]
+    realm_mapping = [subdirs.realm]
+    freq_mapping = [subdirs.freq]
 
     realm_ctr = (len(subdirs.realm))
     i = 0

@@ -1,5 +1,5 @@
 from pathlib import Path
-import catalogbuilder
+from catalogbuilder.scripts import gen_intake_gfdl_runner_config,gen_intake_gfdl_runner, make_sample_data
 
 def test_create_catalog():
       make_sample_data.make_sample_data()
