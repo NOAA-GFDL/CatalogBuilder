@@ -93,7 +93,7 @@ simply specify the associated header name in the appropriate place. E.g. The thi
 
 **OUTPUT FILE TEMPLATE**
 
-The *OUTPUT FILE TEMPLATE* variable controls the expected directory structure of the of input data. This is used to navigate within the post-processed (pp) directory where files are stored.
+The *OUTPUT FILE TEMPLATE* variable controls the expected filename structure of the input data. This is used to grab relevant data stored in filename.
 
 .. code-block:: yaml
 
