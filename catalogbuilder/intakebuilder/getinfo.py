@@ -102,26 +102,26 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     j = -2
     cnt = 1 #'variable_id': 'static', 'time_range': 'land'}
     if configyaml:
-        output_file_template = configyaml.output_file_template
+        input_file_template = configyaml.input_file_template
     else:
-            logger.debug("No output_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
-            sys.exit("No output_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
+            logger.debug("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
+            sys.exit("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
     if( ".static" in filename ):
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO error checking as needed
-        output_file_template = ['realm','NA'] 
+        input_file_template = ['realm','NA'] 
         dictInfo["variable_id"] = "fixed" 
         dictInfo["frequency"] = "fx"
-    nlen = len(output_file_template)
+    nlen = len(input_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
-          if(output_file_template[i] != "NA"):
+          if(input_file_template[i] != "NA"):
               try:
-                  dictInfo[output_file_template[i]] = stemdir[(j)]
+                  dictInfo[input_file_template[i]] = stemdir[(j)]
               except IndexError:
-                  dictInfo[output_file_template[i]] = ""
+                  dictInfo[input_file_template[i]] = ""
       except IndexError:
-          sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+output_file_template[i]+stemdir[j])
+          sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+input_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
     #print(dictInfo["realm"], filename)
@@ -153,24 +153,24 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
     j = -1
     cnt = 1
     if configyaml:
-        output_path_template = configyaml.output_path_template
+        input_path_template = configyaml.input_path_template
     else:
-            logger.debug("No output_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
-            sys.exit("No output_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
+            logger.debug("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
+            sys.exit("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
     #If variable_id is fixed, it's a GFDL PP static dataset and the output path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
     if(variable_id == "fixed"):
-        output_path_template = output_path_template[:-3 or None]
-    nlen = len(output_path_template) 
+        input_path_template = input_path_template[:-3 or None]
+    nlen = len(input_path_template) 
     for i in range(nlen-1,0,-1):
       try:
-          if(output_path_template[i] != "NA"):
+          if(input_path_template[i] != "NA"):
               try:
-                  dictInfo[output_path_template[i]] = stemdir[(j)]
+                  dictInfo[input_path_template[i]] = stemdir[(j)]
               except IndexError:
                   print("Check configuration. Is output path template set correctly?")
                   exit()
       except IndexError:
-          sys.exit("oops in getInfoFromGFDLDRS"+str(i)+str(j)+output_path_template[i]+stemdir[j])
+          sys.exit("oops in getInfoFromGFDLDRS"+str(i)+str(j)+input_path_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
     # WE do not want to work with anythi:1

@@ -124,11 +124,11 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         try:
             list_variable_id = df["variable_id"].unique().tolist()
         except:
-            raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the output_path_template field of your configuration")
+            raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
         try:
             list_realm = df["realm"].unique().tolist()
         except:
-            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the output_path_template field of your configuration")
+            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the input_path_template field of your configuration")
         dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
         #print("standard name from look-up table-", dictVarCF)
         for k, v in dictVarCF.items():

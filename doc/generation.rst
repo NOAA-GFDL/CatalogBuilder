@@ -53,7 +53,7 @@ A template/configuration file is used for all catalog generation.
 What is a catalog template?
 ---------------------------
 
-A catalog template is a YAML file defining headerlist, output path template, output file template, and input/output paths.
+A catalog template is a YAML file defining headerlist, input path template, input file template, and input/output paths.
 
 Using a custom template
 -----------------------
@@ -77,28 +77,27 @@ with the ESM collection specification standards and the appropriate workflows.
                   "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
 
 
-**OUTPUT PATH TEMPLATE**
+**INPUT PATH TEMPLATE**
 
-The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
+The *INPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
 
 .. code-block:: yaml
 
  #Directory structure information
- output_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','realm','cell_methods','frequency','chunk_freq']
+ input_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','realm','cell_methods','frequency','chunk_freq']
 
-For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp the output_path_template is set as above. 
+For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp the input_path_template is set as above. 
 
-We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we
-simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory, 'am5f3b1r0', does not map to an existing header value so we simply add NA in output_path_template for the fourth value. 
+We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in input_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory, 'am5f3b1r0', does not map to an existing header value so we simply add NA in input_path_template for the fourth value. 
 
-**OUTPUT FILE TEMPLATE**
+**INPUT FILE TEMPLATE**
 
-The *OUTPUT FILE TEMPLATE* variable controls the expected filename structure of the input data. This is used to grab relevant data stored in filename.
+The *INPUT FILE TEMPLATE* variable controls the expected filename structure of the input data. This is used to grab relevant data stored in filename.
 
 .. code-block:: yaml
 
  #Filename information
-  output_file_template = ['realm','temporal_subset','variable_id']
+  input_file_template = ['realm','temporal_subset','variable_id']
 
 **INPUT/OUTPUT PATH**
 
@@ -153,7 +152,6 @@ Here is another example *with a custom configuration*:
    #User provides the input directory for which a data catalog needs to be generated.
 
    input_path = "/archive/John.Krasting/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/"
-   #/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
 
    #USER inputs the output path. Based on the following setting, user can expect to see /home/a1r/mycatalog.csv and /home/a1r/mycatalog.json generated as output.
 
@@ -163,7 +161,6 @@ Here is another example *with a custom configuration*:
    #This is an example call to run catalog builder using a yaml config file.
    configyaml = os.path.join(git_package_dir, 'catalogbuilder/scripts/configs/config_default.yaml')
    #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-   #output_path = "sample-mdtf-catalog"
 
    def create_catalog_from_config(input_path=input_path,output_path=output_path,configyaml=configyaml):
     csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path,config=configyaml)
@@ -189,7 +186,6 @@ And an example *with a default configuration*:
    #User provides the input directory for which a data catalog needs to be generated.
 
    input_path = "/archive/a1r/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/"
-   #/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
 
    #USER inputs the output path. Based on the following setting, user can expect to see /home/a1r/mycatalog.csv and /home/a1r/mycatalog.json generated as output.
 
@@ -200,8 +196,6 @@ And an example *with a default configuration*:
    #This is an example call to run catalog builder using a yaml config file.
 
    configyaml = os.path.join(git_package_dir, 'configs/config-template.yaml')
-   #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-   #output_path = "sample-mdtf-catalog"
 
    def create_catalog_from_config(input_path=input_path,output_path=output_path): #,configyaml=configyaml):
        csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path)#,verbose=True,config=configyaml)
@@ -276,7 +270,7 @@ Flags
 - --config - Allows for catalogs to be generated with a custom configuration. Requires path to YAML configuration file. (Ex. "--config custom_config.yaml")  
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
-- --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your output_path_template**
+- --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your input_path_template**
 - --strict - Activates strict mode which validates catalog vocabulary during generation
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
