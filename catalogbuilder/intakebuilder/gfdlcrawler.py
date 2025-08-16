@@ -51,7 +51,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
-
     #Creating a dictionary to track the unique datasets we come across when using slow mode
     #The keys are the standard names and the values are lists tracking var_id,realm,etc..
     unique_datasets = {'':''}
@@ -75,7 +74,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if ("static" not in filename):
-                 if ((len(filename.split('.'))-1) != len(set_ftemplate)):
+                 #set removes duplicates and orders them. Does not serve the purpose when there is more one NA as in CESM
+                 if ((len(filename.split('.'))-1) != len(list_ftemplate)):
                    logger.debug("Skipping "+filename)
                    continue 
                logger.debug(dirpath+"/"+filename)
@@ -133,7 +133,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                         if qualities in unique_datasets.keys():
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
-
+                            print("test..",qualities,standard_name)
                         else:
                             logger.info("Retrieving standard_name from "+ (str)(filename))
                             getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
@@ -148,6 +148,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                       cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
                       if(cmipfreq is not None):
                           dictInfo['frequency'] = cmipfreq 
-                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq) 
+                          print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq) 
                listfiles.append(dictInfo)
     return listfiles
