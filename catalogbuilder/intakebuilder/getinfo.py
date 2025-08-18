@@ -5,7 +5,6 @@ import csv
 from csv import writer
 import os
 import xarray as xr
-#from intakebuilder import configparser
 from . import configparser 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -29,9 +28,6 @@ def getinfoFromYAML(dictInfo,yamlfile,miptable=None):
     import yaml
     with open(yamlfile) as f:
         mappings = yaml.load(f, Loader=yaml.FullLoader)
-        #print(mappings)
-        #for k, v in mappings.items():
-              #print(k, "->", v)
         if(miptable):
             try:
                 dictInfo["frequency"] = mappings[miptable]["frequency"]
@@ -70,7 +66,6 @@ def getStem(dirpath,projectdir):
 
 def getInfoFromFilename(filename,dictInfo,logger):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
-    #print(filename)
     if(filename.endswith(".nc")):
         ncfilename = filename.split(".")[0].split("_")
         varname = ncfilename[0]
@@ -96,7 +91,7 @@ def getInfoFromFilename(filename,dictInfo,logger):
 #adding this back to trace back some old errors
 def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-  if ( (filename.endswith(".nc"))): # & ("static" not in filename)) ): 
+  if ( (filename.endswith(".nc"))): 
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -124,7 +119,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+input_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
-    #print(dictInfo["realm"], filename)
+
     if (".static" in filename):
         if ("ocean" in dictInfo["realm"]):
           dictInfo["table_id"] = "Ofx"
@@ -173,8 +168,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
           sys.exit("oops in getInfoFromGFDLDRS"+str(i)+str(j)+input_path_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
-    # WE do not want to work with anythi:1
-    # ng that's not time series
+    # WE do not want to work with anything that's not time series
     #TODO have verbose option to print message
     #TODO Make this elegant and intuitive 
     #TODO logger messages, not print 
@@ -197,7 +191,6 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
     :param drsstructure:
     :return:
     '''
-    #stemdir = getStem(dirpath, projectdir)
     stemdir = dirpath.split(projectdir)[1].split("/")  # drsstructure is the root
     try:
         institute = stemdir[2]
@@ -223,7 +216,6 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     '''
     #try:
     filexr,filexra = return_xr(fname)
-    #print("Variable atts from file:",filexr[variable_id])
     if (dictInfo[att] == "na"):
       try:
           cfname = filexr[variable_id].attrs["standard_name"]
@@ -283,17 +275,12 @@ def getStandardName(list_variable_id,list_realm):
   for variable_id in list_variable_id:
    for realm in list_realm: 
      cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
-     #cfname = (df[df['GFDL_varname'] == variable_id]["standard_name"])
-     #print(cfname,variable_id)
      list_cfname = cfname.tolist()
      if(len(list_cfname) == 0):
-        #print("what if the names correspond to CMOR_varname")
         cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
         list_cfname = cfname.tolist()
-        #print(list_cfname)
      if len(list_cfname) > 0:
        unique_cf = list(set(list_cfname))[0]
        varrealm = "{0},{1}".format(variable_id,realm)
        dictCF[varrealm] = unique_cf
-       #print(varrealm,unique_cf)
   return (dictCF)
