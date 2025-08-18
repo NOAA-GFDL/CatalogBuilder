@@ -5,7 +5,8 @@ import csv
 from csv import writer
 import os
 import xarray as xr
-from . import configparser 
+from . import configparser
+import yaml 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -19,16 +20,15 @@ def getProject(projectdir,dictInfo):
     :param drsstructure:
     :return: dictionary with project key
     '''
-    if ("archive" in projectdir or "pp" in projectdir): 
+    if "archive" in projectdir or "pp" in projectdir: 
        project = "dev" 
        dictInfo["activity_id"]=project
     return dictInfo
 
 def getinfoFromYAML(dictInfo,yamlfile,miptable=None):
-    import yaml
     with open(yamlfile) as f:
         mappings = yaml.load(f, Loader=yaml.FullLoader)
-        if(miptable):
+        if miptable:
             try:
                 dictInfo["frequency"] = mappings[miptable]["frequency"]
             except KeyError:
@@ -37,20 +37,19 @@ def getinfoFromYAML(dictInfo,yamlfile,miptable=None):
                 dictInfo["realm"] = mappings[miptable]["realm"]
             except KeyError:
                 dictInfo["realm"]  = "NA"
-    return(dictInfo)
+    return dictInfo
 
 def getFreqFromYAML(yamlfile,gfdlfreq=None):
     #returns cmip freq for gfdl pp freq 
-    import yaml
     cmipfreq = None
     with open(yamlfile) as f:
         mappings = yaml.load(f, Loader=yaml.FullLoader)
-        if(gfdlfreq):
+        if gfdlfreq:
             try:
                 cmipfreq = mappings[gfdlfreq]["frequency"]
             except KeyError:
                 cmipfreq = None 
-    return(cmipfreq)
+    return cmipfreq
 
 def getStem(dirpath,projectdir):
     '''
@@ -66,7 +65,7 @@ def getStem(dirpath,projectdir):
 
 def getInfoFromFilename(filename,dictInfo,logger):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
-    if(filename.endswith(".nc")):
+    if filename.endswith(".nc"):
         ncfilename = filename.split(".")[0].split("_")
         varname = ncfilename[0]
         dictInfo["variable"] = varname
@@ -91,7 +90,7 @@ def getInfoFromFilename(filename,dictInfo,logger):
 #adding this back to trace back some old errors
 def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-  if ( (filename.endswith(".nc"))): 
+  if filename.endswith(".nc"): 
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -101,7 +100,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     else:
             logger.debug("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
             sys.exit("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
-    if( ".static" in filename ):
+    if ".static" in filename :
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO error checking as needed
         input_file_template = ['realm','NA'] 
@@ -110,7 +109,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
     nlen = len(input_file_template)
     for i in range(nlen-1,-1,-1): #nlen = 3
       try:
-          if(input_file_template[i] != "NA"):
+          if input_file_template[i] != "NA":
               try:
                   dictInfo[input_file_template[i]] = stemdir[(j)]
               except IndexError:
@@ -120,8 +119,8 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
       j = j - 1
     cnt = cnt + 1
 
-    if (".static" in filename):
-        if ("ocean" in dictInfo["realm"]):
+    if ".static" in filename:
+        if "ocean" in dictInfo["realm"]:
           dictInfo["table_id"] = "Ofx"
         else:
           dictInfo["table_id"] = "fx"
@@ -153,12 +152,12 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
             logger.debug("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
             sys.exit("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
     #If variable_id is fixed, it's a GFDL PP static dataset and the input path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
-    if(variable_id == "fixed"):
+    if variable_id == "fixed" :
         input_path_template = input_path_template[:-3 or None]
     nlen = len(input_path_template) 
     for i in range(nlen-1,0,-1):
       try:
-          if(input_path_template[i] != "NA"):
+          if input_path_template[i] != "NA":
               try:
                   dictInfo[input_path_template[i]] = stemdir[(j)]
               except IndexError:
@@ -173,10 +172,10 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger
     #TODO Make this elegant and intuitive 
     #TODO logger messages, not print 
     if "cell_methods" in dictInfo.keys():
-      if (dictInfo["cell_methods"] == "av"):
+      if dictInfo["cell_methods"] == "av":
          print("Skipping time-average data")
          return {}
-      elif (dictInfo["cell_methods"] == "ts"):
+      elif dictInfo["cell_methods"] == "ts":
          logger.debug("time-series data")
       else: 
          logger.debug("This is likely static")
@@ -276,11 +275,11 @@ def getStandardName(list_variable_id,list_realm):
    for realm in list_realm: 
      cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
      list_cfname = cfname.tolist()
-     if(len(list_cfname) == 0):
+     if len(list_cfname) == 0:
         cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
         list_cfname = cfname.tolist()
      if len(list_cfname) > 0:
        unique_cf = list(set(list_cfname))[0]
        varrealm = "{0},{1}".format(variable_id,realm)
        dictCF[varrealm] = unique_cf
-  return (dictCF)
+  return dictCF
