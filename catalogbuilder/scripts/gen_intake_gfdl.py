@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import json
-import sys,pandas as pd
+import sys
+import pandas as pd
 import time
 import click
 import os
@@ -10,12 +11,11 @@ import logging
 from catalogbuilder.scripts.compval import compval as cv
 from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 
-logger = logging.getLogger('local')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logging.basicConfig(stream=sys.stdout)
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
-#template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
 def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
          overwrite=False, append=False, slow = False, strict = False, verbose=False):
@@ -129,8 +129,8 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
             list_realm = df["realm"].unique().tolist()
         except:
             raise KeyError("Having trouble finding 'realm'... Be sure to add it to the input_path_template field of your configuration")
+
         dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
-        #print("standard name from look-up table-", dictVarCF)
         for k, v in dictVarCF.items():
             try:
                 var = k.split(",")[0]
@@ -140,11 +140,10 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                 realm = k.split(",")[1]
             except ValueError:
                 continue
-            if(var is not None) & (realm is not None):
+            if var is not None and realm is not None:
                 df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
-                #df['standard_name'].loc[(df['variable_id'] == k)] = v
 
-        if ((df is not None) & (len(df) != 0) ):
+        if df is not None and len(df) != 0:
             with open(csv_path, 'w') as csvfile:
                 df.to_csv(csvfile,index=False)
 
