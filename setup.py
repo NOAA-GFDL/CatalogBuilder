@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='catalogbuilder',
-    version='2024.01.01',
+    version='2024.01.02',
     packages=find_packages(),
     include_package_data=True,
     description='intake-esm Catalog Generation Utilities',
