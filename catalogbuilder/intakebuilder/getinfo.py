@@ -68,21 +68,22 @@ def getInfoFromFilename(filename,dictInfo,logger):
     if filename.endswith(".nc"):
         ncfilename = filename.split(".")[0].split("_")
         varname = ncfilename[0]
-        dictInfo["variable"] = varname
-        dictInfo["mip_table"] = miptable
+        dictInfo["variable_id"] = varname
+        table_id = ncfilename[1]
+        dictInfo["table_id"] = table_id 
         modelname = ncfilename[2]
-        dictInfo["model"] = modelname
+        dictInfo["source_id"] = modelname
         expname = ncfilename[3]
         dictInfo["experiment_id"] = expname
         ens = ncfilename[4]
-        dictInfo["ensemble_member"] = ens
+        dictInfo["member_id"] = ens
         grid = ncfilename[5]
         dictInfo["grid_label"] = grid
         try:
            tsubset = ncfilename[6]
         except IndexError:
            tsubset = "null" #For fx fields
-        dictInfo["temporal_subset"] = tsubset
+        dictInfo["time_range"] = tsubset
     else:
         logger.debug("Filename not compatible with this version of the builder:"+filename)
     return dictInfo
