@@ -10,6 +10,9 @@ import yaml
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+import logging
+logger = logging.getLogger(__name__)
+
 '''
 getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
 '''
@@ -127,7 +130,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
           dictInfo["table_id"] = "fx"
     return dictInfo
 
-def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id,logger):
+def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
     '''
     Returns info from project directory and the DRS path to the file
     :param dirpath:

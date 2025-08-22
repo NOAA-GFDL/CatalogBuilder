@@ -8,29 +8,35 @@ import click
 import os
 from pathlib import Path
 import logging
+from importlib.resources import files
 from catalogbuilder.scripts.compval import compval as cv
 from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logging.basicConfig(stream=sys.stdout)
+log_format = '%(levelname)s:%(funcName)s: %(message)s'
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format=log_format)
 
+logger = logging.getLogger()
 package_dir = os.path.dirname(os.path.abspath(__file__))
 
-def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
-         overwrite=False, append=False, slow = False, strict = False, verbose=False):
+
+def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+
+    # Setting up logger
+    # Standard mode's level is set as INFO
+    # Verbose mode's level is set as DEBUG
     if verbose:
         logger.setLevel(logging.DEBUG)
         logger.info("Verbose log activated.\n")
+ 
     else:
         logger.info("[Mostly] silent log activated\n")
+
     if strict:
         logger.warning("!!!!! STRICT MODE IS ACTIVE. CATALOG GENERATION WILL FAIL IF ERRORS ARE FOUND !!!!!\n")
         time.sleep(10)
 
-    configyaml = None
-    if config is not None:
-        configyaml = configparser.Config(config,logger)
+    if config:
+        configyaml = configparser.Config(config)
         if input_path is None:
             input_path = configyaml.input_path
         if output_path is None:
@@ -38,16 +44,10 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     else:
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
         try:
-            pkg = importlib_resources.files("catalogbuilder.scripts")
-            config = pkg / "configs" / "config.yaml"
-            logger.info("Default config path activated from package resources configs/config.yaml")
+            config = files("catalogbuilder").joinpath('intakebuilder/config_default.yaml')
         except:
-            try:
-                config = os.path.join(package_dir, 'configs/config_default.yaml')
-                logger.info("Default config path activated from path configs/config_default.yaml")
-            except:
-                raise FileNotFoundError("Can't locate or read config, check --config ")
-        configyaml = configparser.Config(config,logger)
+            raise FileNotFoundError("Can't locate or read default config, try --config ")
+        configyaml = configparser.Config(config)
 
         if input_path is None:
             input_path = configyaml.input_path
@@ -56,7 +56,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     if input_path is None or output_path is None:
         logger.error("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
         raise TypeError("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
-    
+
     if config is None or not configyaml.schema:
         logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
         template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
@@ -100,7 +100,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.debug("Calling gfdlcrawler.crawlLocal")
-    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, logger, configyaml,slow)
+    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, configyaml,slow)
     #Grabbing data from template JSON, changing CSV path to match output path, and dumping data in new JSON
     with open(template_path, "r") as jsonTemplate:
         data = json.load(jsonTemplate)
@@ -171,11 +171,11 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
-@click.option('--overwrite', is_flag=True, default=False)
-@click.option('--append', is_flag=True, default=False)
+@click.option('--overwrite', is_flag=True, default=False, help='Overwrite existing catalog CSV file')
+@click.option('--append', is_flag=True, default=False, help='Append to existing catalog CSV file (without headers)')
 @click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
 @click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
-@click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
+@click.option('--verbose/--silent','-v', default=False, is_flag=True, help='Enables detailed logging') #default has silent option. Use --verbose for detailed logging
 
 def create_catalog_cli(**kwargs):
     return create_catalog(**kwargs)

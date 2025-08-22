@@ -3,11 +3,15 @@ from . import getinfo
 import sys
 import re
 import operator as op
+import logging
+
+logger = logging.getLogger(__name__)
+
 '''
 localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
 It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
 '''
-def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
+def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
     '''
     crawl through the local directory and run through the getInfo.. functions
     :param projectdir:
@@ -42,9 +46,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
           sys.exit("input_file_template is not set. Check your configuration")
     set_ptemplate = set(list_ptemplate)
     set_ftemplate = set(list_ftemplate)
-    #print(headerlist)
-    #print(list_ptemplate)
-    #print(list_ftemplate)
     if (len(set_ptemplate) > 0):
        diffcols  = [x for x in headerlist  if x not in set_ptemplate]
     if ( len(set_ftemplate) > 0 ):
@@ -93,7 +94,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,logger,configyaml,slow):
                        variable_id = dictInfo["variable_id"] 
                    else: 
                        variable_id = ""
-               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id,logger)
+               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
                if "source_id" in dictInfo: 

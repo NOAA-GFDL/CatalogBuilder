@@ -1,7 +1,12 @@
-import yaml
 import os
+import logging
+import yaml
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 class Config:
-    def __init__(self, config,logger):
+    def __init__(self, config):
         self.config = config
         with open(self.config, 'r') as file:
             configfile = yaml.safe_load(file)

@@ -4,6 +4,8 @@ import pandas as pd
 from csv import writer
 #from intakebuilder import configparser
 from . import configparser 
+import logging
+logger = logging.getLogger(__name__)
 
 def getHeader(configyaml):
     '''
