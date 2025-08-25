@@ -284,4 +284,4 @@ def getStandardName(list_variable_id,list_realm):
                unique_cf = list(set(list_cfname))[0]
                varrealm = "{0},{1}".format(variable_id,realm)
                dictCF[varrealm] = unique_cf
-  return dictCF
+    return dictCF
