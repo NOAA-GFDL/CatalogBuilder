@@ -258,9 +258,9 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     return dictInfo
 
 def getStandardName(list_variable_id,list_realm):
-  '''
-  Returns dict standard name for the variable in question
-  '''
+    '''
+    Returns dict standard name for the variable in question
+    '''
     unique_cf = "na"
     dictCF = {}
     try:
