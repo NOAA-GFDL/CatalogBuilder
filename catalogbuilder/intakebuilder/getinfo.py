@@ -260,9 +260,10 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
 def getStandardName(list_variable_id,list_realm):
   '''
   Returns dict standard name for the variable in question
-  ''' 
-  unique_cf = "na"
-  dictCF = {}
+  '''
+
+    unique_cf = "na"
+    dictCF = {}
     try:
         url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/refs/heads/main/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
         url2 = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/refs/heads/main/data/gfdl-cmor-tables/gfdl_to_cmip6_vars.csv"
