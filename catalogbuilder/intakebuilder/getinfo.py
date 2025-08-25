@@ -66,7 +66,7 @@ def getStem(dirpath,projectdir):
     return stemdir
 
 
-def getInfoFromFilename(filename,dictInfo,logger):
+def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
     if filename.endswith(".nc"):
         ncfilename = filename.split(".")[0].split("_")
@@ -92,7 +92,7 @@ def getInfoFromFilename(filename,dictInfo,logger):
     return dictInfo
 
 #adding this back to trace back some old errors
-def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
+def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
   if filename.endswith(".nc"): 
     stemdir = filename.split(".")
@@ -103,7 +103,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
         input_file_template = configyaml.input_file_template
     else:
             logger.debug("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
-            sys.exit("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
+            raise AttributeError("No input_path_template found. Check configuration. Please open an issue with details if problem persists.Exiting")
     if ".static" in filename :
         ## For static we handle this differently . The GFDL PP expected pattern is atmos.static.nc
         #TODO error checking as needed
@@ -119,7 +119,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,logger,configyaml):
               except IndexError:
                   dictInfo[input_file_template[i]] = ""
       except IndexError:
-          sys.exit("oops in getInfoFromGFDLFilename"+str(i)+str(j)+input_file_template[i]+stemdir[j])
+          raise IndexError("oops in getInfoFromGFDLFilename"+str(i)+str(j)+input_file_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
 
@@ -154,7 +154,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
         input_path_template = configyaml.input_path_template
     else:
             logger.debug("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
-            sys.exit("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
+            raise AttributeError("No input_path_template found in config yaml. Check configuration, open a github issue with details if problem persists. ")
     #If variable_id is fixed, it's a GFDL PP static dataset and the input path template in config is aligned only up to a particular directory structure as this does not have the ts and frequency or time chunks 
     if variable_id == "fixed" :
         input_path_template = input_path_template[:-3 or None]
@@ -165,10 +165,9 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
               try:
                   dictInfo[input_path_template[i]] = stemdir[(j)]
               except IndexError:
-                  print("Check configuration. Is input path template set correctly?")
-                  exit()
+                  raise IndexError("Check configuration. Is input path template set correctly?")
       except IndexError:
-          sys.exit("oops in getInfoFromGFDLDRS"+str(i)+str(j)+input_path_template[i]+stemdir[j])
+          raise IndexError("oops in getInfoFromGFDLDRS"+str(i)+str(j)+input_path_template[i]+stemdir[j])
       j = j - 1
     cnt = cnt + 1
     # WE do not want to work with anything that's not time series
@@ -177,7 +176,7 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
     #TODO logger messages, not print 
     if "cell_methods" in dictInfo.keys():
       if dictInfo["cell_methods"] == "av":
-         print("Skipping time-average data")
+         logger.info("Skipping time-average data")
          return {}
       elif dictInfo["cell_methods"] == "ts":
          logger.debug("time-series data")
@@ -230,7 +229,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
               long_name = "NA"
           cfname = long_name.replace(" ", "_")
       dictInfo["standard_name"] = cfname 
-      print("standard_name found",dictInfo["standard_name"])
+      logger.info(f"standard_name found: {dictInfo["standard_name"]}")
     return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
@@ -264,26 +263,25 @@ def getStandardName(list_variable_id,list_realm):
   ''' 
   unique_cf = "na"
   dictCF = {}
-  try:
-      url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/refs/heads/main/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
-      url2 = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/refs/heads/main/data/gfdl-cmor-tables/gfdl_to_cmip6_vars.csv"
-      df1 = pd.read_csv(url, sep=",", header=0,index_col=False)
-      df2 = pd.read_csv(url2, sep=",", header=0,index_col=False)
-      #TODO Add try catch except for concat operation if concat fails for some reason 
-      df = pd.concat([df1,df2]).drop_duplicates().reset_index(drop=True)
-  except IOError:
-            print("Unable to open file")
-            sys.exit(1)
+    try:
+        url = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/refs/heads/main/data/gfdl-cmor-tables/gfdl_to_cmip5_vars.csv"
+        url2 = "https://raw.githubusercontent.com/NOAA-GFDL/MDTF-diagnostics/refs/heads/main/data/gfdl-cmor-tables/gfdl_to_cmip6_vars.csv"
+        df1 = pd.read_csv(url, sep=",", header=0,index_col=False)
+        df2 = pd.read_csv(url2, sep=",", header=0,index_col=False)
+        #TODO Add try catch except for concat operation if concat fails for some reason 
+        df = pd.concat([df1,df2]).drop_duplicates().reset_index(drop=True)
+    except IOError:
+        raise IOError("Unable to open file")
   #search for variable and its cf name
-  for variable_id in list_variable_id:
-   for realm in list_realm: 
-     cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
-     list_cfname = cfname.tolist()
-     if len(list_cfname) == 0:
-        cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
-        list_cfname = cfname.tolist()
-     if len(list_cfname) > 0:
-       unique_cf = list(set(list_cfname))[0]
-       varrealm = "{0},{1}".format(variable_id,realm)
-       dictCF[varrealm] = unique_cf
+    for variable_id in list_variable_id:
+       for realm in list_realm: 
+           cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
+           list_cfname = cfname.tolist()
+           if len(list_cfname) == 0:
+               cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
+               list_cfname = cfname.tolist()
+           if len(list_cfname) > 0:
+               unique_cf = list(set(list_cfname))[0]
+               varrealm = "{0},{1}".format(variable_id,realm)
+               dictCF[varrealm] = unique_cf
   return dictCF

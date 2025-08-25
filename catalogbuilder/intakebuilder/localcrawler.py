@@ -4,7 +4,6 @@ It finally returns a list of dict
 '''
 
 import os
-#from intakebuilder import getinfo
 from . import getinfo
 import re
 import logger
@@ -51,7 +50,7 @@ def crawlLocal(projectdir, dictFilter):
                         continue
 
                    dictInfo["path"]=filepath
-                   dictInfo = getinfo.getInfoFromFilename(filename, dictInfo,logger)
+                   dictInfo = getinfo.getInfoFromFilename(filename, dictInfo)
                    dictInfo = getinfo.getInfoFromDRS(dirpath, projectdir, dictInfo)
 
                    #eliminate bad DRS filenames spotted
@@ -61,5 +60,4 @@ def crawlLocal(projectdir, dictFilter):
                       logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename", dictInfo["experiment"],filepath)
                       continue
                    listfiles.append(dictInfo)
-                   #print(listfiles)
     return listfiles

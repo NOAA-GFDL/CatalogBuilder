@@ -2,7 +2,6 @@ import os.path
 import csv
 import pandas as pd
 from csv import writer
-#from intakebuilder import configparser
 from . import configparser 
 import logging
 logger = logging.getLogger(__name__)
@@ -16,7 +15,7 @@ def getHeader(configyaml):
         return configyaml.headerlist
     else:
         logger.debug("Can't getHeader() from config. Check header in config yaml or open an issue with error details.")
-        sys.exit(-1)
+        raise AttributeError("Can't getHeader() from config. Check header in config yaml or open an issue with error details.")
 
 
 def file_appender(dictinputs, csvfile):
@@ -86,4 +85,4 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
                             writer.writerow(data)
      
     except IOError:
-        print("I/O error")
+        raise IOError("I/O error")

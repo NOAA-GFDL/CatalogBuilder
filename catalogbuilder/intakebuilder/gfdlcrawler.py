@@ -19,7 +19,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
     '''
     listfiles = []
     pat = None
-    if("realm" in dictFilter.keys()) & (("frequency") in dictFilter.keys()):
+    if "realm" in dictFilter.keys() and "frequency" in dictFilter.keys():
         pat = re.compile('({}/{}/{}/{})'.format(dictFilter["realm"],"ts",dictFilter["frequency"],dictFilter["chunk_freq"]))
     
     orig_pat = pat
@@ -28,7 +28,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
        headerlist = configyaml.headerlist
     else:
        logger.debug("Unable to get headerlist from config yaml")
-       sys.exit("Unable to get headerlist from config yaml")
+       raise AttributeError("Unable to get headerlist from config yaml")
+
     #For those columns that we cannot find in input path template or input file template from config yaml, we have hooks
     #now to look up the netcdf dataset if slow option is True
     #todo catch exceptions upon furhter testing
@@ -37,18 +38,18 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
     set_ptemplate = set()
     set_ftemplate = set()
 
-    if(configyaml is not None):
-        if (configyaml.input_path_template is not None) & (configyaml.input_file_template is not None) :
+    if configyaml:
+        if configyaml.input_path_template and configyaml.input_file_template:
           list_ptemplate = configyaml.input_path_template
           list_ftemplate = configyaml.input_file_template
     else:
           logger.debug("input_file_template is not set. Check your configuration")
-          sys.exit("input_file_template is not set. Check your configuration")
+          raise AttributeError("input_file_template is not set. Check your configuration")
     set_ptemplate = set(list_ptemplate)
     set_ftemplate = set(list_ftemplate)
-    if (len(set_ptemplate) > 0):
+    if len(set_ptemplate) > 0:
        diffcols  = [x for x in headerlist  if x not in set_ptemplate]
-    if ( len(set_ftemplate) > 0 ):
+    if len(set_ftemplate) > 0:
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
@@ -68,35 +69,38 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                # get info from filename
                filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
 
-               #if filename.startswith("."):
-               #    logger.debug("Skipping hidden file", filepath)
-               #    continue
                if not filename.endswith(".nc"):
                    logger.debug("FILE does not end with .nc. Skipping "+ filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
-               if ("static" not in filename):
-                 if ((len(filename.split('.'))-1) != len(set_ftemplate)) and ((len(filename.split('_'))) > 2) and ((len(filename.split('_'))) != len(set_ftemplate)):
-                   logger.debug("Skipping "+filename)
-                   continue 
+               if "static" not in filename:
+                   if (len(filename.split('.'))-1 != len(set_ftemplate) 
+                   and len(filename.split('_')) > 2 
+                   and len(filename.split('_')) != len(set_ftemplate)):
+                       logger.debug("Skipping "+filename)
+                       continue
+
                logger.debug(dirpath+"/"+filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
-               #filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
                dictInfo["path"]=filepath
-               if (op.countOf(filename,".") == 1):
-                 dictInfo = getinfo.getInfoFromFilename(filename,dictInfo, logger)
+
+               if op.countOf(filename,".") == 1:
+                   dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
-                 dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo, logger,configyaml)
+                   dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
+
                if "variable_id" in dictInfo.keys():
                    if dictInfo["variable_id"] is not None:
                        variable_id = dictInfo["variable_id"] 
                    else: 
                        variable_id = ""
+
                dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
+
                if "source_id" in dictInfo: 
                    if(dictInfo["source_id"] in list_bad_modellabel):
                        logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename",filepath)
@@ -117,9 +121,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                # we can scan filenames or config etc 
                #here, we will see if there are missing header values and compare with file attributes if slow option is turned on
                # TODO: Possibly use slow option if lookup table can't find standard_name
-               if (slow == True) & (bool(dictInfo) == True):
+               if slow == True and bool(dictInfo) == True:
                     #TODO Possibly improvement: get a list of all files to be opened, dmget the files at once or in logical batches before examining with xarray
-                    #print("Slow option turned on.. lets open some files using xarray and lookup atts")
                     
                     #todo we could look at var attributes, but right now we stick to those that are necessary. scope to extend this easily to missngcols or if header info is not in config yaml
                     if "standard_name" in missingcols:
@@ -142,13 +145,12 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
 
                #replace frequency as needed 
                if 'frequency' in dictInfo.keys():
-                      package_dir = os.path.dirname(os.path.abspath(__file__))
-                      yamlfile = os.path.join(package_dir, 'dat/gfdlcmipfreq.yaml')
-                      cmipfreq = None
-                      gfdlfreq = dictInfo['frequency']  
-                      cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
-                      if(cmipfreq is not None):
-                          dictInfo['frequency'] = cmipfreq 
-                          #print("Adjusting frequency from ", gfdlfreq ," to ",cmipfreq) 
+                   package_dir = os.path.dirname(os.path.abspath(__file__))
+                   yamlfile = os.path.join(package_dir, 'dat/gfdlcmipfreq.yaml')
+                   cmipfreq = None
+                   gfdlfreq = dictInfo['frequency']  
+                   cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
+                   if(cmipfreq is not None):
+                       dictInfo['frequency'] = cmipfreq 
                listfiles.append(dictInfo)
     return listfiles
