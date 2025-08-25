@@ -12,9 +12,7 @@ import logging
 from importlib.resources import files
 import urllib.request
 
-logger = logging.getLogger('local')
-logger.setLevel(logging.INFO)
-logging.basicConfig(stream=sys.stdout)
+logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument('json_path',nargs=1,required=True)

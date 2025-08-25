@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
 import os
-#from intakebuilder import localcrawler, CSVwriter
 from . import localcrawler, CSVwriter
 import logging
-logger = logging.getLogger('local')
-hdlr = logging.FileHandler('/nbhome/a1r/logs/local.log') #TODO this will break
-logger.addHandler(hdlr)
-logger.setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 def main():
     #######INPUT HERE OR USE FROM A CONFIG FILE LATER######
@@ -15,6 +11,7 @@ def main():
     project_dir = "/uda/CMIP6/"#
     #CMIP/NOAA-GFDL/GFDL-ESM4/"
     csvfile = "/nbhome/a1r/intakebuilder_cats/intake_local.csv" ##"/Users/ar46/PycharmProjects/CatalogBuilder/intakebuilder/test/intake_local.csv"
+
     #######################################################
     ######### SEARCH FILTERS ###########################
     dictFilter = {}
@@ -22,16 +19,17 @@ def main():
    #COMMENT  dictFilter["miptable"] = "Amon" #Remove this if you don't want to filter by miptable
    #COMMENT dictFilter["varname"] = "tas"   #Remove this if you don't want to filter by variable name
     #########################################################
+
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.info("Calling localcrawler.crawlLocal") 
-    print("Calling localcrawler.crawlLocal")
-    list_files = localcrawler.crawlLocal(project_dir, dictFilter, logger)
+    list_files = localcrawler.crawlLocal(project_dir, dictFilter)
     headers = CSVwriter.getHeader()
-    if (not os.path.exists(csvfile)):
+
+    if not os.path.exists(csvfile):
         os.makedirs(os.path.dirname(csvfile), exist_ok=True)
     CSVwriter.listdict_to_csv(list_files, headers, csvfile)
-    print("CSV generated at:", os.path.abspath(csvfile))
-    logger.info("CSV generated at"+ os.path.abspath(csvfile))
+    logger.info(f"CSV generated at {os.path.abspath(csvfile)}")
+
 if __name__ == '__main__':
     main()
