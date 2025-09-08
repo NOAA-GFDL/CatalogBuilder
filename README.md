@@ -1,10 +1,10 @@
 # CatalogBuilder
 
-The GFDL Catalog Builder is a python community package ecosystem” that allows users to generate data catalogs compatible with intake-esm.
+The GFDL Catalog Builder is a python community package ecosystem that allows users to generate data catalogs compatible with intake-esm.
 
 Data catalogs simplify data discovery by creating customizable, extendable, and queryable catalogs.
 
-If you would like to use the catalog builder, you must install the [conda package](https://anaconda.org/NOAA-GFDL/catalogbuilder), clone the [github repository](https://github.com/NOAA-GFDL/CatalogBuilder), or use the [FRE command line interface](https://github.com/NOAA-GFDL/fre-cli).
+To use the catalog builder, install the [conda package](https://anaconda.org/NOAA-GFDL/catalogbuilder), clone the [github repository](https://github.com/NOAA-GFDL/CatalogBuilder), or use the [FRE command line interface](https://github.com/NOAA-GFDL/fre-cli).
 
 
 Building a catalog would then look something like this: 
