@@ -10,13 +10,13 @@ To use the catalog builder, install the [conda package](https://anaconda.org/NOA
 Building a catalog would then look something like this: 
 
 ``` 
-gen_intake_gfdl.py /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp $HOME/catalog
+gen_intake_gfdl.py /archive/path_to_data_dir /home/$USER/catalog
 ```
 
 OR
 
 ``` 
-fre catalog build --overwrite /archive/path_to_data_dir 
+fre catalog build /archive/path_to_data_dir /home/$USER/catalog
 ```
 
 If you run into any problems please create an [issue](https://github.com/NOAA-GFDL/CatalogBuilder/issues) here.
