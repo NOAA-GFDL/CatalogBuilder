@@ -27,7 +27,7 @@ jobs:
         # put conda env binaries in GITHUB_PATH
         echo $CONDA/envs/catalogbuilder/bin >> $GITHUB_PATH
         # install catalogbuilder to conda env directories
-        $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder .
+        $CONDA/envs/catalogbuilder/bin/python -m pip install -e --prefix $CONDA/envs/catalogbuilder .
 
     - name: Make sample data
       run: |
