@@ -15,19 +15,26 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+    #- name: Add conda to system path
+    #  run: |
+    #    # $CONDA is an environment variable pointing to the root of the miniconda directory
+    #    echo $CONDA/bin >> $GITHUB_PATH
 
-    - name: Create catalogbuilder conda environment
+    #- name: Create catalogbuilder conda environment
+    #  run: |
+    #    # create environment catalogbuilder will be installed into
+    #    conda env create -f environment.yml --name catalogbuilder
+    #    # put conda env binaries in GITHUB_PATH
+    #    echo $CONDA/envs/catalogbuilder/bin >> $GITHUB_PATH
+    #    # install catalogbuilder to conda env directories
+    #    $CONDA/envs/catalogbuilder/bin/python -m pip install -e --prefix $CONDA/envs/catalogbuilder .
+
+    - name: Install package
       run: |
-        # create environment catalogbuilder will be installed into
-        conda env create -f environment.yml --name catalogbuilder
-        # put conda env binaries in GITHUB_PATH
-        echo $CONDA/envs/catalogbuilder/bin >> $GITHUB_PATH
-        # install catalogbuilder to conda env directories
-        $CONDA/envs/catalogbuilder/bin/python -m pip install -e --prefix $CONDA/envs/catalogbuilder .
+        echo "HERE HERE HERE"
+        pwd
+        echo "HERE HERE HERE"
+        pip install -e CatalogBuilder
 
     - name: Make sample data
       run: |
