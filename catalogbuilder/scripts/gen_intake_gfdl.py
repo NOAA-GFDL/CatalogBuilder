@@ -16,7 +16,6 @@ log_format = '%(levelname)s:%(funcName)s: %(message)s'
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format=log_format)
 
 logger = logging.getLogger()
-package_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
@@ -44,7 +43,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
     else:
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
         try:
-            config = files("catalogbuilder").joinpath('intakebuilder/config_default.yaml')
+            config = files('catalogbuilder').joinpath('intakebuilder/config_default.yaml')
             print(config)
         except:
             raise FileNotFoundError("Can't locate or read default config, try --config ")
@@ -60,7 +59,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
 
     if config is None or not configyaml.schema:
         logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
-        template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+        template_path = files('catalogbuilder').joinpath('cats/gfdl_template.json')
     else:
         template_path = configyaml.schema
         logger.info("Using schema from config file", template_path)

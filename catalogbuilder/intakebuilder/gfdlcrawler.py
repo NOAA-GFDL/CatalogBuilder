@@ -2,6 +2,7 @@ import os
 from . import getinfo
 import sys
 import re
+from importlib.resources import files
 import operator as op
 import logging
 
@@ -145,8 +146,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
 
                #replace frequency as needed 
                if 'frequency' in dictInfo.keys():
-                   package_dir = os.path.dirname(os.path.abspath(__file__))
-                   yamlfile = os.path.join(package_dir, 'dat/gfdlcmipfreq.yaml')
+                   #package_dir = os.path.dirname(os.path.abspath(__file__))
+                   yamlfile = files('catalogbuilder').joinpath('intakebuilder/dat/gfdlcmipfreq.yaml')
                    cmipfreq = None
                    gfdlfreq = dictInfo['frequency']  
                    cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
