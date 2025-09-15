@@ -43,6 +43,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
     else:
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
         try:
+            print(f"Type of 'files' is: {type(files)}")
             config = files('catalogbuilder').joinpath('intakebuilder/config_default.yaml')
             print(config)
         except:
