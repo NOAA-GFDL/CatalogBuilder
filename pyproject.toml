@@ -30,6 +30,7 @@ include = ["catalogbuilder*"]
 [tool.setuptools.package-data]
 catalogbuilder = [
     "cats/**",
+    "intakebuilder/config_default.yaml",
     "intakebuilder/dat/**",
     "scripts/configs/**",
 ]
