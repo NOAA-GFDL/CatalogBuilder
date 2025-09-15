@@ -63,7 +63,7 @@ jobs:
 
     - name: Run pytest with downloaded artifacts
       run: |
-        $CONDA/envs/catalogbuilder/bin/pytest -v --runxfail catalogbuilder
+        pytest -v --runxfail catalogbuilder
 
     - name: Test for completeness
       run: | 
