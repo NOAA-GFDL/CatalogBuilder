@@ -1,10 +1,8 @@
 import catalogbuilder
 from catalogbuilder.scripts import gen_intake_gfdl
 from importlib.resources import files
-#import sys, os 
 
 #This is an example call to run catalog builder using a yaml config file.
-#package_dir = os.path.dirname(os.path.abspath(__file__))
 configyaml = files('catalogbuilder').joinpath('intakebuilder/config_default.yaml')
 input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
 output_path = "sample-mdtf-catalog"
