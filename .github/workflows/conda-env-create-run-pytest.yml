@@ -31,9 +31,6 @@ jobs:
 
     - name: Install package
       run: |
-        echo "HERE HERE HERE"
-        pwd
-        echo "HERE HERE HERE"
         pip install .
 
     - name: Make sample data
