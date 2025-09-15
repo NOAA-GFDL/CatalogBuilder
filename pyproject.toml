@@ -29,7 +29,6 @@ include = ["catalogbuilder*"]
 
 [tool.setuptools.package-data]
 catalogbuilder = [
-    #"bin/**",
     "cats/**",
     "intakebuilder/config_default.yaml",
     "intakebuilder/dat/**",
