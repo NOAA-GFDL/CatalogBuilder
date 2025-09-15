@@ -229,7 +229,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
               long_name = "NA"
           cfname = long_name.replace(" ", "_")
       dictInfo["standard_name"] = cfname 
-      logger.info(f"standard_name found: {dictInfo["standard_name"]}")
+      logger.info(f"standard_name found: {dictInfo['standard_name']}")
     return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
