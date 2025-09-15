@@ -34,7 +34,7 @@ jobs:
         echo "HERE HERE HERE"
         pwd
         echo "HERE HERE HERE"
-        pip install -e CatalogBuilder
+        pip install CatalogBuilder
 
     - name: Make sample data
       run: |
