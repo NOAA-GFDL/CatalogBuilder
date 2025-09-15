@@ -64,7 +64,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
         searchpath = dirpath
         if (orig_pat is None):
             pat = dirpath  #we assume matching entire path
-        if(pat is not None):
+        if pat is not None:
             m = re.search(pat, searchpath)
             for filename in files:
                # get info from filename
@@ -103,11 +103,11 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                list_bad_chunklabel = ['DO_NOT_USE']
 
                if "source_id" in dictInfo: 
-                   if(dictInfo["source_id"] in list_bad_modellabel):
+                   if dictInfo["source_id"] in list_bad_modellabel:
                        logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename",filepath)
                    #   continue
                if "chunk_freq" in dictInfo:
-                   if(dictInfo["chunk_freq"] in list_bad_chunklabel):
+                   if dictInfo["chunk_freq"] in list_bad_chunklabel:
                        logger.debug("Found bad chunk, skipping this possibly bad DRS filename",filepath)
                        continue     
                # remove those keys that are not CSV headers 
@@ -150,7 +150,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                    cmipfreq = None
                    gfdlfreq = dictInfo['frequency']  
                    cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
-                   if(cmipfreq is not None):
+                   if cmipfreq is not None:
                        dictInfo['frequency'] = cmipfreq 
                listfiles.append(dictInfo)
     return listfiles

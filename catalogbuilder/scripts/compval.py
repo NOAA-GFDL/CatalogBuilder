@@ -179,7 +179,7 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
                 errors += 1
 
             if column in catalog.columns:
-                if(catalog[column].isnull().values.any()):
+                if catalog[column].isnull().values.any():
                     logger.error("'" + column + "' contains empty values.")
                     errors += 1
 
