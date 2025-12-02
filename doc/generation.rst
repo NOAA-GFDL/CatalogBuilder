@@ -7,12 +7,12 @@ There are a few ways to use the catalog builder. This page contains instructions
 Installation
 ============
 
-You will need to install the Catalog Builder package to begin.
+You will need to install the Catalog Builder package to begin. The current recommended approach for installing the catalog builder is to install the tool as a pip package.
 
 Cloning the repository
 ----------------------
 
-The current recommended approach for installing the catalog builder is to install the tool as a pip package. You'll need to first clone the `github repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_:
+You'll need to first clone the `github repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_:
 
 **With ssh**
 
@@ -39,28 +39,18 @@ Now that you have a local copy of the source code, you are able to install the p
    This installation method is expected to change slightly when the package is uploaded to the Python Package index.
 
 
-Alternative approach: Install as a `conda package <https://anaconda.org/NOAA-GFDL/catalogbuilder>`_:
-
-.. code-block:: console
-
-  conda install catalogbuilder -c noaa-gfdl
-
 Configuration
 =============
 
-A template/configuration file is used for all catalog generation.
+A catalog template is a YAML file defining headerlist, input path template, input file template, and input/output paths. A template/configuration file is used for all catalog generation.
 
-What is a catalog template?
----------------------------
-
-A catalog template is a YAML file defining headerlist, input path template, input file template, and input/output paths.
 
 Using a custom template
 -----------------------
 
 A default configuration is used for catalog generation unless a custom configuration is provided. We recommend the use of a custom configuration file if you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented. Configs must be passed to the builder using the ``--config flag``. See `Flags`_ here.
 
-`Here <https://github.com/NOAA-GFDL/CatalogBuilder/examples/config-cfname.yaml>`_ is an example configuration file.
+`Here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml>`_ is an example configuration file.
 
 
 **HEADERLIST**

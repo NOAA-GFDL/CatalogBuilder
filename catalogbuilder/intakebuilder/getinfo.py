@@ -240,11 +240,11 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
     filexra = return_xr(fname)
     if dictInfo["institute"] == "NA":
-      try:
-          institute = filexra["institution_id"]
-      except KeyError:
+        try:
+            institute = filexra["institution_id"]
+        except KeyError:
           institute = "NA"
-      dictInfo["institute"] = institute
+        dictInfo["institute"] = institute
     if dictInfo["version"] == "NA":
         try:
             version = filexra["version"]

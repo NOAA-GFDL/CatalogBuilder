@@ -78,3 +78,6 @@ It is recommended that developers install an `editable <https://setuptools.pypa.
 .. code-block:: console
 
    pip install -e .
+
+.. note::
+Sometimes it is necessary to deactivate and reactivate the virtual environment in order for PATH to be properly resolved.
