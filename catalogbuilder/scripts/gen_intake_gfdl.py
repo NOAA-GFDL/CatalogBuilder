@@ -20,6 +20,9 @@ logger = logging.getLogger()
 
 def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
 
+
+    logger.warning("!!!!! IMPORTANT: RECENT CHANGES TO THE CATALOG BUILDER MAY AFFECT EXISTING WORKFLOWS !!!!!")
+    time.sleep(10)
     # Setting up logger
     # Standard mode's level is set as INFO
     # Verbose mode's level is set as DEBUG
