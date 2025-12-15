@@ -1,3 +1,0 @@
-recursive-include catalogbuilder/cats *
-recursive-include catalogbuilder/intakebuilder/dat *
-recursive-include catalogbuilder/scripts/configs *

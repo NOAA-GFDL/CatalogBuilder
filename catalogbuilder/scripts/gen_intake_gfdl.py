@@ -1,91 +1,79 @@
 #!/usr/bin/env python
 
 import json
-import sys,pandas as pd
+import sys
+import pandas as pd
 import time
 import click
 import os
 from pathlib import Path
 import logging
+from importlib.resources import files as _files #Using files causes bug..
+from catalogbuilder.scripts.compval import compval as cv
+from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 
-logger = logging.getLogger('local')
-logger.setLevel(logging.INFO)
-logging.basicConfig(stream=sys.stdout)
+log_format = '%(levelname)s:%(funcName)s: %(message)s'
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format=log_format)
 
-try:
-    from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
-    from catalogbuilder.tests.compval import compval as cv
-except ModuleNotFoundError:
-    logger.warning("The module intakebuilder is not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it? ")
-    logger.warning("Attempting again with adjusted sys.path ")
-    try:
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    except:
-        logger.error("Unable to adjust sys.path")
-    #print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    try:
+logger = logging.getLogger()
 
-        from intakebuilder import gfdlcrawler, CSVwriter, configparser,getinfo
-        import tests.compval as cv
-        logger.info(gfdlcrawler.__file__)
 
-    except ModuleNotFoundError:
-        logger.error("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
-        raise ImportError("The module 'intakebuilder' is still not installed. Do you have intakebuilder in your sys.path or have you activated the conda environment with the intakebuilder package in it?")
+def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
 
-package_dir = os.path.dirname(os.path.abspath(__file__))
-#template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
 
-def create_catalog(input_path=None, output_path=None, config=None, filter_realm=None, filter_freq=None, filter_chunk=None,
-         overwrite=False, append=False, slow = False, strict = False, verbose=False):
+    logger.warning("!!!!! IMPORTANT: RECENT CHANGES TO THE CATALOG BUILDER MAY AFFECT EXISTING WORKFLOWS !!!!!")
+    time.sleep(10)
+    # Setting up logger
+    # Standard mode's level is set as INFO
+    # Verbose mode's level is set as DEBUG
     if verbose:
         logger.setLevel(logging.DEBUG)
         logger.info("Verbose log activated.\n")
+ 
     else:
         logger.info("[Mostly] silent log activated\n")
+
     if strict:
         logger.warning("!!!!! STRICT MODE IS ACTIVE. CATALOG GENERATION WILL FAIL IF ERRORS ARE FOUND !!!!!\n")
         time.sleep(10)
-    configyaml = None
-    if (config is not None):
-        configyaml = configparser.Config(config,logger)
-        if(input_path is None):
+
+    if config:
+        configyaml = configparser.Config(config)
+        if input_path is None:
             input_path = configyaml.input_path
-        if(output_path is None):
+        if output_path is None:
             output_path = configyaml.output_path
     else:
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
-        #
         try:
-            pkg = importlib_resources.files("catalogbuilder.scripts")
-            config = pkg / "configs" / "config.yaml"
-            logger.info("Default config path activated from package resources configs/config.yaml")
+            config = _files('catalogbuilder').joinpath('intakebuilder/config_default.yaml')
+            print(config)
         except:
-            try:
-                config = os.path.join(package_dir, 'configs/config_default.yaml')
-                logger.info("Default config path activated from path configs/config_default.yaml")
-            except:
-                raise FileNotFoundError("Can't locate or read config, check --config ")
-        configyaml = configparser.Config(config,logger)
-        if(input_path is None):
+            raise FileNotFoundError("Can't locate or read default config, try --config ")
+        configyaml = configparser.Config(config)
+
+        if input_path is None:
             input_path = configyaml.input_path
-        if(output_path is None):
+        if output_path is None:
             output_path = configyaml.output_path
-    if((input_path is None) or (output_path is None)):
+    if input_path is None or output_path is None:
         logger.error("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
         raise TypeError("Missing: input_path or output_path. Pass it in the config yaml or as command-line option")
+
     if config is None or not configyaml.schema:
         logger.info("Default schema: catalogbuilder/cats/gfdl_template.json")
-        template_path = os.path.join(package_dir, '../cats/gfdl_template.json')
+        template_path = _files('catalogbuilder').joinpath('cats/gfdl_template.json')
     else:
         template_path = configyaml.schema
         logger.info("Using schema from config file", template_path)
+
     if not os.path.exists(input_path):
         logger.error("Input path does not exist. Adjust configuration.")
         raise FileNotFoundError("Input path does not exist. Adjust configuration.")
     if not os.path.exists(Path(output_path).parent.absolute()):
         logger.error("Output path parent directory does not exist. Adjust configuration.")
         raise ValueError("Output path parent directory does not exist. Adjust configuration.")
+
     logger.info("input path: "+ input_path)
     logger.info("output path: "+ output_path)
     project_dir = input_path
@@ -115,7 +103,7 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.debug("Calling gfdlcrawler.crawlLocal")
-    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, logger, configyaml,slow)
+    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, configyaml,slow)
     #Grabbing data from template JSON, changing CSV path to match output path, and dumping data in new JSON
     with open(template_path, "r") as jsonTemplate:
         data = json.load(jsonTemplate)
@@ -139,13 +127,13 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
         try:
             list_variable_id = df["variable_id"].unique().tolist()
         except:
-            raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the output_path_template field of your configuration")
+            raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
         try:
             list_realm = df["realm"].unique().tolist()
         except:
-            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the output_path_template field of your configuration")
+            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the input_path_template field of your configuration")
+
         dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
-        #print("standard name from look-up table-", dictVarCF)
         for k, v in dictVarCF.items():
             try:
                 var = k.split(",")[0]
@@ -155,11 +143,10 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
                 realm = k.split(",")[1]
             except ValueError:
                 continue
-            if(var is not None) & (realm is not None):
+            if var is not None and realm is not None:
                 df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
-                #df['standard_name'].loc[(df['variable_id'] == k)] = v
 
-        if ((df is not None) & (len(df) != 0) ):
+        if df is not None and len(df) != 0:
             with open(csv_path, 'w') as csvfile:
                 df.to_csv(csvfile,index=False)
 
@@ -187,11 +174,11 @@ def create_catalog(input_path=None, output_path=None, config=None, filter_realm=
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
-@click.option('--overwrite', is_flag=True, default=False)
-@click.option('--append', is_flag=True, default=False)
+@click.option('--overwrite', is_flag=True, default=False, help='Overwrite existing catalog CSV file')
+@click.option('--append', is_flag=True, default=False, help='Append to existing catalog CSV file (without headers)')
 @click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
 @click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
-@click.option('--verbose/--silent', default=False, is_flag=True) #default has silent option. Use --verbose for detailed logging
+@click.option('--verbose/--silent','-v', default=False, is_flag=True, help='Enables detailed logging') #default has silent option. Use --verbose for detailed logging
 
 def create_catalog_cli(**kwargs):
     return create_catalog(**kwargs)

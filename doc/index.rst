@@ -21,7 +21,8 @@ See our `Github repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_ here.
    generation
    validation
    usage
-   presentation 
+   presentation
+   developers
 
 Indices and tables
 ==================

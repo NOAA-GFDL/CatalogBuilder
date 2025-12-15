@@ -1,69 +1,109 @@
+========================
 Generating data catalogs
 ========================
 
-There are a few ways to use the catalog builder.
+There are a few ways to use the catalog builder. This page contains instructions to help you start using the tool.
 
 Installation
-------------
+============
 
-Recommended approach: Install as a `conda package <https://anaconda.org/NOAA-GFDL/catalogbuilder>`_
+You will need to install the Catalog Builder package to begin. The current recommended approach for installing the catalog builder is to install the tool as a pip package.
 
-.. code-block:: console
+Cloning the repository
+----------------------
 
-  conda install catalogbuilder -c noaa-gfdl
+You'll need to first clone the `github repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_:
 
-Alternatively, you may clone the `git repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_
-and create your conda environment using the `environment.yml <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/environment.yml>`_ in the git repository. 
-
-.. code-block:: console
-
-   git clone https://github.com/NOAA-GFDL/CatalogBuilder
-
-   conda env create -f environment_intake.yml 
-
-Expected output
----------------
-
-A JSON catalog specification file and a CSV catalog in the specfied output directory with the specified name. 
-
-Using conda package
--------------------
-
-**1. Install the package using conda:** 
+**With ssh**
 
 .. code-block:: console
 
-  conda install catalogbuilder -c noaa-gfdl
+   git clone git@github.com:NOAA-GFDL/CatalogBuilder.git
 
-If you're trying these steps from GFDL, likely that you may need to do additional things to get it to work. See below
-  
-Add these to your ~/.condarc file 
-
-whitelist_channels:
-  - noaa-gfdl
-  - conda-forge
-  - anaconda
-channels:
-  - noaa-gfdl
-  - conda-forge
-  - anaconda
-
-(and try: conda config --add channels noaa-gfdl conda config --append channels conda-forge)
-
-If you encounter issues "ChecksumMismatchError: Conda detected a mismatch between the expected.." , do the following:
-
-conda config --add pkgs_dirs /local2/home/conda/pkgs
-conda config --add envs_dirs /local2/home/conda/envs
-
-**2. Add conda environment's site packages to PATH**
-
-   See example below.
+**With https**
 
 .. code-block:: console
 
-   setenv PATH ${PATH}:${CONDA_PREFIX}/lib/python3.1/site-packages/scripts/
+  https://github.com/NOAA-GFDL/CatalogBuilder.git
 
-**3. Call the builder** 
+Installing the package
+----------------------
+
+Now that you have a local copy of the source code, you are able to install the package. From the root of the repository, run:
+
+.. code-block:: console
+
+   pip install .
+
+.. note::
+   This installation method is expected to change slightly when the package is uploaded to the Python Package index.
+
+
+Configuration
+=============
+
+A catalog template is a YAML file defining headerlist, input path template, input file template, and input/output paths. A template/configuration file is used for all catalog generation.
+
+
+Using a custom template
+-----------------------
+
+A default configuration is used for catalog generation unless a custom configuration is provided. We recommend the use of a custom configuration file if you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented. Configs must be passed to the builder using the ``--config flag``. See `Flags`_ here.
+
+`Here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml>`_ is an example configuration file.
+
+
+**HEADERLIST**
+
+Catalog headers (column names) are set with the *HEADER LIST* variable. The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
+with the ESM collection specification standards and the appropriate workflows. 
+
+.. code-block:: yaml
+   
+ #Catalog Headers
+ headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
+                  "frequency", "realm", "table_id",
+                  "member_id", "grid_label", "variable_id",
+                  "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
+
+
+**INPUT PATH TEMPLATE**
+
+The *INPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
+
+.. code-block:: yaml
+
+ #Directory structure information
+ input_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','realm','cell_methods','frequency','chunk_freq']
+
+For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp the input_path_template is set as above. 
+
+We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in input_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory, 'am5f3b1r0', does not map to an existing header value so we simply add NA in input_path_template for the fourth value. 
+
+**INPUT FILE TEMPLATE**
+
+The *INPUT FILE TEMPLATE* variable controls the expected filename structure of the input data. This is used to grab relevant data stored in filename.
+
+.. code-block:: yaml
+
+ #Filename information
+  input_file_template = ['realm','temporal_subset','variable_id']
+
+**INPUT/OUTPUT PATH**
+
+The *INPUT/OUTPUT PATH* variables are used by the Catalog Builder to locate input data and store output to the proper location. 
+
+.. code-block:: yaml
+
+ #Input directory and output info
+  input_path:  "/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/"
+  output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can be an absolute or a relative path.
+
+Creating a data catalog
+=======================
+
+Using the installed package
+---------------------------
 
 Catalogs are generated by the following command:  *gen_intake_gfdl.py <INPUT_PATH> <OUTPUT_PATH>*
 
@@ -81,54 +121,10 @@ This would create a catalog.csv and catalog.json in the user's home directory.
 
 See `Flags`_ here.
 
-Using a configuration file
---------------------------
-
-We recommend the use of a configuration file to provide input to the catalog builder. This is necessary and useful if you want to work with datasets and directories that are *not quite* GFDL post-processed directory oriented.
-
-`Here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml>`_ is an example configuration file.
-
-Catalog headers (column names) are set with the *HEADER LIST* variable. The *OUTPUT PATH TEMPLATE* variable controls the expected directory structure of input data.
-
-.. code-block:: yaml
-   
- #Catalog Headers
- headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
-                  "frequency", "realm", "table_id",
-                  "member_id", "grid_label", "variable_id",
-                  "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
-
-The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
-with the ESM collection specification standards and the appropriate workflows.
-
-.. code-block:: yaml
-
- #Directory structure information
- output_path_template = ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','realm','cell_methods','frequency','chunk_freq']
-
-For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
-the output_path_template is set as above. We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we
-simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply NA in output_path_template for the fourth value. We have NA in values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in output_path_template is set to 'source_id'. We make sure this is a valid value in headerlist as well. #The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply set NA in output_path_template for the fourth value.
-
-.. code-block:: yaml
-
- #Filename information
-  output_file_template = ['realm','temporal_subset','variable_id']
-
-.. code-block:: yaml
-
- #Input directory and output info
-  input_path:  "/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/"
-  output_path: "/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can  be an absolute or a relative path
-
-Template
---------
-
-All data catalogs are generated using a template file. This file defines headerlist, output path template, output file template, and input/output paths.
-
 From a Python script
 ---------------------
 Do you have a python script or a notebook where you could also include steps to generate a data catalog? 
+
 See example `here <https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/scripts/gen_intake_gfdl_runner_config.py>`_
 
 Here is another example *with a custom configuration*:
@@ -146,7 +142,6 @@ Here is another example *with a custom configuration*:
    #User provides the input directory for which a data catalog needs to be generated.
 
    input_path = "/archive/John.Krasting/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/"
-   #/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
 
    #USER inputs the output path. Based on the following setting, user can expect to see /home/a1r/mycatalog.csv and /home/a1r/mycatalog.json generated as output.
 
@@ -156,7 +151,6 @@ Here is another example *with a custom configuration*:
    #This is an example call to run catalog builder using a yaml config file.
    configyaml = os.path.join(git_package_dir, 'catalogbuilder/scripts/configs/config_default.yaml')
    #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-   #output_path = "sample-mdtf-catalog"
 
    def create_catalog_from_config(input_path=input_path,output_path=output_path,configyaml=configyaml):
     csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path,config=configyaml)
@@ -182,7 +176,6 @@ And an example *with a default configuration*:
    #User provides the input directory for which a data catalog needs to be generated.
 
    input_path = "/archive/a1r/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/"
-   #/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
 
    #USER inputs the output path. Based on the following setting, user can expect to see /home/a1r/mycatalog.csv and /home/a1r/mycatalog.json generated as output.
 
@@ -193,8 +186,6 @@ And an example *with a default configuration*:
    #This is an example call to run catalog builder using a yaml config file.
 
    configyaml = os.path.join(git_package_dir, 'configs/config-template.yaml')
-   #input_path = "/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
-   #output_path = "sample-mdtf-catalog"
 
    def create_catalog_from_config(input_path=input_path,output_path=output_path): #,configyaml=configyaml):
        csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path)#,verbose=True,config=configyaml)
@@ -211,12 +202,11 @@ Refer to this `notebook <https://github.com/aradhakrishnanGFDL/canopy-cats/blob/
 .. image:: _static/catalog_generation.png
   :alt: Screenshot of a notebook showing catalog generation
 
-
 Using FRE-CLI (GFDL only)
 -------------------------
 
 **1. Setup FRE-CLI**
-Setup FRE-CLI through Lmod following `their setup documentation <https://noaa-gfdl.github.io/fre-cli/setup.html#on-gfdl-systems>`_.
+Setup FRE-CLI through Lmod following `their setup documentation <https://noaa-gfdl.readthedocs.io/projects/fre-cli/en/latest/setup.html>`_.
 
 .. code-block:: console
 
@@ -227,28 +217,34 @@ Setup FRE-CLI through Lmod following `their setup documentation <https://noaa-gf
 
 **2. Call the builder**
 
+
 Generate a catalog by running:
 
 .. code-block:: console
 
-  fre catalog builder $INPUT_PATH $OUTPUT_PATH
+  fre catalog build $INPUT_PATH $OUTPUT_PATH
 
 (OUTPUT_PATH should end with the desired output filename WITHOUT a file ending) See example below.
 
 .. code-block:: console
 
- fre catalog builder --overwrite /archive/path_to_data_dir ~/output
+ fre catalog build --overwrite /archive/path_to_data_dir ~/output
 
 
 See `additional options here. <https://noaa-gfdl.github.io/CatalogBuilder/generation.html#arguments-options>`_
 
-See `Fre-CLI Documentation here <https://noaa-gfdl.github.io/fre-cli/>`_
+See `Fre-CLI Documentation here <https://noaa-gfdl.readthedocs.io/projects/fre-cli/en/latest/>`_
 
+Expected output
+---------------
 
-Arguments/Options
-_____
+The catalog builder tool generates a JSON catalog specification file and a CSV catalog in the specfied output directory with the specified name.
 
-**Input/Output paths can be passed directly to catalog builder tool through calling command**
+Arguments and Options
+=====================
+
+Arguments
+---------
 
 All methods of catalog builder generation support direct input/output path passing.
 
@@ -257,12 +253,14 @@ Input path must be the 1st argument. Output path must be the 2nd.
 Ex. gen_intake_gfdl.py /archive/Some.User/input-path ./output_path
 
 
+Flags
+-----
 .. Reference `Flags`_.
 
 - --config - Allows for catalogs to be generated with a custom configuration. Requires path to YAML configuration file. (Ex. "--config custom_config.yaml")  
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
-- --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your output_path_template**
+- --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your input_path_template**
 - --strict - Activates strict mode which validates catalog vocabulary during generation
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path

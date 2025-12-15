@@ -7,12 +7,8 @@ import pathlib
 import sys 
 import os, click
 
-test = False
-
-if(test == True):
-  json1 = "/home/a1r/github/noaa-gfdl/catalogs/CM4.5v01_om5b06_piC_noBLING.json"
-  json2 = "/home/a1r/github/noaa-gfdl/catalogs/ESM4.5v01_om5b04_piC.json"
-  combined_json = "/home/a1r/github/noaa-gfdl/catalogs/combined_CM4.5v01_om5b06_piC_noBLING_and_ESM4.5v01_om5b04_piC.json"
+import logging
+logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option('-i','--inputfiles',required=True,multiple=True,help='Pass json catalog files to-be-combined, space separated')
@@ -21,24 +17,25 @@ if(test == True):
 #Assume csv is in the same path and deduce the filename
 def combine_cats(inputfiles,output_path):
     """This script combines two json catalogs. It takes the path to input catalogs and the output catalog names as input. \nThe options may be passed with this as the template: \n combine_catalogs.py -i jsoncatalog -i jsoncatalog2 -o outputjson \n\n Example usage: combine_cats.py -i /home/a1r/github/noaa-gfdl/catalogs/CM4.5v01_om5b06_piC_noBLING.json -i /home/a1r/github/noaa-gfdl/catalogs/ESM4.5v01_om5b04_piC.json -o combinedcat.json """
+
     try:
        json1 = inputfiles[0]
     except:
-       sys.exit("cannot parse inputfiles")
+       raise IndexError("cannot parse inputfiles")
     try:
        json2 = inputfiles[1]
     except:
-       sys.exit("cannot parse inputfiles2")
+       raise IndexError("cannot parse inputfiles2")
     try:
        combined_json = output_path
     except:
-       sys.exit("cannot parse output_path")
+       raise IndexError("cannot parse output_path")
     p1 = pathlib.PurePath(json1)
     csv1 =  p1.with_suffix('.csv')
-    print(csv1)
+    logger.debug(f"{csv1}")
     p2 = pathlib.Path(json2)
     csv2 = p2.with_suffix('.csv')
-    print(csv2)
+    logger.debug(f"{csv2}")
 
     cat_csvs = [csv1,csv2] #TODO check for valid paths, pass it with cmd line if necessary 
 
@@ -47,20 +44,20 @@ def combine_cats(inputfiles,output_path):
         json_obj1 = json.load(f1)
         json_obj2 = json.load(f2) 
     differ = diff(json_obj1, json_obj2) 
-    print("INFO: Schema differs")
-    print(differ)
+        logger.info("Schema differs")
+    logger.info("{differ}")
     if len(differ.keys()) == 1:
-      if "catalog_file" in differ.keys():
-          print("We can combine since the catalog_file is the only difference")
+        if "catalog_file" in differ.keys():
+            logger.info("We can combine since the catalog_file is the only difference")
     else:
-      print("Schema likely varies significantly, cannot combine")
-      sys.exit()
+        logger.info("Schema likely varies significantly, cannot combine")
+        raise RuntimeError("Schema likely varies significantly, cannot combine")
+
     #### If the headers are the same, append the data frames together and create the combined csv 
     p3 = pathlib.Path(combined_json)
     combined_csv = p3.with_suffix('.csv')
 
     df_concat = pd.concat([pd.read_csv(f) for f in cat_csvs], ignore_index = True)
-    #df_concat = pd.concat([pd.read_csv(f) for f in cat_csvs])
     df_concat.to_csv(combined_csv, index=False)
 
     #Write out a catalog specification 
@@ -68,14 +65,15 @@ def combine_cats(inputfiles,output_path):
     catspec = json.load(f)
     for catalog_file in catspec['catalog_file']:
        catspec['catalog_file'] = os.fspath(combined_csv)
-    #Write out the combined json 
- 
+
+    #Write out the combined json  
     json_data = json.dumps(catspec,indent=4)
     with open(combined_json,'w') as outfile:
-      outfile.write(json_data)
+        outfile.write(json_data)
+
     #Print pointers 
-    print("Combined catalog specification- ", combined_json)
-    print("Combined csv/catalog- ", combined_csv)
+    logger.info("Combined catalog specification: {combined_json}")
+    logger.info("Combined csv/catalog: {combined_csv}")
 
 def combine_cats_cli(**kwargs):
     return combine_cats(**kwargs)

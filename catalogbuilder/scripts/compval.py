@@ -12,9 +12,7 @@ import logging
 from importlib.resources import files
 import urllib.request
 
-logger = logging.getLogger('local')
-logger.setLevel(logging.INFO)
-logging.basicConfig(stream=sys.stdout)
+logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument('json_path',nargs=1,required=True)
@@ -181,7 +179,7 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
                 errors += 1
 
             if column in catalog.columns:
-                if(catalog[column].isnull().values.any()):
+                if catalog[column].isnull().values.any():
                     logger.error("'" + column + "' contains empty values.")
                     errors += 1
 

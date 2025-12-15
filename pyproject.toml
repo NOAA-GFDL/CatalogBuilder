@@ -1,0 +1,36 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "catalogbuilder"
+version = "2025.01.01"
+description = "intake-esm Catalog Generation Utilities"
+readme = "README.md"
+license = "CC-BY-NC-SA-4.0"
+dependencies = [
+    "pytest",
+    "click",
+    "xarray",
+    "pandas",
+    "jsondiff",
+    "intake-esm",
+    "boto3",
+    "polars-lts-cpu", #Hoping to remove this in the future
+]
+
+[project.scripts]
+gen_intake_gfdl = "catalogbuilder.scripts.gen_intake_gfdl:create_catalog_cli"
+
+[tool.setuptools.packages.find]
+include = ["catalogbuilder*"]
+
+[tool.setuptools.package-data]
+catalogbuilder = [
+    "cats/**",
+    "intakebuilder/config_default.yaml",
+    "intakebuilder/dat/**",
+    "scripts/configs/**",
+]
