@@ -44,7 +44,7 @@ def combine_cats(inputfiles,output_path):
         json_obj1 = json.load(f1)
         json_obj2 = json.load(f2) 
     differ = diff(json_obj1, json_obj2) 
-        logger.info("Schema differs")
+    logger.info("Schema differs")
     logger.info("{differ}")
     if len(differ.keys()) == 1:
         if "catalog_file" in differ.keys():
