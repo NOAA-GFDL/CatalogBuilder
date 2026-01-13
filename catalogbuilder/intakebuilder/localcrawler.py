@@ -7,7 +7,7 @@ import os
 from . import getinfo
 import re
 import logger
-logger = logging.getLogger(
+logger = logging.getLogger(__name__)
 
 def crawlLocal(projectdir, dictFilter):
     '''
