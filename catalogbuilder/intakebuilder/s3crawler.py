@@ -5,7 +5,7 @@ import botocore
 from . import getinfo
 
 import logging
-logger = logging.getLogger(__name__
+logger = logging.getLogger(__name__)
 
 '''
 s3 crawler crawls through the S3 bucket, passes the bucket path to the helper functions to getinfo.

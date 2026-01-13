@@ -7,7 +7,7 @@ import os
 from . import getinfo
 import re
 import logger
-logger = logging.getLogger(
+logger = logging.getLogger(__name__)
 
 def crawlLocal(projectdir, dictFilter):
     '''
@@ -17,7 +17,7 @@ def crawlLocal(projectdir, dictFilter):
     '''
     listfiles = []
     pat = None
-    if "miptable" in dictFilter.keys()) and "varname" in dictFilter.keys():
+    if "miptable" in dictFilter.keys() and "varname" in dictFilter.keys():
         pat = re.compile('({}/{}/)'.format(dictFilter["miptable"],dictFilter["varname"]))
     elif "miptable" in dictFilter.keys():
         pat = re.compile('({}/)'.format(dictFilter["miptable"]))
