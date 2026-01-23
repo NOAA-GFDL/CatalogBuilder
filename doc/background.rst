@@ -1,9 +1,9 @@
 Background
 ==========
 
-The catalog builder project is a “python community package ecosystem” that allows you to generate data catalogs compatible with intake-esm.  Available as a Conda package. 
+The catalog builder project is a “python community package ecosystem” that allows you to generate data catalogs compatible with intake-esm. It is currently available as a pip package. 
 
-See our `Github repository here <https://github.com/aradhakrishnanGFDL/CatalogBuilder>`_.
+See our `Github repository here <https://github.com/NOAA-GFDL/CatalogBuilder>`_.
 We have contributing guidelines and code of conduct documented in our GitHub repo. We welcome your contributions. 
 
 Brief overview on data catalogs 
@@ -15,15 +15,15 @@ Data catalogs in this project have 3 components. One of those is the "intake-esm
 
 Catalog Specification
 
-- What we expect to find inside and how to open the “datasets”/objects? 
+- What we expect to find inside and how to open the “datasets”/objects?
 - Provides metadata about the catalog
 - Identifies how multiple files can be aggregated into a single “dataset”
 - Support for extensible metadata
 - Single JSON file
 
-Catalogs 
+Catalogs
 
-- Tells us more about the data collection 
+- Tells us more about the data collection
 - Path to the files (objects),  and associated metadata.
 - CSV file
 - User-defined granularity
@@ -32,7 +32,4 @@ Intake-ESM API
 
 - Opens possibilities to QUERY and ANALYZE
 - Provides a pythonic way to “query” for information in the catalogs
-- Loads the results in an xarray dataset object 
-
-
-
+- Loads the results in an xarray dataset object

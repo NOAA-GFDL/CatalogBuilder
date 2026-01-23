@@ -1,6 +1,6 @@
 package:
   name: catalogbuilder
-  version: 2.0.1
+  version: 2025.01.01
 
 source:
   path: .
@@ -22,7 +22,7 @@ requirements:
     - xarray
     - pandas
     - jsondiff
-    - conda-forge::intake-esm=2023.7.7
+    - conda-forge::intake-esm
     - boto3
 test:
   imports:

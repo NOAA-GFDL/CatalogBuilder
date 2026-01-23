@@ -11,7 +11,7 @@ The Catalog Builder API will collect building blocks necessary to build a data c
 
 Tested on posix file system, S3 and GFDL post-processed (select simulations, components) at this time. This repository has unit tests (pytest) and incorporated the same in GitHub Actions, when a PR is open or a push is initiated.
 
-See our `Github repository <https://github.com/aradhakrishnanGFDL/CatalogBuilder>`_ here.
+See our `Github repository <https://github.com/NOAA-GFDL/CatalogBuilder>`_ here.
 
 .. toctree::
    :maxdepth: 2
@@ -19,8 +19,10 @@ See our `Github repository <https://github.com/aradhakrishnanGFDL/CatalogBuilder
 
    background
    generation
+   validation
    usage
-   presentation 
+   presentation
+   developers
 
 Indices and tables
 ==================

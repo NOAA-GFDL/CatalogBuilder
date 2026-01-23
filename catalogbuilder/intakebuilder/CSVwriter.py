@@ -2,30 +2,21 @@ import os.path
 import csv
 import pandas as pd
 from csv import writer
-#from intakebuilder import builderconfig, configparser
-from . import builderconfig, configparser 
+from . import configparser 
+import logging
+logger = logging.getLogger(__name__)
 
 def getHeader(configyaml):
     '''
-    returns header that is the first line in the csv file, refers builderconfig.py
+    returns header that is the first line in the csv file, refers default or user passed config yaml 
     :return: headerlist with all columns
     '''
     if configyaml:
         return configyaml.headerlist
     else:
-        return builderconfig.headerlist
+        logger.debug("Can't getHeader() from config. Check header in config yaml or open an issue with error details.")
+        raise AttributeError("Can't getHeader() from config. Check header in config yaml or open an issue with error details.")
 
-def writeHeader(csvfile):
-  '''
-  writing header for the csv
-  :param csvfile: pass csvfile absolute path
-  :return: csv writer object
-  '''
-  # list containing header values
-  # inputting these headers into a csv
-  with open(csvfile, "w+", newline="") as f:
-        writerobject = csv.writer(f)
-        writerobject.writerow(builderconfig.headerlist)
 
 def file_appender(dictinputs, csvfile):
     '''
@@ -63,7 +54,7 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
             if os.path.isfile(csvfile):
                 user_input = ''
                 while True:
-                    user_input = input('Found existing file! Overwrite? (y/n)')
+                    user_input = input('\nFound existing file! Overwrite? (y/n)\n')
 
                     if user_input.lower() == 'y':
                         with open(csvfile, 'w') as csvfile:
@@ -94,4 +85,4 @@ def listdict_to_csv(dict_info,headerlist, csvfile, overwrite, append,slow):
                             writer.writerow(data)
      
     except IOError:
-        print("I/O error")
+        raise IOError("I/O error")

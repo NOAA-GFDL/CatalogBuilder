@@ -25,7 +25,7 @@ def main():
     project_dir = project_dir.rstrip("/")
     logger.info("Calling localcrawler.crawlLocal") 
     print("Calling localcrawler.crawlLocal")
-    list_files = localcrawler.crawlLocal(project_dir, dictFilter, logger)
+    list_files = localcrawler.crawlLocal(project_dir, dictFilter)
     headers = CSVwriter.getHeader()
     if (not os.path.exists(csvfile)):
         os.makedirs(os.path.dirname(csvfile), exist_ok=True)

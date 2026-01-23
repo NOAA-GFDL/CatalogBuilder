@@ -1,4 +1,4 @@
-name: conda-env-create-run-pytest
+name: test-pip-install-run-pytest
 
 on: [pull_request]
 
@@ -15,24 +15,14 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Add conda to system path
+    - name: Install pip package
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-
-    - name: Create catalogbuilder conda environment
-      run: |
-        # create environment catalogbuilder will be installed into
-        conda env create -f environment.yml --name catalogbuilder
-        # put conda env binaries in GITHUB_PATH
-        echo $CONDA/envs/catalogbuilder/bin >> $GITHUB_PATH
-        # install catalogbuilder to conda env directories
-        $CONDA/envs/catalogbuilder/bin/python -m pip install --prefix $CONDA/envs/catalogbuilder .
+        pip install .
 
     - name: Make sample data
       run: |
         which python
-        python catalogbuilder/tests/make_sample_data.py
+        python catalogbuilder/scripts/make_sample_data.py
 
     - name: Generate catalog
       run: |
@@ -56,10 +46,10 @@ jobs:
 
     - name: Run pytest with downloaded artifacts
       run: |
-        $CONDA/envs/catalogbuilder/bin/pytest -v --runxfail catalogbuilder
+        pytest -v --runxfail catalogbuilder
 
     - name: Test for completeness
       run: | 
         which python
-        python catalogbuilder/scripts/test_catalog.py -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
-        python catalogbuilder/scripts/test_catalog.py -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json
+        python catalogbuilder/scripts/compval.py --proper_generation -tf gfdl_autotest.json catalogbuilder/cats/gfdl_template.json
+        python catalogbuilder/scripts/compval.py --proper_generation -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json

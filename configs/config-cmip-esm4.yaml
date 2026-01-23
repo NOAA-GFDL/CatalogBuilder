@@ -13,9 +13,9 @@
 #with the ESM collection specification standards and the appropriate workflows.
 
 headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
-                  "frequency", "modeling_realm", "table_id",
-                  "member_id", "grid_label", "variable_id",
-                  "temporal_subset", "chunk_freq","grid_label","platform","dimensions","cell_methods","path"]
+                  "frequency", "realm", "table_id",
+                  "member_id", "grid_label", "variable_id","version_id",
+                  "time_range", "chunk_freq","platform","dimensions","cell_methods","path"]
 
 #what kind of directory structure to expect?
 #For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
@@ -26,10 +26,11 @@ headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
 #this is a valid value in headerlist as well.
 #The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply NA in output_path_template
 #for the fourth value.
+#project_dir = "/uda/data_cmip6/CMIP6/CMIP/NOAA-GFDL/GFDL-ESM4/"
+#/uda/CMIP6/CMIP/NOAA-GFDL/GFDL-ESM4/1pctCO2/r1i1p1f1/Amon/tas/gr1/v20180701/tas_Amon_GFDL-ESM4_1pctCO2_r1i1p1f1_gr1_000101-010012.nc
+output_path_template: ['NA','activity_id','NA','institution_id','source_id','experiment_id','member_id','table_id','variable_id','grid_label','version_id']
 
-output_path_template: ['NA','NA','source_id','NA','experiment_id','platform','custom_pp','modeling_realm','cell_methods','frequency','chunk_freq']
-
-output_file_template: ['modeling_realm','temporal_subset','variable_id']
+output_file_template: ['variable_id','table_id','source_id','experiment_id','member_id','grid_label','time_range']
 
 #OUTPUT FILE INFO is currently passed as command-line argument.
 #We will revisit adding a csvfile, jsonfile and logfile configuration to the builder configuration file in the future.
@@ -37,5 +38,6 @@ output_file_template: ['modeling_realm','temporal_subset','variable_id']
 
 #######################################################
 
-input_path: "/Users/ar46/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/" #"ENTER INPUT PATH HERE" #Example: /Users/ar46/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
-output_path: "catalog" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)
+input_path: "/uda/CMIP6/CMIP/NOAA-GFDL/GFDL-ESM4/"
+#"/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/" #"ENTER INPUT PATH HERE" #Example: /Users/ar46/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp/"
+output_path: "catalogcmiptest" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)

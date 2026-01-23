@@ -1,0 +1,68 @@
+#what kind of directory structure to expect? 
+#For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
+# the input_path_template is set as follows.
+#We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we
+#simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example
+#above is the model (source_id), so the third list value in input_path_template is set to 'source_id'. We make sure
+#this is a valid value in headerlist as well.
+#The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply NA in input_path_template
+#for the fourth value.
+
+#catalog headers
+#The headerlist is expected column names in your catalog/csv file. This is usually determined by the users in conjuction
+#with the ESM collection specification standards and the appropriate workflows.
+
+# default, failed because standard_name not compatible with X-SHiELD output
+# may be okay with updated diag table that uses cmip variable names
+#headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
+#                  "frequency", "realm", "table_id",
+#                  "member_id", "grid_label", "variable_id",
+#                  "time_range", "chunk_freq","platform","dimensions","cell_methods","standard_name","path"]
+
+# working prototype v1
+#headerlist: ["activity_id", "institution_id", "source_id", "experiment_id",
+#                  "frequency", "realm", "table_id",
+#                  "member_id", "grid_label", "variable_id",
+#                  "time_range", "chunk_freq","platform","dimensions","cell_methods","path"]
+
+# eliminated some unused headers, but
+# eliminating frequency, realm, table_id, chunk_freq, causes a problem
+# when col.search is called
+headerlist: ["source_id", "experiment_id",
+                  "frequency", "realm", "table_id",
+                  "member_id", "grid_label", "variable_id",
+                  "time_range", "chunk_freq","platform","path"]
+
+#headerlist: ["source_id","platform","activity_id", "experiment_id",
+#                  "frequency", "realm", "table_id",
+#                  "member_id", "grid_label", "variable_id",
+#                  "time_range", "chunk_freq","platform","dimensions","cell_methods","path"]
+
+#input_path_template: ['NA','NA','source_id','platform','activity_id','experiment_id','custom_pp','time_range']
+
+#what kind of directory structure to expect?
+#For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp
+# the input_path_template is set as follows.
+#We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we
+#simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example
+#above is the model (source_id), so the third list value in input_path_template is set to 'source_id'. We make sure
+#this is a valid value in headerlist as well.
+#The fourth directory is am5f3b1r0 which does not map to an existing header value. So we simply NA in input_path_template
+#for the fourth value.
+
+input_path_template: ['NA','NA','NA','source_id','platform','member_id','experiment_id','custom_pp','time_range']
+
+input_file_template: ['variable_id','NA']
+
+#OUTPUT FILE INFO is currently passed as command-line argument.
+#We will revisit adding a csvfile, jsonfile and logfile configuration to the builder configuration file in the future.
+#csvfile =  #jsonfile =  #logfile =
+
+#######################################################
+
+# note: this input path is built from softlinks to the directory /scratch/cimes/GLOBALFV3/stellar_run/
+# cp -as /scratch/cimes/GLOBALFV3/stellar_run/processed/  /scratch/cimes/tmerlis/GLOBALFV3/stellar_run/processed
+# cp -as /scratch/cimes/GLOBALFV3/stellar_run/processed_new/  /scratch/cimes/tmerlis/GLOBALFV3/stellar_run/processed_new
+# this avoids the other directories that contain other experiments that have not been 'processed'
+input_path:  "/scratch/cimes/tmerlis/GLOBALFV3/stellar_run/"
+output_path: "/home/tmerlis/hackathon/catbuild/pire4" # ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. e.g catalog (the builder then generates catalog.csv and catalog.json. This can also be an absolute path)
