@@ -18,7 +18,6 @@ jobs:
     - name: Install pip package
       run: |
         pip install .
-        pip show intake-esm
 
     - name: Make sample data
       run: |
