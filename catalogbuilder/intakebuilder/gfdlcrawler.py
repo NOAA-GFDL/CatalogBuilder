@@ -54,7 +54,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
-
     #Creating a dictionary to track the unique datasets we come across when using slow mode
     #The keys are the standard names and the values are lists tracking var_id,realm,etc..
     unique_datasets = {'':''}
@@ -138,7 +137,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                         if qualities in unique_datasets.keys():
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
-
                         else:
                             logger.info("Retrieving standard_name from "+ (str)(filename))
                             getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
