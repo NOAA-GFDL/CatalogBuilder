@@ -11,10 +11,10 @@ jobs:
       image: continuumio/miniconda3:latest
     steps:
     - name: Checkout Files
-      uses: actions/checkout@v4 
+      uses: actions/checkout@v4
     - name: Run Docker to Build
       run: |
         conda config --append channels conda-forge
-        conda config --append channels noaa-gfdl        
+        conda config --append channels noaa-gfdl
         conda install conda-build conda-verify
         conda build .
