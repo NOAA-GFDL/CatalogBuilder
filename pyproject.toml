@@ -16,7 +16,7 @@ dependencies = [
     "xarray",
     "pandas",
     "jsondiff",
-    "intake-esm ==2025.7.9",
+    "intake-esm ==2025.2.3",
     "boto3",
     "polars-lts-cpu", #Hoping to remove this in the future
 ]
