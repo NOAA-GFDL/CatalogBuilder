@@ -123,6 +123,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
     if not slow and 'standard_name' in headers:
         #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
         df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
+        df['standard_name'] = df['standard_name'].astype(object)
         list_variable_id = []
         try:
             list_variable_id = df["variable_id"].unique().tolist()
@@ -144,7 +145,8 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             except ValueError:
                 continue
             if var is not None and realm is not None:
-                df['standard_name'].loc[(df['variable_id'] == var) & (df['realm'] == realm) ] = v
+                mask = (df['variable_id'] == var) & (df['realm'] == realm)
+                df.loc[mask, 'standard_name'] = v
 
         if df is not None and len(df) != 0:
             with open(csv_path, 'w') as csvfile:
