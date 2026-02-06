@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Generating data catalogs &#8212; Catalog Builder 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Catalog Validation" href="validation.html" />
+    <link rel="prev" title="Background" href="background.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">Catalog Builder 1.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Generating data catalogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="validation.html">Catalog Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Using data catalogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="presentation.html">Presentation links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">For developers</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="generating-data-catalogs">
+<h1>Generating data catalogs<a class="headerlink" href="#generating-data-catalogs" title="Link to this heading">¶</a></h1>
+<p>There are a few ways to use the catalog builder. This page contains instructions to help you start using the tool.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>You will need to install the Catalog Builder package to begin. The current recommended approach for installing the catalog builder is to install the tool as a pip package.</p>
+<section id="cloning-the-repository">
+<h3>Cloning the repository<a class="headerlink" href="#cloning-the-repository" title="Link to this heading">¶</a></h3>
+<p>You’ll need to first clone the <a class="reference external" href="https://github.com/NOAA-GFDL/CatalogBuilder">github repository</a>:</p>
+<p><strong>With ssh</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone git@github.com:NOAA-GFDL/CatalogBuilder.git</span>
+</pre></div>
+</div>
+<p><strong>With https</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">https://github.com/NOAA-GFDL/CatalogBuilder.git</span>
+</pre></div>
+</div>
+</section>
+<section id="installing-the-package">
+<h3>Installing the package<a class="headerlink" href="#installing-the-package" title="Link to this heading">¶</a></h3>
+<p>Now that you have a local copy of the source code, you are able to install the package. From the root of the repository, run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install .</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This installation method is expected to change slightly when the package is uploaded to the Python Package index.</p>
+</div>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
+<p>A catalog template is a YAML file defining headerlist, input path template, input file template, and input/output paths. A template/configuration file is used for all catalog generation.</p>
+<section id="using-a-custom-template">
+<h3>Using a custom template<a class="headerlink" href="#using-a-custom-template" title="Link to this heading">¶</a></h3>
+<p>A default configuration is used for catalog generation unless a custom configuration is provided. We recommend the use of a custom configuration file if you want to work with datasets and directories that are <em>not quite</em> GFDL post-processed directory oriented. Configs must be passed to the builder using the <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">flag</span></code>. See <a class="reference internal" href="#flags">Flags</a> here.</p>
+<p><a class="reference external" href="https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/tests/config-cfname.yaml">Here</a> is an example configuration file.</p>
+<p><strong>HEADERLIST</strong></p>
+<p>Catalog headers (column names) are set with the <em>HEADER LIST</em> variable. The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
+with the ESM collection specification standards and the appropriate workflows.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1">#Catalog Headers</span>
+<span class="nt">headerlist</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;activity_id&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;institution_id&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;source_id&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;experiment_id&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">                 </span><span class="s">&quot;frequency&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;realm&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;table_id&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">                 </span><span class="s">&quot;member_id&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;grid_label&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;variable_id&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">                 </span><span class="s">&quot;time_range&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;chunk_freq&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;platform&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;dimensions&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;cell_methods&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;standard_name&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;path&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p><strong>INPUT PATH TEMPLATE</strong></p>
+<p>The <em>INPUT PATH TEMPLATE</em> variable controls the expected directory structure of input data.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1">#Directory structure information</span>
+<span class="l l-Scalar l-Scalar-Plain">input_path_template = [&#39;NA&#39;,&#39;NA&#39;,&#39;source_id&#39;,&#39;NA&#39;,&#39;experiment_id&#39;,&#39;platform&#39;,&#39;custom_pp&#39;,&#39;realm&#39;,&#39;cell_methods&#39;,&#39;frequency&#39;,&#39;chunk_freq&#39;]</span>
+</pre></div>
+</div>
+<p>For a directory structure like /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp the input_path_template is set as above.</p>
+<p>We have NA in those values that do not match up with any of the expected headerlist (CSV columns), otherwise we simply specify the associated header name in the appropriate place. E.g. The third directory in the PP path example above is the model (source_id), so the third list value in input_path_template is set to ‘source_id’. We make sure this is a valid value in headerlist as well. The fourth directory, ‘am5f3b1r0’, does not map to an existing header value so we simply add NA in input_path_template for the fourth value.</p>
+<p><strong>INPUT FILE TEMPLATE</strong></p>
+<p>The <em>INPUT FILE TEMPLATE</em> variable controls the expected filename structure of the input data. This is used to grab relevant data stored in filename.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1">#Filename information</span>
+<span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_file_template = [&#39;realm&#39;,&#39;temporal_subset&#39;,&#39;variable_id&#39;]</span>
+</pre></div>
+</div>
+<p><strong>INPUT/OUTPUT PATH</strong></p>
+<p>The <em>INPUT/OUTPUT PATH</em> variables are used by the Catalog Builder to locate input data and store output to the proper location.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1">#Input directory and output info</span>
+<span class="w"> </span><span class="nt">input_path</span><span class="p">:</span><span class="w">  </span><span class="s">&quot;/archive/am5/am5/am5f7b10r0/c96L65_am5f7b10r0_amip/gfdl.ncrc5-deploy-prod-openmp/pp/&quot;</span>
+<span class="w"> </span><span class="nt">output_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/home/a1r/github/noaa-gfdl/catalogs/c96L65_am5f7b10r0_amip&quot;</span><span class="w"> </span><span class="c1"># ENTER NAME OF THE CSV AND JSON, THE SUFFIX ALONE. This can be an absolute or a relative path.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="creating-a-data-catalog">
+<h2>Creating a data catalog<a class="headerlink" href="#creating-a-data-catalog" title="Link to this heading">¶</a></h2>
+<section id="using-the-installed-package">
+<h3>Using the installed package<a class="headerlink" href="#using-the-installed-package" title="Link to this heading">¶</a></h3>
+<p>Catalogs are generated by the following command:  <em>gen_intake_gfdl.py &lt;INPUT_PATH&gt; &lt;OUTPUT_PATH&gt;</em></p>
+<p>Output path argumment should end with the desired output filename WITHOUT a file ending. See example below.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">gen_intake_gfdl.py /archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp $HOME/catalog</span>
+</pre></div>
+</div>
+<p>This would create a catalog.csv and catalog.json in the user’s home directory.</p>
+<a class="reference internal image-reference" href="_images/ezgif-4-786144c287.gif"><img alt="Catalog generation demonstration" src="_images/ezgif-4-786144c287.gif" style="width: 1000px;" />
+</a>
+<p>See <a class="reference internal" href="#flags">Flags</a> here.</p>
+</section>
+<section id="from-a-python-script">
+<h3>From a Python script<a class="headerlink" href="#from-a-python-script" title="Link to this heading">¶</a></h3>
+<p>Do you have a python script or a notebook where you could also include steps to generate a data catalog?</p>
+<p>See example <a class="reference external" href="https://github.com/NOAA-GFDL/CatalogBuilder/blob/main/catalogbuilder/scripts/gen_intake_gfdl_runner_config.py">here</a></p>
+<p>Here is another example <em>with a custom configuration</em>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">import sys, os</span>
+<span class="go">git_package_dir = &#39;/home/a1r/git/forkCatalogBuilder-/&#39;</span>
+<span class="go">sys.path.append(git_package_dir)</span>
+
+<span class="go">import catalogbuilder</span>
+<span class="go">from catalogbuilder.scripts import gen_intake_gfdl</span>
+<span class="gp">#</span><span class="c1">#####USER input begins########</span>
+
+<span class="gp">#</span>User<span class="w"> </span>provides<span class="w"> </span>the<span class="w"> </span>input<span class="w"> </span>directory<span class="w"> </span><span class="k">for</span><span class="w"> </span>which<span class="w"> </span>a<span class="w"> </span>data<span class="w"> </span>catalog<span class="w"> </span>needs<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span>generated.
+
+<span class="go">input_path = &quot;/archive/John.Krasting/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/&quot;</span>
+
+<span class="gp">#</span>USER<span class="w"> </span>inputs<span class="w"> </span>the<span class="w"> </span>output<span class="w"> </span>path.<span class="w"> </span>Based<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>following<span class="w"> </span>setting,<span class="w"> </span>user<span class="w"> </span>can<span class="w"> </span>expect<span class="w"> </span>to<span class="w"> </span>see<span class="w"> </span>/home/a1r/mycatalog.csv<span class="w"> </span>and<span class="w"> </span>/home/a1r/mycatalog.json<span class="w"> </span>generated<span class="w"> </span>as<span class="w"> </span>output.
+
+<span class="go">output_path = &quot;/home/a1r/tests/mycatalog-jpk-def&quot;</span>
+<span class="gp">#</span>NOTE:<span class="w"> </span>If<span class="w"> </span>your<span class="w"> </span>input_path<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>look<span class="w"> </span>like<span class="w"> </span>the<span class="w"> </span>above<span class="w"> </span><span class="k">in</span><span class="w"> </span>general,<span class="w"> </span>you<span class="w"> </span>will<span class="w"> </span>need<span class="w"> </span>to<span class="w"> </span>pass<span class="w"> </span>a<span class="w"> </span>--config<span class="w"> </span>which<span class="w"> </span>is<span class="w"> </span>custom
+
+<span class="gp">#</span>This<span class="w"> </span>is<span class="w"> </span>an<span class="w"> </span>example<span class="w"> </span>call<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span>catalog<span class="w"> </span>builder<span class="w"> </span>using<span class="w"> </span>a<span class="w"> </span>yaml<span class="w"> </span>config<span class="w"> </span>file.
+<span class="go">configyaml = os.path.join(git_package_dir, &#39;catalogbuilder/scripts/configs/config_default.yaml&#39;)</span>
+<span class="gp">#</span><span class="nv">input_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp&quot;</span>
+
+<span class="go">def create_catalog_from_config(input_path=input_path,output_path=output_path,configyaml=configyaml):</span>
+<span class="go"> csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path,config=configyaml)</span>
+<span class="go">    return(csv,json)</span>
+
+<span class="go">if __name__ == &#39;__main__&#39;:</span>
+<span class="go">    create_catalog_from_config(input_path,output_path) #,configyaml)</span>
+</pre></div>
+</div>
+<p>And an example <em>with a default configuration</em>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">import sys, os</span>
+<span class="go">git_package_dir = &#39;/home/a1r/git/forkCatalogBuilder-/&#39;</span>
+<span class="go">sys.path.append(git_package_dir)</span>
+
+<span class="go">import catalogbuilder</span>
+<span class="go">from catalogbuilder.scripts import gen_intake_gfdl</span>
+<span class="go">print(gen_intake_gfdl.__file__)</span>
+
+<span class="gp">#</span><span class="c1">#####USER input begins########</span>
+
+<span class="gp">#</span>User<span class="w"> </span>provides<span class="w"> </span>the<span class="w"> </span>input<span class="w"> </span>directory<span class="w"> </span><span class="k">for</span><span class="w"> </span>which<span class="w"> </span>a<span class="w"> </span>data<span class="w"> </span>catalog<span class="w"> </span>needs<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span>generated.
+
+<span class="go">input_path = &quot;/archive/a1r/fre/FMS2024.02_OM5_20240724/CM4.5v01_om5b06_piC_noBLING/gfdl.ncrc5-intel23-prod-openmp/pp/&quot;</span>
+
+<span class="gp">#</span>USER<span class="w"> </span>inputs<span class="w"> </span>the<span class="w"> </span>output<span class="w"> </span>path.<span class="w"> </span>Based<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>following<span class="w"> </span>setting,<span class="w"> </span>user<span class="w"> </span>can<span class="w"> </span>expect<span class="w"> </span>to<span class="w"> </span>see<span class="w"> </span>/home/a1r/mycatalog.csv<span class="w"> </span>and<span class="w"> </span>/home/a1r/mycatalog.json<span class="w"> </span>generated<span class="w"> </span>as<span class="w"> </span>output.
+
+<span class="go">output_path = &quot;/home/a1r/tests/static-catalog&quot;</span>
+<span class="gp">#</span>NOTE:<span class="w"> </span>If<span class="w"> </span>your<span class="w"> </span>input_path<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>look<span class="w"> </span>like<span class="w"> </span>the<span class="w"> </span>above<span class="w"> </span><span class="k">in</span><span class="w"> </span>general,<span class="w"> </span>you<span class="w"> </span>will<span class="w"> </span>need<span class="w"> </span>to<span class="w"> </span>pass<span class="w"> </span>a<span class="w"> </span>--config<span class="w"> </span>which<span class="w"> </span>is<span class="w"> </span>custom
+<span class="gp"> #</span><span class="c1">###END OF user input ##########</span>
+
+<span class="gp">#</span>This<span class="w"> </span>is<span class="w"> </span>an<span class="w"> </span>example<span class="w"> </span>call<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span>catalog<span class="w"> </span>builder<span class="w"> </span>using<span class="w"> </span>a<span class="w"> </span>yaml<span class="w"> </span>config<span class="w"> </span>file.
+
+<span class="go">configyaml = os.path.join(git_package_dir, &#39;configs/config-template.yaml&#39;)</span>
+
+<span class="go">def create_catalog_from_config(input_path=input_path,output_path=output_path): #,configyaml=configyaml):</span>
+<span class="go">    csv, json = gen_intake_gfdl.create_catalog(input_path=input_path,output_path=output_path)#,verbose=True,config=configyaml)</span>
+<span class="go">     return(csv,json)</span>
+
+<span class="go">if __name__ == &#39;__main__&#39;:</span>
+<span class="go">    csv,json = create_catalog_from_config(input_path,output_path)#,configyaml)</span>
+</pre></div>
+</div>
+</section>
+<section id="from-jupyter-notebook">
+<h3>From Jupyter Notebook<a class="headerlink" href="#from-jupyter-notebook" title="Link to this heading">¶</a></h3>
+<p>Refer to this <a class="reference external" href="https://github.com/aradhakrishnanGFDL/canopy-cats/blob/main/notebooks/cm4_default.ipynb">notebook</a> to see how you can generate catalogs from a Jupyter Notebook</p>
+<img alt="Screenshot of a notebook showing catalog generation" src="_images/catalog_generation.png" />
+</section>
+<section id="using-fre-cli-gfdl-only">
+<h3>Using FRE-CLI (GFDL only)<a class="headerlink" href="#using-fre-cli-gfdl-only" title="Link to this heading">¶</a></h3>
+<p><strong>1. Setup FRE-CLI</strong>
+Setup FRE-CLI through Lmod following <a class="reference external" href="https://noaa-gfdl.readthedocs.io/projects/fre-cli/en/latest/setup.html">their setup documentation</a>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>find<span class="w"> </span>the<span class="w"> </span>most<span class="w"> </span>recent<span class="w"> </span>version<span class="w"> </span>of<span class="w"> </span>fre
+<span class="go">module avail fre</span>
+<span class="gp"># </span>load<span class="w"> </span>the<span class="w"> </span>fre<span class="w"> </span>module.<span class="w"> </span>replace<span class="w"> </span>&lt;NN&gt;<span class="w"> </span>with<span class="w"> </span>the<span class="w"> </span>latest<span class="w"> </span>version
+<span class="go">module load fre/2025.&lt;NN&gt;</span>
+</pre></div>
+</div>
+<p><strong>2. Call the builder</strong></p>
+<p>Generate a catalog by running:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fre catalog build $INPUT_PATH $OUTPUT_PATH</span>
+</pre></div>
+</div>
+<p>(OUTPUT_PATH should end with the desired output filename WITHOUT a file ending) See example below.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fre catalog build --overwrite /archive/path_to_data_dir ~/output</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="https://noaa-gfdl.github.io/CatalogBuilder/generation.html#arguments-options">additional options here.</a></p>
+<p>See <a class="reference external" href="https://noaa-gfdl.readthedocs.io/projects/fre-cli/en/latest/">Fre-CLI Documentation here</a></p>
+</section>
+<section id="expected-output">
+<h3>Expected output<a class="headerlink" href="#expected-output" title="Link to this heading">¶</a></h3>
+<p>The catalog builder tool generates a JSON catalog specification file and a CSV catalog in the specfied output directory with the specified name.</p>
+</section>
+</section>
+<section id="arguments-and-options">
+<h2>Arguments and Options<a class="headerlink" href="#arguments-and-options" title="Link to this heading">¶</a></h2>
+<section id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Link to this heading">¶</a></h3>
+<p>All methods of catalog builder generation support direct input/output path passing.</p>
+<p>Input path must be the 1st argument. Output path must be the 2nd.</p>
+<p>Ex. gen_intake_gfdl.py /archive/Some.User/input-path ./output_path</p>
+</section>
+<section id="flags">
+<h3>Flags<a class="headerlink" href="#flags" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>–config - Allows for catalogs to be generated with a custom configuration. Requires path to YAML configuration file. (Ex. “–config custom_config.yaml”)</p></li>
+<li><p>–overwrite - Overwrite an existing catalog at the given output path</p></li>
+<li><p>–append - Append (without headerlist) to an existing catalog at the given output path</p></li>
+<li><p>–slow - Activates slow mode which retrieves standard_name (or long_name) where possible. <strong>“Standard_name” must be in your input_path_template</strong></p></li>
+<li><p>–strict - Activates strict mode which validates catalog vocabulary during generation</p></li>
+<li><p>–i - Optional method for passing input path</p></li>
+<li><p>–o - Optional method for passing output path</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Generating data catalogs</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#cloning-the-repository">Cloning the repository</a></li>
+<li><a class="reference internal" href="#installing-the-package">Installing the package</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#using-a-custom-template">Using a custom template</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-data-catalog">Creating a data catalog</a><ul>
+<li><a class="reference internal" href="#using-the-installed-package">Using the installed package</a></li>
+<li><a class="reference internal" href="#from-a-python-script">From a Python script</a></li>
+<li><a class="reference internal" href="#from-jupyter-notebook">From Jupyter Notebook</a></li>
+<li><a class="reference internal" href="#using-fre-cli-gfdl-only">Using FRE-CLI (GFDL only)</a></li>
+<li><a class="reference internal" href="#expected-output">Expected output</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#arguments-and-options">Arguments and Options</a><ul>
+<li><a class="reference internal" href="#arguments">Arguments</a></li>
+<li><a class="reference internal" href="#flags">Flags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="background.html">
+                    <span class="icon">&lt;</span><span>Background</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="validation.html"><span>Catalog Validation</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Aparna Radhakrishnan.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>
