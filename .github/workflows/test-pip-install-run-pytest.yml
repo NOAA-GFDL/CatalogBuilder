@@ -19,6 +19,11 @@ jobs:
       run: |
         pip install .
 
+    - name: Install and use pylint
+      run: |
+        pip install pylint
+        pylint catalogbuilder
+
     - name: Make sample data
       run: |
         which python
