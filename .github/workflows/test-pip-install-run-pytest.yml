@@ -22,7 +22,7 @@ jobs:
     - name: Install and use pylint
       run: |
         pip install pylint
-        pylint catalogbuilder || true
+        pylint catalogbuilder --exit-zero
 
     - name: Make sample data
       run: |
