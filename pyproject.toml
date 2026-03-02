@@ -35,3 +35,9 @@ catalogbuilder = [
     "intakebuilder/dat/**",
     "scripts/configs/**",
 ]
+
+#Semantic Release Configuration
+
+[tool.semantic_release]
+version_variable = ["pyproject.toml:project.version"]  # Tell it where to find the project version in this file
+branch = "main"
