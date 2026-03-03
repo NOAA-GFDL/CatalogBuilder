@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "catalogbuilder"
-version = "2025.01.01"
+version = "2026.0.0"
 description = "intake-esm Catalog Generation Utilities"
 readme = "README.md"
 license = "CC-BY-NC-SA-4.0"
@@ -36,8 +36,17 @@ catalogbuilder = [
     "scripts/configs/**",
 ]
 
-#Semantic Release Configuration
+[tool.bumpversion]
+current_version = "2026.0.0"
+commit = false 
+tag = false
+parse = "(?P<year>\\d+)\\.(?P<major>\\d+)\\.(?P<minor>\\d+)"
+serialize = ["{year}.{major}.{minor}"]
 
-[tool.semantic_release]
-version_variable = ["pyproject.toml:project.version"]  # Tell it where to find the project version in this file
-branch = "main"
+[tool.bumpversion.parts.release]
+calver_format = "{YYYY}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
