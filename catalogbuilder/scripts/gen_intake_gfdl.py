@@ -129,23 +129,10 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             list_variable_id = df["variable_id"].unique().tolist()
         except:
             raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
-        try:
-            list_realm = df["realm"].unique().tolist()
-        except:
-            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the input_path_template field of your configuration")
-
-        dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
+        dictVarCF = getinfo.getStandardName(list_variable_id)
         for k, v in dictVarCF.items():
-            try:
-                var = k.split(",")[0]
-            except ValueError:
-                continue
-            try:
-                realm = k.split(",")[1]
-            except ValueError:
-                continue
-            if var is not None and realm is not None:
-                mask = (df['variable_id'] == var) & (df['realm'] == realm)
+            if k is not None:
+                mask = df['variable_id'] == k
                 df.loc[mask, 'standard_name'] = v
 
         if df is not None and len(df) != 0:
