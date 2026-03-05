@@ -43,7 +43,7 @@ tag = false
 parse = "(?P<year>\\d+)\\.(?P<major>\\d+)\\.(?P<minor>\\d+)"
 serialize = ["{year}.{major}.{minor}"]
 
-[tool.bumpversion.parts.release]
+[tool.bumpversion.parts.year]
 calver_format = "{YYYY}"
 
 [[tool.bumpversion.files]]
