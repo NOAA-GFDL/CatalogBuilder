@@ -269,7 +269,7 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     dictInfo["frequency"] = frequency
     return dictInfo
 
-def getStandardName(list_variable_id,list_realm):
+def getStandardName(list_variable_id):
     '''
     Returns dict standard name for the variable in question
     '''
@@ -286,14 +286,12 @@ def getStandardName(list_variable_id,list_realm):
         raise IOError("Unable to open file")
   #search for variable and its cf name
     for variable_id in list_variable_id:
-       for realm in list_realm: 
-           cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
-           list_cfname = cfname.tolist()
-           if len(list_cfname) == 0:
-               cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
-               list_cfname = cfname.tolist()
-           if len(list_cfname) > 0:
-               unique_cf = list(set(list_cfname))[0]
-               varrealm = "{0},{1}".format(variable_id,realm)
-               dictCF[varrealm] = unique_cf
+        cfname = df[df['GFDL_varname'] == variable_id]["standard_name"]
+        list_cfname = cfname.tolist()
+        if len(list_cfname) == 0:
+            cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
+            list_cfname = cfname.tolist()
+        if len(list_cfname) > 0:
+            unique_cf = list(set(list_cfname))[0]
+            dictCF[variable_id] = unique_cf
     return dictCF
