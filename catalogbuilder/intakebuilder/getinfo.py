@@ -229,19 +229,20 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     '''
     #try:
      
-    filexr,filexra = return_xr(fname)
-    if (dictInfo[att] == "na"):
-      try:
-          cfname = filexr[variable_id].attrs["standard_name"]
-      except KeyError:
-          cfname = "NA"
+    #filexr,filexra = return_xr(fname)
+    with xr.open_dataset(fname) as filexr:
+        if (dictInfo[att] == "na"):
           try:
-              long_name = filexr[variable_id].attrs["long_name"]
+              cfname = filexr[variable_id].attrs["standard_name"]
           except KeyError:
-              long_name = "NA"
-          cfname = long_name.replace(" ", "_")
-      dictInfo["standard_name"] = cfname 
-      logger.info(f"standard_name found: {dictInfo['standard_name']}")
+              cfname = "NA"
+              try:
+                  long_name = filexr[variable_id].attrs["long_name"]
+              except KeyError:
+                  long_name = "NA"
+              cfname = long_name.replace(" ", "_")
+          dictInfo["standard_name"] = cfname 
+          logger.info(f"standard_name found: {dictInfo['standard_name']}")
     return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
