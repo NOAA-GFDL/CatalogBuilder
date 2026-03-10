@@ -1,0 +1,66 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Get PR information
+        id: pr
+        uses: 8BitJonny/gh-get-current-pr@3.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version bump type
+        id: bump
+        if: steps.pr.outputs.pr_number != ''
+        run: |
+          python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}"
+          BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
+          echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "Version bump type: $BUMP_TYPE"
+
+      - name: Install bumpversion
+        if: steps.pr.outputs.pr_number != ''
+        run: pip install bumpversion
+
+      - name: Configure git
+        if: steps.pr.outputs.pr_number != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version (No bump)
+        if: steps.bump.outputs.type == 'none'
+        run: echo "No version bump requested"
+
+      - name: Bump version (Major)
+        if: steps.bump.outputs.type == 'major'
+        run: |
+          bumpversion major --config-file pyproject.toml
+          git push --follow-tags
+
+      - name: Bump version (Minor)
+        if: steps.bump.outputs.type == 'minor'
+        run: |
+          bumpversion minor --config-file pyproject.toml
+          git push --follow-tags

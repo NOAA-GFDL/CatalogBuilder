@@ -4,6 +4,10 @@ on:
     branches:
     # for testing conda build w no upload during PRs
     - main
+  push:
+    tags:
+    # Build when version tags are created
+    - '*.*.*'
 jobs:
   build:
     runs-on: ubuntu-latest
