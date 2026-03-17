@@ -39,9 +39,9 @@ jobs:
           echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
           echo "Version bump type: $BUMP_TYPE"
 
-      - name: Install bumpversion
+      - name: Install bump-my-version
         if: steps.pr.outputs.pr_number != ''
-        run: pip install bumpversion
+        run: pip install bump-my-version
 
       - name: Configure git
         if: steps.pr.outputs.pr_number != ''
@@ -56,11 +56,11 @@ jobs:
       - name: Bump version (Major)
         if: steps.bump.outputs.type == 'major'
         run: |
-          bumpversion major --config-file pyproject.toml
+          bump-my-version bump --config-file pyproject.toml --part major
           git push --follow-tags
 
       - name: Bump version (Minor)
         if: steps.bump.outputs.type == 'minor'
         run: |
-          bumpversion minor --config-file pyproject.toml
+          bump-my-version bump --config-file pyproject.toml --part minor
           git push --follow-tags
