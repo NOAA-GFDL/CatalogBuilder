@@ -12,9 +12,9 @@ CHECKBOX_MAP = {
 def determine_bump(body: str) -> BumpLevel:
     checked = []
     for label, level in CHECKBOX_MAP.items():
-        # GitHub markdown checked box:
-        # - [x] label text
-        marker = f"- [x] {label}"
+        # GitHub markdown checked box with bolded label:
+        # - [x] **label text**
+        marker = f"- [x] **{label}**"
         if marker in body:
             checked.append(level)
 
