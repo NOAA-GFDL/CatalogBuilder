@@ -24,13 +24,14 @@ jobs:
         id: validate
         run: |
           PR_BODY="${{ github.event.pull_request.body }}"
-          python .github/scripts/determine_bump.py "$PR_BODY" > /dev/null 2>&1
-          if [ $? -eq 0 ]; then
-            echo "Version bump checkbox is properly selected"
-            exit 0
-          else
+          BUMP_RESULT=$(python .github/scripts/determine_bump.py "$PR_BODY")
+          STATUS=$?
+          if [ "$STATUS" -ne 0 ] || [ "$BUMP_RESULT" = "none" ]; then
             echo "Version bump checkbox validation failed"
             exit 1
+          else
+            echo "Version bump checkbox is properly selected"
+            exit 0
           fi
 
       - name: Comment on PR if validation fails
