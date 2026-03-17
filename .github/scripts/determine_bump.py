@@ -7,6 +7,7 @@ BumpLevel = Literal["major", "minor", "none"]
 CHECKBOX_MAP = {
     "Minor version": "minor",
     "Major version": "major",
+    "No version bump": "none",
 }
 
 def determine_bump(body: str) -> BumpLevel:
@@ -19,7 +20,10 @@ def determine_bump(body: str) -> BumpLevel:
             checked.append(level)
 
     if len(checked) == 0:
-        return "none"
+        # No checkbox selected: this is an error because a choice is required
+        raise SystemExit(
+            "No version bump checkbox selected. Please select exactly one."
+        )
     if len(checked) > 1:
         # Raise an error if multiple boxes are checked
         raise SystemExit(
