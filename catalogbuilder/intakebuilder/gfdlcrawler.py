@@ -134,7 +134,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                         # TODO: Extended qualities to determine uniquness from more... qualities
                         #TODO extend this to append other qualities later
                         qualities=(dictInfo["variable_id"])
-                        print(dictInfo)
                         if qualities in unique_datasets.keys():
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
