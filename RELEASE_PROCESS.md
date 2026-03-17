@@ -15,8 +15,8 @@ CatalogBuilder uses an automated release process that:
 CatalogBuilder uses **calendar versioning** with the format: `YYYY.MAJOR.MINOR`
 
 - **YYYY (Year)**: Automatically set to the current year. Updates automatically on calendar year changes.
-- **MAJOR**: Incremented for bug fixes, patches, and maintenance releases
-- **MINOR**: Incremented for new features and backwards-compatible additions
+- **MAJOR**: Incremented for new features and backwards-compatible additions
+- **MINOR**: Incremented for bug fixes, patches, and maintenance releases
 
 ### Examples
 - `2026.0.0` → First release of 2026
