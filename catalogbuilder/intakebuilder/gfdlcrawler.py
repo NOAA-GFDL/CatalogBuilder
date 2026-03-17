@@ -55,7 +55,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
       missingcols.remove("path") #because we get this anyway
       logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
     #Creating a dictionary to track the unique datasets we come across when using slow mode
-    #The keys are the standard names and the values are lists tracking var_id,realm,etc..
+    #The values are lists tracking var_id,realm,etc.. and the keys are the standard names
     unique_datasets = {'':''}
  
     #TODO INCLUDE filter in traversing through directories at the top
@@ -130,8 +130,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                         # Set standard_name as na to avoid error from getInfoFromVarAtts
                         dictInfo["standard_name"] = "na"
 
-                        # qualities define the uniqueness and help us determine when to open files. here, we define uniqueness by realm and var_id combinations. we store the realm/var_id pairs + their standard_names in unique_datasets{} and the current pair being checked as a tuple list called 'qualities'. if a pair stored in unique_datasets aligns with the current pair being checked, we won't open the file and will instead use the standard_name already found
-                        # TODO: Extended qualities to determine uniquness from more... qualities
+                        # qualities define the uniqueness and help us determine when to open files. here, we define uniqueness by var_id. We store the var_id's + their standard_names in unique_datasets{} and the current var_id being checked as a variable called 'qualities'. If a var_id/standard_name pair stored in unique_datasets aligns with the current var_id being checked, we won't open the file and will instead use the standard_name already found
                         #TODO extend this to append other qualities later
                         qualities=(dictInfo["variable_id"])
                         if qualities in unique_datasets.keys():
