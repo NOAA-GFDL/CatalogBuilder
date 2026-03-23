@@ -18,6 +18,7 @@ jobs:
     - name: Install pip package
       run: |
         pip install .
+        pip install netcdf4
 
     - name: Spellcheck with codespell
       run: |
