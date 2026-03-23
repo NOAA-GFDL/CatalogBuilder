@@ -227,22 +227,29 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     :param filexr: Xarray dataset object
     :return: dictInfo with all variable atts 
     '''
-    #try:
-     
-    #filexr,filexra = return_xr(fname)
-    with xr.open_dataset(fname) as filexr:
+    # If an xarray Dataset is provided via filexra, use it directly; otherwise open fname.
+    close_filexr = False
+    if filexra is not None:
+        filexr = filexra
+    else:
+        filexr = xr.open_dataset(fname)
+        close_filexr = True
+    try:
         if (dictInfo[att] == "na"):
-          try:
-              cfname = filexr[variable_id].attrs["standard_name"]
-          except KeyError:
-              cfname = "NA"
-              try:
-                  long_name = filexr[variable_id].attrs["long_name"]
-              except KeyError:
-                  long_name = "NA"
-              cfname = long_name.replace(" ", "_")
-          dictInfo["standard_name"] = cfname 
-          logger.info(f"standard_name found: {dictInfo['standard_name']}")
+            try:
+                cfname = filexr[variable_id].attrs["standard_name"]
+            except KeyError:
+                cfname = "NA"
+                try:
+                    long_name = filexr[variable_id].attrs["long_name"]
+                except KeyError:
+                    long_name = "NA"
+                cfname = long_name.replace(" ", "_")
+            dictInfo["standard_name"] = cfname 
+            logger.info(f"standard_name found: {dictInfo['standard_name']}")
+    finally:
+        if close_filexr:
+            filexr.close()
     return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
