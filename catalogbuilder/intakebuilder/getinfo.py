@@ -272,7 +272,11 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
 
 def getStandardName(list_variable_id):
     '''
-    Returns dict standard name for the variable in question
+    This method takes a list of all unique variable id's in the catalog and searches for them within MDTF lookup tables to determine their standard names. If the lookup fails, the standard name will be not be included in the returned dictionary.
+
+    :param list_variable_id: list containing each unique variable_id in catalog
+    :type list_variable_id: list
+    :return: dictionary of variable_id's (key) and unique standard names (value)
     '''
     unique_cf = "na"
     dictCF = {}
