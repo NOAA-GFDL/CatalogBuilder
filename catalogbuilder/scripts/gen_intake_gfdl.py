@@ -133,9 +133,11 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             list_variable_id = df["variable_id"].unique().tolist()
         except:
             raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
+        logger.info("Because standard_name is in headerlist and slow mode is off, standard_name will be retrieved from an offline lookup table")
         dictVarCF = getinfo.getStandardName(list_variable_id)
         for k, v in dictVarCF.items():
             if k is not None:
+                logger.info("Because standard_name is in headerlist an")
                 mask = df['variable_id'] == k
                 df.loc[mask, 'standard_name'] = v
 
