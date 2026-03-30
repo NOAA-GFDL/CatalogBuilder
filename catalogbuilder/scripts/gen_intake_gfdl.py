@@ -12,14 +12,19 @@ from importlib.resources import files as _files #Using files causes bug..
 from catalogbuilder.scripts.compval import compval as cv
 from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 
-log_format = '%(levelname)s:%(funcName)s: %(message)s'
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format=log_format)
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
 
+    if not logging.root.handlers:
+        log_format = '%(levelname)s:%(funcName)s: %(message)s'
+        logging.basicConfig(
+            level=logging.DEBUG if verbose else logging.INFO,
+            stream=sys.stdout,
+            format=log_format
+        )
 
     logger.warning("!!!!! IMPORTANT: RECENT CHANGES TO THE CATALOG BUILDER MAY AFFECT EXISTING WORKFLOWS !!!!!")
     time.sleep(10)
