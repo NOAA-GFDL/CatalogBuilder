@@ -24,7 +24,8 @@ def getProject(projectdir,dictInfo):
     :return: dictionary with project key
     '''
     if "archive" in projectdir or "pp" in projectdir: 
-       project = "dev" 
+       project = "dev"
+       logger.info("Archive/pp has been found in project directory. Project will be set to dev") 
        dictInfo["activity_id"]=project
     return dictInfo
 
@@ -238,15 +239,19 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
         if (dictInfo[att] == "na"):
             try:
                 cfname = filexr[variable_id].attrs["standard_name"]
+                dictInfo["standard_name"] = cfname
+                logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
             except KeyError:
                 cfname = "NA"
                 try:
                     long_name = filexr[variable_id].attrs["long_name"]
+                    fname = long_name.replace(" ", "_")
+                    dictInfo["standard_name"] = cfname
+                logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+
                 except KeyError:
-                    long_name = "NA"
-                cfname = long_name.replace(" ", "_")
-            dictInfo["standard_name"] = cfname 
-            logger.info(f"standard_name found: {dictInfo['standard_name']}")
+                    dictInfo["standard_name"] = cfname
+                    logger.info(f"Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
     finally:
         if close_filexr:
             filexr.close()
