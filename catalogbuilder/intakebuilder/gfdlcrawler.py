@@ -103,7 +103,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
 
                if "source_id" in dictInfo: 
                    if dictInfo["source_id"] in list_bad_modellabel:
-                       logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename",filepath)
+                       logger.info("Found experiment name in model column, skipping this possibly bad DRS filename",filepath)
                    #   continue
                if "chunk_freq" in dictInfo:
                    if dictInfo["chunk_freq"] in list_bad_chunklabel:
