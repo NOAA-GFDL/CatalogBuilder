@@ -145,9 +145,9 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                if 'frequency' in dictInfo.keys():
                    yamlfile = _files('catalogbuilder').joinpath('intakebuilder/dat/gfdlcmipfreq.yaml') #using _files due to bug when using files
                    cmipfreq = None
-                   gfdlfreq = dictInfo['frequency']  
                    cmipfreq = getinfo.getFreqFromYAML(yamlfile,gfdlfreq=dictInfo['frequency'])
                    if cmipfreq is not None:
+                       logger.info("Using CMIP style frequency as determined by %s", yamlfile)
                        dictInfo['frequency'] = cmipfreq 
                listfiles.append(dictInfo)
     return listfiles
