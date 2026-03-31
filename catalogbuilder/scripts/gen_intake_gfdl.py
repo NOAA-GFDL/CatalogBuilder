@@ -137,7 +137,6 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
         dictVarCF = getinfo.getStandardName(list_variable_id)
         for k, v in dictVarCF.items():
             if k is not None:
-                logger.info("Because standard_name is in headerlist an")
                 mask = df['variable_id'] == k
                 df.loc[mask, 'standard_name'] = v
 
