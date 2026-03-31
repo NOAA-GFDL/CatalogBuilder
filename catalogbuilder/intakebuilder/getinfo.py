@@ -25,7 +25,7 @@ def getProject(projectdir,dictInfo):
     '''
     if "archive" in projectdir or "pp" in projectdir: 
        project = "dev"
-       logger.info("Archive/pp has been found in project directory. Project will be set to dev") 
+       logger.info("'Archive' or 'pp' has been found in project directory. Project will be set to dev") 
        dictInfo["activity_id"]=project
     return dictInfo
 
