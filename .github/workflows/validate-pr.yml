@@ -1,0 +1,47 @@
+name: Validate PR Requirements
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  pull-requests: write
+  checks: write
+
+jobs:
+  validate-version-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Validate version bump selection
+        id: validate
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          BUMP_RESULT=$(python .github/scripts/determine_bump.py "$PR_BODY")
+          STATUS=$?
+          if [ "$STATUS" -ne 0 ] || [ "$BUMP_RESULT" = "none" ]; then
+            echo "Version bump checkbox validation failed"
+            exit 1
+          else
+            echo "Version bump checkbox is properly selected"
+            exit 0
+          fi
+
+      - name: Comment on PR if validation fails
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'PR Validation Failed\n\nPlease select exactly ONE version bump option in the PR template:\n- **No version bump** - Documentation or refactoring\n- **Minor version** - Bug fix or patch\n- **Major version** - New feature\n\nNote: The year increments automatically with calendar versioning.'
+            })

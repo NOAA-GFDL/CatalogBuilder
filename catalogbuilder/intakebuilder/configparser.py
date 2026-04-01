@@ -3,7 +3,6 @@ import logging
 import yaml
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class Config:
     def __init__(self, config):

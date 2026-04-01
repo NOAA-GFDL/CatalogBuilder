@@ -18,8 +18,8 @@ Validating a catalog during catalog generation
 
 In order to validate a catalog during generation, use the '--strict' flag. This only activates vocabulary validation, however, as proper catalog generation is meant to be checked after generation is complete.
 
-Using the standlone validator tool
-----------------------------------
+Using the standalone validator tool
+-----------------------------------
 
 The comprehensive validator tool can be found in catalogbuilder/tests/compval.py.
 

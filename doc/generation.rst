@@ -55,7 +55,7 @@ A default configuration is used for catalog generation unless a custom configura
 
 **HEADERLIST**
 
-Catalog headers (column names) are set with the *HEADER LIST* variable. The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjuction
+Catalog headers (column names) are set with the *HEADER LIST* variable. The headerlist contains the expected column names of your catalog/csv file. This is usually determined by the users in conjunction
 with the ESM collection specification standards and the appropriate workflows. 
 
 .. code-block:: yaml
@@ -238,7 +238,7 @@ See `Fre-CLI Documentation here <https://noaa-gfdl.readthedocs.io/projects/fre-c
 Expected output
 ---------------
 
-The catalog builder tool generates a JSON catalog specification file and a CSV catalog in the specfied output directory with the specified name.
+The catalog builder tool generates a JSON catalog specification file and a CSV catalog in the specified output directory with the specified name.
 
 Arguments and Options
 =====================

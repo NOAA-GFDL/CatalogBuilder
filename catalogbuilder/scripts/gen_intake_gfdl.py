@@ -12,14 +12,19 @@ from importlib.resources import files as _files #Using files causes bug..
 from catalogbuilder.scripts.compval import compval as cv
 from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, getinfo
 
-log_format = '%(levelname)s:%(funcName)s: %(message)s'
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format=log_format)
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
 
+    if not logging.root.handlers:
+        log_format = '%(levelname)s:%(funcName)s: %(message)s'
+        logging.basicConfig(
+            level=logging.DEBUG if verbose else logging.INFO,
+            stream=sys.stdout,
+            format=log_format
+        )
 
     logger.warning("!!!!! IMPORTANT: RECENT CHANGES TO THE CATALOG BUILDER MAY AFFECT EXISTING WORKFLOWS !!!!!")
     time.sleep(10)
@@ -47,7 +52,6 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             # If user does not pass a config, we will use the default config with the same format to avoid special cases
         try:
             config = _files('catalogbuilder').joinpath('intakebuilder/config_default.yaml')
-            print(config)
         except:
             raise FileNotFoundError("Can't locate or read default config, try --config ")
         configyaml = configparser.Config(config)
@@ -129,23 +133,11 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             list_variable_id = df["variable_id"].unique().tolist()
         except:
             raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
-        try:
-            list_realm = df["realm"].unique().tolist()
-        except:
-            raise KeyError("Having trouble finding 'realm'... Be sure to add it to the input_path_template field of your configuration")
-
-        dictVarCF = getinfo.getStandardName(list_variable_id,list_realm)
+        logger.info("Because standard_name is in headerlist and slow mode is off, standard_name will be retrieved from an offline lookup table")
+        dictVarCF = getinfo.getStandardName(list_variable_id)
         for k, v in dictVarCF.items():
-            try:
-                var = k.split(",")[0]
-            except ValueError:
-                continue
-            try:
-                realm = k.split(",")[1]
-            except ValueError:
-                continue
-            if var is not None and realm is not None:
-                mask = (df['variable_id'] == var) & (df['realm'] == realm)
+            if k is not None:
+                mask = df['variable_id'] == k
                 df.loc[mask, 'standard_name'] = v
 
         if df is not None and len(df) != 0:

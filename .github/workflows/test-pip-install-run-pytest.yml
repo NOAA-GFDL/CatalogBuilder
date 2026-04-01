@@ -18,6 +18,17 @@ jobs:
     - name: Install pip package
       run: |
         pip install .
+        pip install netcdf4
+
+    - name: Spellcheck with codespell
+      run: |
+        pip install codespell
+        codespell --ignore-words-list="nd,te" --skip="doc/_build/*" doc/
+
+    - name: Install and use pylint
+      run: |
+        pip install pylint
+        pylint catalogbuilder --exit-zero
 
     - name: Make sample data
       run: |

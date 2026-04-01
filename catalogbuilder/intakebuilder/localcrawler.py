@@ -6,8 +6,8 @@ It finally returns a list of dict
 import os
 from . import getinfo
 import re
-import logger
-logger = logging.getLogger(
+import logging
+logger = logging.getLogger(__name__)
 
 def crawlLocal(projectdir, dictFilter):
     '''

@@ -24,7 +24,8 @@ def getProject(projectdir,dictInfo):
     :return: dictionary with project key
     '''
     if "archive" in projectdir or "pp" in projectdir: 
-       project = "dev" 
+       project = "dev"
+       logger.info("'Archive' or 'pp' has been found in project directory. Project will be set to dev") 
        dictInfo["activity_id"]=project
     return dictInfo
 
@@ -227,21 +228,33 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     :param filexr: Xarray dataset object
     :return: dictInfo with all variable atts 
     '''
-    #try:
-     
-    filexr,filexra = return_xr(fname)
-    if (dictInfo[att] == "na"):
-      try:
-          cfname = filexr[variable_id].attrs["standard_name"]
-      except KeyError:
-          cfname = "NA"
-          try:
-              long_name = filexr[variable_id].attrs["long_name"]
-          except KeyError:
-              long_name = "NA"
-          cfname = long_name.replace(" ", "_")
-      dictInfo["standard_name"] = cfname 
-      logger.info(f"standard_name found: {dictInfo['standard_name']}")
+    # If an xarray Dataset is provided via filexra, use it directly; otherwise open fname.
+    close_filexr = False
+    if filexra is not None:
+        filexr = filexra
+    else:
+        filexr = xr.open_dataset(fname)
+        close_filexr = True
+    try:
+        if (dictInfo[att] == "na"):
+            try:
+                cfname = filexr[variable_id].attrs["standard_name"]
+                dictInfo["standard_name"] = cfname
+                logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+            except KeyError:
+                cfname = "NA"
+                try:
+                    long_name = filexr[variable_id].attrs["long_name"]
+                    fname = long_name.replace(" ", "_")
+                    dictInfo["standard_name"] = cfname
+                    logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+
+                except KeyError:
+                    dictInfo["standard_name"] = cfname
+                    logger.info(f"Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
+    finally:
+        if close_filexr:
+            filexr.close()
     return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
@@ -269,9 +282,13 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     dictInfo["frequency"] = frequency
     return dictInfo
 
-def getStandardName(list_variable_id,list_realm):
+def getStandardName(list_variable_id):
     '''
-    Returns dict standard name for the variable in question
+    This method takes a list of all unique variable id's in the catalog and searches for them within MDTF lookup tables to determine their standard names. If the lookup fails, the standard name will be not be included in the returned dictionary.
+
+    :param list_variable_id: list containing each unique variable_id in catalog
+    :type list_variable_id: list
+    :return: dictionary of variable_id's (key) and unique standard names (value)
     '''
     unique_cf = "na"
     dictCF = {}
@@ -286,14 +303,12 @@ def getStandardName(list_variable_id,list_realm):
         raise IOError("Unable to open file")
   #search for variable and its cf name
     for variable_id in list_variable_id:
-       for realm in list_realm: 
-           cfname = df[(df['GFDL_varname'] == variable_id) & (realm in df['modeling_realm'])]["standard_name"]
-           list_cfname = cfname.tolist()
-           if len(list_cfname) == 0:
-               cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
-               list_cfname = cfname.tolist()
-           if len(list_cfname) > 0:
-               unique_cf = list(set(list_cfname))[0]
-               varrealm = "{0},{1}".format(variable_id,realm)
-               dictCF[varrealm] = unique_cf
+        cfname = df[df['GFDL_varname'] == variable_id]["standard_name"]
+        list_cfname = cfname.tolist()
+        if len(list_cfname) == 0:
+            cfname = (df[df['CMOR_varname'] == variable_id]["standard_name"])
+            list_cfname = cfname.tolist()
+        if len(list_cfname) > 0:
+            unique_cf = list(set(list_cfname))[0]
+            dictCF[variable_id] = unique_cf
     return dictCF
