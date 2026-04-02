@@ -22,8 +22,9 @@ jobs:
 
       - name: Validate version bump selection
         id: validate
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
           PR_BODY=$(echo "$PR_BODY" | tr -d '\r')
           BUMP_RESULT=$(python .github/scripts/determine_bump.py "$PR_BODY")
           STATUS=$?
