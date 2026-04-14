@@ -33,6 +33,29 @@ jobs:
             exit 1
           else
             echo "Version bump checkbox is properly selected: $BUMP_RESULT"
+            
+            # Get current version from pyproject.toml
+            CURRENT_VERSION=$(grep -E '^version = "' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+            echo "Current version: $CURRENT_VERSION"
+            
+            # Calculate new version based on bump type
+            if [ "$BUMP_RESULT" == "none" ]; then
+              echo "New version: $CURRENT_VERSION (no change)"
+            elif [ "$BUMP_RESULT" == "minor" ]; then
+              # Parse year.major.minor format
+              YEAR=$(echo $CURRENT_VERSION | cut -d. -f1)
+              MAJOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+              MINOR=$(echo $CURRENT_VERSION | cut -d. -f3)
+              NEW_MINOR=$((10#$MINOR + 1))
+              NEW_VERSION=$(printf "%s.%02d.%02d" "$YEAR" "$((10#$MAJOR))" "$NEW_MINOR")
+              echo "New version: $NEW_VERSION"
+            elif [ "$BUMP_RESULT" == "major" ]; then
+              YEAR=$(echo $CURRENT_VERSION | cut -d. -f1)
+              MAJOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+              NEW_MAJOR=$((10#$MAJOR + 1))
+              NEW_VERSION=$(printf "%s.%02d.00" "$YEAR" "$NEW_MAJOR")
+              echo "New version: $NEW_VERSION"
+            fi
             exit 0
           fi
 
@@ -45,5 +68,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'PR Validation Failed\n\nPlease select exactly ONE version bump option in the PR template:\n- **No version bump** - Documentation or refactoring\n- **Minor version** - Bug fix or patch\n- **Major version** - New feature\n\nNote: The year increments automatically with calendar versioning.'
+              body: 'PR Validation Failed\n\nPlease select exactly ONE version bump option in the PR template:\n- **No version bump** - Documentation or refactoring\n- **Minor version** - Bug fix or patch (increments year.0.x)\n- **Major version** - New feature (increments year.x.0)'
             })
