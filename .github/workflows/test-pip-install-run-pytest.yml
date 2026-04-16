@@ -53,7 +53,7 @@ jobs:
             catalogbuilder/cats/gfdl_autotest_from_yaml.json
             catalogbuilder/cats/gfdl_autotest_from_yaml.csv 
     - name: Download all workflow run artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
 
     - name: Run pytest with downloaded artifacts
       run: |
