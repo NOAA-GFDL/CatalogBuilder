@@ -52,8 +52,12 @@ jobs:
           path: |
             catalogbuilder/cats/gfdl_autotest_from_yaml.json
             catalogbuilder/cats/gfdl_autotest_from_yaml.csv 
+            
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v8
+      with:
+          name: gfdl_autotest_from_yaml     # or the actual name you upload with
+          path: workflow-artifacts1
 
     - name: List extracted files (debug)
       run: |
