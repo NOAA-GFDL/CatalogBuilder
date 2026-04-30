@@ -55,6 +55,11 @@ jobs:
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v8
 
+    - name: List extracted files (debug)
+      run: |
+        echo "Will list extracted artifacts extraction dir"
+        find . -type f
+
     - name: Run pytest with downloaded artifacts
       run: |
         pytest -v --runxfail catalogbuilder
