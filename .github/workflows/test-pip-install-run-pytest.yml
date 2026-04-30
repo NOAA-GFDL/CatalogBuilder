@@ -56,7 +56,7 @@ jobs:
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v8
       with:
-          name: gfdl_autotest_from_yaml     # or the actual name you upload with
+          name: workflow-artifacts1
           path: workflow-artifacts1
 
     - name: List extracted files (debug)
