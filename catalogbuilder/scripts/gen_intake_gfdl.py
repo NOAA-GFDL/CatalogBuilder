@@ -16,7 +16,7 @@ from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, g
 logger = logging.getLogger(__name__)
 
 
-def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+def create_catalog(input_path, output_path, config, fillna, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
 
     if not logging.root.handlers:
         log_format = '%(levelname)s:%(funcName)s: %(message)s'
@@ -144,6 +144,16 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             with open(csv_path, 'w') as csvfile:
                 df.to_csv(csvfile,index=False)
 
+    # Fill empty coulmns
+    if fillna:
+        for column in fillna:
+            if column not in df.columns:
+                raise ValueError(f"Column '{column}' does not exist in the catalog CSV")
+            df[column] = df[column].fillna('NA')
+            df[column] = df[column].replace('', 'NA')
+        df.to_csv(csv_path, index=False)
+        logger.info(f"Filled empty values in column '{column}' with 'NA'")
+
     # Strict Mode
     if strict:
         vocab = True
@@ -165,6 +175,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
 @click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
+@click.option('--fillna', '-f', required=False, multiple=True, help='Fill empty column values with "NA"')
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
