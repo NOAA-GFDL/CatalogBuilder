@@ -26,8 +26,6 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
             format=log_format
         )
 
-    logger.warning("!!!!! IMPORTANT: RECENT CHANGES TO THE CATALOG BUILDER MAY AFFECT EXISTING WORKFLOWS !!!!!")
-    time.sleep(10)
     # Setting up logger
     # Standard mode's level is set as INFO
     # Verbose mode's level is set as DEBUG
@@ -126,6 +124,7 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
 
     if not slow and 'standard_name' in headers:
         #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
+        logger.info("Because standard_name is in headerlist and slow mode is off, standard_name will be retrieved from an offline lookup table")
         df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
         df['standard_name'] = df['standard_name'].astype(object)
         list_variable_id = []
@@ -133,7 +132,6 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
             list_variable_id = df["variable_id"].unique().tolist()
         except:
             raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
-        logger.info("Because standard_name is in headerlist and slow mode is off, standard_name will be retrieved from an offline lookup table")
         dictVarCF = getinfo.getStandardName(list_variable_id)
         for k, v in dictVarCF.items():
             if k is not None:
@@ -145,6 +143,9 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
                 df.to_csv(csvfile,index=False)
 
     # Fill empty columns with 'NA' values
+    if 'table_id' in df.columns:
+        df['table_id'] = df['table_id'].fillna('NA')
+        df['table_id'] = df['table_id'].replace('', 'NA')
     if fillna:
         for column in fillna:
             if column not in df.columns:
