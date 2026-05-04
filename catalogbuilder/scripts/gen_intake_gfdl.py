@@ -144,7 +144,7 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
             with open(csv_path, 'w') as csvfile:
                 df.to_csv(csvfile,index=False)
 
-    # Fill empty coulmns
+    # Fill empty columns with 'NA' values
     if fillna:
         for column in fillna:
             if column not in df.columns:

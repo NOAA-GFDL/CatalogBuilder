@@ -262,5 +262,6 @@ Flags
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your input_path_template**
 - --strict - Activates strict mode which validates catalog vocabulary during generation
+- --fillna - Fills empty column values with "NA"
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
