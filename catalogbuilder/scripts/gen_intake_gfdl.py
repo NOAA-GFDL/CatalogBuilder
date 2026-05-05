@@ -141,19 +141,34 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
         if df is not None and len(df) != 0:
             df.to_csv(csv_path,index=False)
 
-    # Fill empty columns with 'NA' values
+    # Fill table_id column by default
     if 'table_id' in df.columns:
         df['table_id'] = df['table_id'].fillna('NA')
-        df['table_id'] = df['table_id'].replace('', 'NA')
-        df.to_csv(csv_path,index=False)      
-    if fillna:
-        for column in fillna:
-            if column not in df.columns:
-                raise ValueError(f"Column '{column}' does not exist in the catalog CSV")
-            df[column] = df[column].fillna('NA')
-            df[column] = df[column].replace('', 'NA')
-        df.to_csv(csv_path, index=False)
+        df['table_id'] = df['table_id'].replace(r'^\s*$', 'NA', regex=True)
+        updated = True
+        logger.info("Filled empty values in column 'table_id' with 'NA' (default)")
+
+    # Now handle user-provided columns
+    cols_to_fill = list(fillna) if fillna else []
+
+    if 'all' in cols_to_fill:
+        cols_to_fill = list(df.columns)
+    cols_to_fill = list(dict.fromkeys(cols_to_fill))
+    if 'table_id' in cols_to_fill:
+        cols_to_fill.remove('table_id')
+    if 'all' in cols_to_fill:
+        cols_to_fill.remove('all')
+
+    for column in cols_to_fill:
+        if column not in df.columns:
+            raise ValueError(f"Column '{column}' does not exist in the catalog CSV")
+        df[column] = df[column].fillna('NA')
+        df[column] = df[column].replace(r'^\s*$', 'NA', regex=True)
+        updated = True
         logger.info(f"Filled empty values in column '{column}' with 'NA'")
+
+    if updated:
+        df.to_csv(csv_path, index=False)
 
     # Strict Mode
     if strict:
@@ -166,8 +181,6 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
 
     logger.info("JSON generated at: " + os.path.abspath(json_path))
     logger.info("CSV generated at: " + os.path.abspath(csv_path))
-    print("here")
-    print(df.columns)
     return(csv_path,json_path)
 
 #Setting up argument parsing/flags
@@ -178,7 +191,7 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
 @click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
-@click.option('--fillna', '-f', required=False, multiple=True, help='Fill empty column values with "NA"')
+@click.option('--fillna', '-f', required=False, multiple=True, type=str, help="Column(s) in which to fill empty values with 'NA'. Use '--fillna all' to fill all columns.")
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
