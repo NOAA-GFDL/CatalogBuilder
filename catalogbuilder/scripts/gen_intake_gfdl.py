@@ -139,13 +139,13 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
                 df.loc[mask, 'standard_name'] = v
 
         if df is not None and len(df) != 0:
-            with open(csv_path, 'w') as csvfile:
-                df.to_csv(csvfile,index=False)
+            df.to_csv(csv_path,index=False)
 
     # Fill empty columns with 'NA' values
     if 'table_id' in df.columns:
         df['table_id'] = df['table_id'].fillna('NA')
         df['table_id'] = df['table_id'].replace('', 'NA')
+        df.to_csv(csv_path,index=False)      
     if fillna:
         for column in fillna:
             if column not in df.columns:
@@ -166,6 +166,8 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
 
     logger.info("JSON generated at: " + os.path.abspath(json_path))
     logger.info("CSV generated at: " + os.path.abspath(csv_path))
+    print("here")
+    print(df.columns)
     return(csv_path,json_path)
 
 #Setting up argument parsing/flags
