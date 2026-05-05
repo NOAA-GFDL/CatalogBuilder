@@ -46,7 +46,7 @@ jobs:
         python catalogbuilder/scripts/gen_intake_gfdl.py --config catalogbuilder/tests/test_config.yaml
   
     - name: upload-artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
           name: workflow-artifacts1 
           path: |
