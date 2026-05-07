@@ -16,7 +16,7 @@ from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, g
 logger = logging.getLogger(__name__)
 
 
-def create_catalog(input_path, output_path, config, fillna, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+def create_catalog(input_path, output_path, config, fill, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
 
     if not logging.root.handlers:
         log_format = '%(levelname)s:%(funcName)s: %(message)s'
@@ -149,7 +149,7 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
         logger.info("Filled empty values in column 'table_id' with 'NA' (default)")
 
     # Now handle user-provided columns
-    cols_to_fill = list(fillna) if fillna else []
+    cols_to_fill = list(fill) if fill else []
 
     if 'all' in cols_to_fill:
         cols_to_fill = list(df.columns)
@@ -191,7 +191,7 @@ def create_catalog(input_path, output_path, config, fillna, filter_realm, filter
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
 @click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
-@click.option('--fillna', '-f', required=False, multiple=True, type=str, help="Column(s) in which to fill empty values with 'NA'. Use '--fillna all' to fill all columns.")
+@click.option('--fill', '-f', required=False, multiple=True, type=str, help="Column(s) in which to fill empty values with 'NA'. Use '--fill all' to fill all columns.")
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
