@@ -147,7 +147,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         for column in df.columns:
             df[column] = df[column].fillna('NA')
             df[column] = df[column].replace(r'^\s*$', 'NA', regex=True)
-            logger.info(f"Filled empty values in column '{column}' with 'NA'")
+        logger.info(f"Filled empty values in {len(df.columns)} column(s) with 'NA'")
         df.to_csv(csv_path, index=False)
 
     # Strict Mode
