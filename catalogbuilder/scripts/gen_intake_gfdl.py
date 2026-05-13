@@ -190,8 +190,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 
     if fill:
         # Replace NaN values and blank/whitespace-only strings with 'NA' so that
-        # the output CSV has no truly empty cells, making downstream intake-ESM
-        # queries more predictable.
+        # the output CSV has no truly empty cells
         if df is None:
             df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0, index_col=False)
         for column in df.columns:
@@ -221,7 +220,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
 @click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
-@click.option('--fill', '-f', default=True, type=bool, help="Fill all empty CSV column values with 'NA'. Defaults to True. Use --fill=false to disable.")
+@click.option('--fill', '-f', default=True, type=bool, help="Fill all empty CSV column values with 'NA'. Defaults to True. Use --fill=False to disable.")
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
