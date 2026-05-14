@@ -22,5 +22,5 @@ def test_create_catalog():
 
 
 def test_create_catalog_fill():
-      df = pd.read_csv("default-mdtf-catalog.csv")
+      df = pd.read_csv("default-mdtf-catalog.csv", keep_default_na=False)
       assert not df.isna().any().any()
