@@ -16,7 +16,54 @@ from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, g
 logger = logging.getLogger(__name__)
 
 
-def create_catalog(input_path, output_path, config, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+def create_catalog(input_path, output_path, config, fill, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+    """Generate an intake-ESM-compatible data catalog (CSV + JSON) from a local directory tree.
+
+    Crawls *input_path* for NetCDF files, assembles catalog rows according to the
+    supplied (or default) YAML configuration, writes a CSV catalog file and a
+    matching intake-ESM JSON descriptor to *output_path*.
+
+    Args:
+        input_path (str | None): Root directory to crawl for dataset files.
+            May be ``None`` if the value is provided in *config*.
+        output_path (str | None): Destination path **without** a file extension.
+            The function appends ``.csv`` / ``.json`` automatically.
+            May be ``None`` if the value is provided in *config*.
+        config (str | os.PathLike | None): Path to a custom YAML configuration
+            file.  When ``None`` the package-bundled default config is used.
+        fill (bool): When ``True`` (the default), all empty cells in the
+            generated CSV are replaced with the string ``'NA'``.  Pass
+            ``False`` to leave empty cells as-is.
+        filter_realm (str | None): If provided, only files whose
+            ``modeling_realm`` matches this value are included.
+        filter_freq (str | None): If provided, only files whose ``frequency``
+            matches this value are included.
+        filter_chunk (str | None): If provided, only files whose
+            ``chunk_freq`` matches this value are included.
+        overwrite (bool): When ``True``, an existing CSV at *output_path* is
+            overwritten rather than raising an error.
+        append (bool): When ``True``, new rows are appended to an existing CSV
+            (without re-writing the header row).
+        slow (bool): When ``True``, ``standard_name`` (or ``long_name``) is
+            read directly from each NetCDF file's metadata instead of being
+            looked up in an offline table.
+        strict (bool): When ``True``, the finished catalog is validated against
+            the CV vocabulary embedded in the JSON schema; generation fails if
+            any violations are found.
+        verbose (bool): When ``True``, log level is set to ``DEBUG``; otherwise
+            ``INFO`` is used.
+
+    Returns:
+        tuple[str, str]: A 2-tuple ``(csv_path, json_path)`` with the absolute
+        paths to the generated catalog files.
+
+    Raises:
+        FileNotFoundError: If *input_path* does not exist or the default config
+            cannot be located.
+        TypeError: If *input_path* or *output_path* cannot be determined from
+            the arguments and the config file.
+        ValueError: If the parent directory of *output_path* does not exist.
+    """
 
     if not logging.root.handlers:
         log_format = '%(levelname)s:%(funcName)s: %(message)s'
@@ -26,8 +73,6 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             format=log_format
         )
 
-    logger.warning("!!!!! IMPORTANT: RECENT CHANGES TO THE CATALOG BUILDER MAY AFFECT EXISTING WORKFLOWS !!!!!")
-    time.sleep(10)
     # Setting up logger
     # Standard mode's level is set as INFO
     # Verbose mode's level is set as DEBUG
@@ -126,6 +171,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
 
     if not slow and 'standard_name' in headers:
         #If we badly need standard name, we use gfdl cmip mapping tables especially when one does not prefer the slow option. Useful for MDTF runs
+        logger.info("Because standard_name is in headerlist and slow mode is off, standard_name will be retrieved from an offline lookup table")
         df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0,index_col=False)
         df['standard_name'] = df['standard_name'].astype(object)
         list_variable_id = []
@@ -133,7 +179,6 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
             list_variable_id = df["variable_id"].unique().tolist()
         except:
             raise KeyError("Having trouble finding 'variable_id'... Be sure to add it to the input_path_template field of your configuration")
-        logger.info("Because standard_name is in headerlist and slow mode is off, standard_name will be retrieved from an offline lookup table")
         dictVarCF = getinfo.getStandardName(list_variable_id)
         for k, v in dictVarCF.items():
             if k is not None:
@@ -141,8 +186,18 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
                 df.loc[mask, 'standard_name'] = v
 
         if df is not None and len(df) != 0:
-            with open(csv_path, 'w') as csvfile:
-                df.to_csv(csvfile,index=False)
+            df.to_csv(csv_path,index=False)
+
+    if fill:
+        # Replace NaN values and blank/whitespace-only strings with 'NA' so that
+        # the output CSV has no truly empty cells
+        if df is None:
+            df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0, index_col=False)
+        for column in df.columns:
+            df[column] = df[column].fillna('NA')
+            df[column] = df[column].replace(r'^\s*$', 'NA', regex=True)
+        logger.info(f"Filled empty values in {len(df.columns)} column(s) with 'NA'")
+        df.to_csv(csv_path, index=False)
 
     # Strict Mode
     if strict:
@@ -165,6 +220,7 @@ def create_catalog(input_path, output_path, config, filter_realm, filter_freq, f
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
 @click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
+@click.option('--fill', '-f', default=True, type=bool, help="Fill all empty CSV column values with 'NA'. Defaults to True. Use --fill=False to disable.")
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)
