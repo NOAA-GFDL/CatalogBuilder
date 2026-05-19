@@ -185,18 +185,21 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
                 mask = df['variable_id'] == k
                 df.loc[mask, 'standard_name'] = v
 
-        if df is not None and len(df) != 0:
-            df.to_csv(csv_path,index=False)
-
     if fill:
         # Replace NaN values and blank/whitespace-only strings with 'NA' so that
         # the output CSV has no truly empty cells
         if df is None:
             df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0, index_col=False)
+        filled_count = 0
         for column in df.columns:
+            had_missing = df[column].isna().any() or df[column].astype(str).str.match(r'^\s*$').any()
             df[column] = df[column].fillna('NA')
             df[column] = df[column].replace(r'^\s*$', 'NA', regex=True)
-        logger.info(f"Filled empty values in {len(df.columns)} column(s) with 'NA'")
+            if had_missing:
+                filled_count += 1
+        logger.info(f"Filled empty values in {filled_count} column(s) with 'NA'")
+
+    if df is not None and len(df) != 0:
         df.to_csv(csv_path, index=False)
 
     # Strict Mode
@@ -220,7 +223,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 @click.argument('output_path',required=False,nargs=1)
 #,help='Specify output filename suffix only. e.g. catalog')
 @click.option('--config',required=False,type=click.Path(exists=True),nargs=1,help='Path to your yaml config, Use the config_template in intakebuilder repo')
-@click.option('--fill', '-f', default=True, type=bool, help="Fill all empty CSV column values with 'NA'. Defaults to True. Use --fill=False to disable.")
+@click.option('--fill/--no-fill', default=True, help="Fill all empty CSV column values with 'NA'. Enabled by default. Use --no-fill to disable.")
 @click.option('--filter_realm', nargs=1)
 @click.option('--filter_freq', nargs=1)
 @click.option('--filter_chunk', nargs=1)

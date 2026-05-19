@@ -1,0 +1,9 @@
+pytest
+click
+xarray
+pandas
+jsondiff
+intake-esm==2025.12.12
+IPython
+boto3
+polars-lts-cpu
