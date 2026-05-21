@@ -232,7 +232,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 @click.option('--filter_chunk', nargs=1)
 @click.option('--overwrite', is_flag=True, default=False, help='Overwrite existing catalog CSV file')
 @click.option('--append', is_flag=True, default=False, help='Append to existing catalog CSV file (without headers)')
-@click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name isnt in your header specs, you dont need this option')
+@click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
 @click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
 @click.option('--verbose/--silent','-v', default=False, is_flag=True, help='Enables detailed logging') #default has silent option. Use --verbose for detailed logging
 
