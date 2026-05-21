@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-from catalogbuilder.scripts import gen_intake_gfdl_runner_config,gen_intake_gfdl_runner, make_sample_data
+from catalogbuilder.scripts import gen_intake_gfdl, gen_intake_gfdl_runner_config, gen_intake_gfdl_runner, make_sample_data
 
 def test_create_catalog():
       make_sample_data.make_sample_data()
@@ -20,7 +20,35 @@ def test_create_catalog():
       assert csvpath2.is_file()
       assert jsonpath2.is_file()
 
-
 def test_create_catalog_fill():
-      df = pd.read_csv("default-mdtf-catalog.csv", keep_default_na=False)
-      assert not df.isna().any().any()
+    make_sample_data.make_sample_data()
+    configyaml = Path(__file__).parent / "fill-test-config.yaml"
+    input_path = "archive/am5/am5/am5f3b1r0/c96L65_am5f3b1r0_pdclim1850F/gfdl.ncrc5-deploy-prod-openmp/pp"
+
+    # Generate catalog with fill disabled and confirm missing values are present
+    csv_nofill, _ = gen_intake_gfdl.create_catalog(
+        input_path=input_path, output_path="test-nofill-catalog",
+        config=configyaml, fill=False, filter_realm=None, filter_freq=None,
+        filter_chunk=None, overwrite=True, append=False, slow=False, strict=False, verbose=False,
+    )
+    df_nofill = pd.read_csv(csv_nofill, keep_default_na=True)
+    assert df_nofill.isna().any().any(), (
+        "Expected at least one missing value somewhere in the catalog when fill is disabled (--no-fill)"
+    )
+
+    # Generate catalog with fill enabled and confirm all missing values are replaced
+    csv_fill, _ = gen_intake_gfdl.create_catalog(
+        input_path=input_path, output_path="test-fill-catalog",
+        config=configyaml, fill=True, filter_realm=None, filter_freq=None,
+        filter_chunk=None, overwrite=True, append=False, slow=False, strict=False, verbose=False,
+    )
+    df_fill = pd.read_csv(csv_fill, keep_default_na=False)
+    assert not df_fill.isna().any().any(), (
+        "Expected no NaN values anywhere in the catalog when fill is enabled (--fill)"
+    )
+    assert not (df_fill == '').any().any(), (
+        "Expected no empty strings anywhere in the catalog when fill is enabled (--fill)"
+    )
+    assert (df_fill == 'NA').any().any(), (
+        "Expected at least one value to be filled with 'NA' when fill is enabled (--fill)"
+    )

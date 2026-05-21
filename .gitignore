@@ -4,3 +4,7 @@ logs/
 __pycache__/
 docs/build/ 
 docs/make.bat
+*.egg-info/
+archive/
+/*.csv
+/*.json
