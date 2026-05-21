@@ -21,7 +21,6 @@ def test_create_catalog():
       assert csvpath2.is_file()
       assert jsonpath2.is_file()
 
-
 def test_create_catalog_fill():
     make_sample_data.make_sample_data()
     configyaml = files('catalogbuilder').joinpath('intakebuilder/config_default.yaml')
