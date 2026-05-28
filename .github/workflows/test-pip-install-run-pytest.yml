@@ -59,11 +59,6 @@ jobs:
           name: workflow-artifacts1
           path: workflow-artifacts1
 
-    - name: List extracted files (debug)
-      run: |
-        echo "Will list extracted artifacts extraction dir"
-        find . -type f
-
     - name: Run pytest with downloaded artifacts
       run: |
         pytest -v --runxfail catalogbuilder
