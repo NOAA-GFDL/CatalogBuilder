@@ -34,7 +34,11 @@ jobs:
         id: bump
         if: steps.pr.outputs.pr_number != ''
         run: |
-          BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
+          set -euo pipefail
+          if ! BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}"); then
+            echo "::error::determine_bump.py failed to parse PR checkbox selection."
+            exit 1
+          fi
           echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
           echo "Version bump type: $BUMP_TYPE"
 
