@@ -56,11 +56,11 @@ jobs:
       - name: Bump version (Major)
         if: steps.bump.outputs.type == 'major'
         run: |
-          bump-my-version bump --config-file pyproject.toml --commit --tag --part major
+          bump-my-version bump --config-file pyproject.toml --commit --tag major
           git push --follow-tags
 
       - name: Bump version (Minor)
         if: steps.bump.outputs.type == 'minor'
         run: |
-          bump-my-version bump --config-file pyproject.toml --commit --tag --part minor
+          bump-my-version bump --config-file pyproject.toml --commit --tag minor
           git push --follow-tags
