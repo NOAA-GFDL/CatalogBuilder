@@ -34,8 +34,11 @@ jobs:
         id: bump
         if: steps.pr.outputs.pr_number != ''
         run: |
-          python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}"
-          BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
+          set -euo pipefail
+          if ! BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}"); then
+            echo "::error::determine_bump.py failed to parse PR checkbox selection."
+            exit 1
+          fi
           echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
           echo "Version bump type: $BUMP_TYPE"
 
@@ -56,11 +59,21 @@ jobs:
       - name: Bump version (Major)
         if: steps.bump.outputs.type == 'major'
         run: |
+          set -euo pipefail
           bump-my-version bump --config-file pyproject.toml --commit --tag major
+          git diff-tree --no-commit-id --name-only -r HEAD | grep -qx 'pyproject.toml' || {
+            echo "::error::Version bump commit did not update pyproject.toml."
+            exit 1
+          }
           git push --follow-tags
 
       - name: Bump version (Minor)
         if: steps.bump.outputs.type == 'minor'
         run: |
+          set -euo pipefail
           bump-my-version bump --config-file pyproject.toml --commit --tag minor
+          git diff-tree --no-commit-id --name-only -r HEAD | grep -qx 'pyproject.toml' || {
+            echo "::error::Version bump commit did not update pyproject.toml."
+            exit 1
+          }
           git push --follow-tags
