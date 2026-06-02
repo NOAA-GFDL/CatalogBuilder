@@ -1,0 +1,14 @@
+monthly:
+    frequency: mon
+h0:
+    frequency: mon
+h2:
+    frequency: day    
+daily:
+    frequency: day 
+hourly:
+    frequency: 1hr
+annual:
+    frequency: yearly
+3hr:
+    frequency: 3hr 
