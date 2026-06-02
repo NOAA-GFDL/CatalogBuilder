@@ -34,7 +34,6 @@ jobs:
         id: bump
         if: steps.pr.outputs.pr_number != ''
         run: |
-          python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}"
           BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
           echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
           echo "Version bump type: $BUMP_TYPE"
