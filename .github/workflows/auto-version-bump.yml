@@ -39,7 +39,7 @@ jobs:
             echo "::error::determine_bump.py failed to parse PR checkbox selection."
             exit 1
           fi
-          echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "type=$BUMP_TYPE" >> "$GITHUB_OUTPUT"
           echo "Version bump type: $BUMP_TYPE"
 
       - name: Install bump-my-version
