@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" Tests to load the catalog and extend the test capabilities """
+""" Tests that catalog files can be opened by intake-esm and produce a pandas DataFrame. """
 
 __author__ = "A.Radhakrishnan"
 __maintainer__ = "GFDL MSD workflow team"
@@ -12,7 +12,7 @@ import os
 import pathlib
 
 def load_cat(catspec=None):
-  """Checks if the json and associated csv can be opened by intake_esm"""
+  """Opens the intake-esm datastore at catspec and returns the catalog object. Returns None if the catalog cannot be opened."""
   cat = None
   try:
     cat = intake.open_esm_datastore(catspec)

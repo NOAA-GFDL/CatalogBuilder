@@ -1,6 +1,7 @@
 '''
-localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
-It finally returns a list of dict
+localcrawler walks a local CMIP6-style directory tree, calls helper functions in getinfo to
+extract metadata from each NetCDF file path and filename, and returns a list of dictionaries —
+one per file — containing the catalog column values for that file.
 '''
 
 import os
@@ -11,9 +12,10 @@ logger = logging.getLogger(__name__)
 
 def crawlLocal(projectdir, dictFilter):
     '''
-    Craw through the local directory and run through the getInfo.. functions
-    :param projectdir:
-    :return:listfiles which has a dictionary of all key/value pairs for each file to be added to the csv
+    Walks the directory tree rooted at projectdir, filters NetCDF files according to dictFilter
+    (source_prefix, miptable, varname), extracts metadata from each file path and filename using
+    getinfo helper functions, and returns a list of dictionaries. Each dictionary contains the
+    catalog column values for one file.
     '''
     listfiles = []
     pat = None

@@ -14,14 +14,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 '''
-getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
+getinfo.py contains helper functions that extract metadata from file paths, filenames, directory
+structures (DRS), and NetCDF file attributes. The extracted metadata is used to populate catalog
+columns.
 '''
 def getProject(projectdir,dictInfo):
     '''
-    return Project name from the project directory input
-    :type dictInfo: object
-    :param drsstructure:
-    :return: dictionary with project key
+    Sets the activity_id field in dictInfo based on the project directory path. If the path
+    contains "archive" or "pp", activity_id is set to "dev". Returns dictInfo with the
+    updated activity_id key.
     '''
     if "archive" in projectdir or "pp" in projectdir: 
        project = "dev"
@@ -57,11 +58,8 @@ def getFreqFromYAML(yamlfile,gfdlfreq=None):
 
 def getStem(dirpath,projectdir):
     '''
-    return stem from the project directory passed and the files crawled within
-    :param dirpath:
-    :param projectdir:
-    :param stem directory:
-    :return:
+    Extracts the directory stem by splitting dirpath on projectdir and then splitting the
+    remainder on "/". Returns a list of path components between the project root and the file.
     '''
     stemdir = dirpath.split(projectdir)[1].split("/")  # drsstructure is the root
     return stemdir
@@ -140,11 +138,11 @@ def getRealm(dictInfo):
 
 def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
     '''
-    Returns info from project directory and the DRS path to the file
-    :param dirpath:
-    :param drsstructure:
-    :param variable_id to check for static
-    :return:
+    Extracts catalog metadata from a GFDL-style directory path (DRS) by matching path
+    components against the input_path_template defined in configyaml. Populates dictInfo
+    with fields such as source_id, experiment_id, frequency, and realm. If variable_id is
+    "fixed" (static dataset), truncates the template before the time-series portion. Returns
+    an empty dict if the path corresponds to time-averaged (not time-series) data.
     '''
    # we need thise dict keys "project", "institute", "model", "experiment_id",
    #               "frequency", "realm", "mip_table",
@@ -200,10 +198,9 @@ def getInfoFromGFDLDRS(dirpath,projectdir,dictInfo,configyaml,variable_id):
 
 def getInfoFromDRS(dirpath,projectdir,dictInfo):
     '''
-    Returns info from project directory and the DRS path to the file
-    :param dirpath:
-    :param drsstructure:
-    :return:
+    Extracts institute and version fields from a CMIP6-style directory path (DRS) by splitting
+    dirpath on projectdir and indexing into the resulting path components. Returns dictInfo
+    updated with "institute" and "version" keys.
     '''
     stemdir = dirpath.split(projectdir)[1].split("/")  # drsstructure is the root
     try:
@@ -223,10 +220,10 @@ def return_xr(fname):
     return filexr,filexra
 def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
     '''
-    Returns info from the filename and xarray dataset object
-    :param fname: filename
-    :param filexr: Xarray dataset object
-    :return: dictInfo with all variable atts 
+    Reads the standard_name (or long_name) attribute for variable_id from a NetCDF file and
+    stores it in dictInfo["standard_name"]. If filexra (an already-opened xarray Dataset) is
+    provided, it is used directly; otherwise fname is opened and closed after use. If the
+    attribute cannot be found, standard_name is set to "NA". Returns updated dictInfo.
     '''
     # If an xarray Dataset is provided via filexra, use it directly; otherwise open fname.
     close_filexr = False
@@ -258,10 +255,9 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     return dictInfo
 def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
     '''
-    Returns info from the filename and xarray dataset object
-    :param fname: DRS compliant filename
-    :param filexr: Xarray dataset object
-    :return: dictInfo with institution_id version realm frequency and product
+    Reads global attributes (institution_id, version, realm, frequency) from a NetCDF file and
+    stores them in dictInfo. Only fills in institute and version if they are currently "NA".
+    Returns updated dictInfo.
     '''
     filexra = return_xr(fname)
     if dictInfo["institute"] == "NA":
@@ -284,11 +280,10 @@ def getInfoFromGlobalAtts(fname,dictInfo,filexra=None):
 
 def getStandardName(list_variable_id):
     '''
-    This method takes a list of all unique variable id's in the catalog and searches for them within MDTF lookup tables to determine their standard names. If the lookup fails, the standard name will be not be included in the returned dictionary.
-
-    :param list_variable_id: list containing each unique variable_id in catalog
-    :type list_variable_id: list
-    :return: dictionary of variable_id's (key) and unique standard names (value)
+    Looks up the CF standard name for each variable ID in list_variable_id using GFDL-to-CMIP
+    mapping tables fetched from the MDTF-diagnostics GitHub repository. Returns a dictionary
+    mapping each variable ID to its standard name. Variable IDs with no match are excluded
+    from the returned dictionary.
     '''
     unique_cf = "na"
     dictCF = {}

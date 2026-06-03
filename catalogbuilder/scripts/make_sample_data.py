@@ -1,15 +1,8 @@
 """
-This script generates a sample directory structure with a few PP components and empty netcdf files. 
-There is a subdirs.py in the scripts directory that provides info as to how the structure can be, while the root structure is defined in the script below.
-In the near future, this will allow us to add more patterns and directory structure expectations, components,different chunks, time series/time average etc and expand
-the following script and subdirs.py. 
-
-Context for this script- We use this in our GitHub Actions workflow to create sample directories on the fly before running the GFDL catalog builder 
-script dynamically.
-
-Author: A.Radhakrishnan and workflow team
-Date: Nov 15, 2023
-
+This script creates a sample GFDL post-processing directory tree with empty NetCDF files.
+It is used by the GitHub Actions CI workflow to generate test data on-the-fly before running
+the catalog builder. The root directory structure is defined in this file; the realm, frequency,
+variable, and time-range patterns are defined in subdirs.py.
 """
 import os
 from pathlib import Path

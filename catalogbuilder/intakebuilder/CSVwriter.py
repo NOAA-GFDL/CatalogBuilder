@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 def getHeader(configyaml):
     '''
-    returns header that is the first line in the csv file, refers default or user passed config yaml 
-    :return: headerlist with all columns
+    Returns the list of column headers for the catalog CSV. The headers are read from the provided
+    Config object (configyaml). Raises an AttributeError if the header list cannot be retrieved.
     '''
     if configyaml:
         return configyaml.headerlist
@@ -20,10 +20,8 @@ def getHeader(configyaml):
 
 def file_appender(dictinputs, csvfile):
     '''
-    creating function that puts values in dictionary into the csv
-    :param dictinputs:
-    :param csvfile:
-    :return:
+    Appends a row of values from dictinputs (a dictionary or list) to the CSV file at csvfile.
+    Opens csvfile in append mode and writes dictinputs as a new row.
     '''
     # opening file in append mode
     with open(csvfile, 'a', newline='') as write_obj:

@@ -1,6 +1,8 @@
 """ 
-utils for scripts/make_sample_data.py
-the sub-directories and other patterns in the directory strucure and file names needed for testing are defined below, assuming there is a root defined in the caller script
+Defines the subdirectory patterns and filename components used by make_sample_data.py to build
+the sample GFDL post-processing directory tree for testing. Each list (realm, freq, vars, time)
+provides the set of values used when constructing directory names and filenames under the root
+directory defined in make_sample_data.py.
 """
 
 realm = [

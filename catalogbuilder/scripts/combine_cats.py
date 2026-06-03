@@ -16,7 +16,13 @@ logger = logging.getLogger(__name__)
 
 #Assume csv is in the same path and deduce the filename
 def combine_cats(inputfiles,output_path):
-    """This script combines two json catalogs. It takes the path to input catalogs and the output catalog names as input. \nThe options may be passed with this as the template: \n combine_catalogs.py -i jsoncatalog -i jsoncatalog2 -o outputjson \n\n Example usage: combine_cats.py -i /home/a1r/github/noaa-gfdl/catalogs/CM4.5v01_om5b06_piC_noBLING.json -i /home/a1r/github/noaa-gfdl/catalogs/ESM4.5v01_om5b04_piC.json -o combinedcat.json """
+    """Combines two intake-ESM JSON catalogs and their associated CSV files into a single catalog.
+
+    Reads the two JSON catalog descriptors identified by inputfiles, verifies that their schemas
+    are compatible (only the catalog_file field differs), concatenates the two CSV files, and
+    writes a new merged CSV and a new JSON descriptor to combined_json. Usage example:
+    combine_cats.py -i catalog1.json -i catalog2.json -o combined.json
+    """
 
     try:
        json1 = inputfiles[0]

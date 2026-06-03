@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 """ 
-Tests to load a (dynamically generated) catalog and extend the test capabilities in the actions workflow . We check if a pandas data frame is 
-returned while opening the data catalog with intake-esm. TODO: For more visual tests, we need more than empty files as input. 
-This test is run from a dynamically generated csv and json using GitHub actions workflow. See workflow create-gfdl-catalog for more info.
-We refer to the csv with the artifact path, the one downloaded via actions workflow. See catspec path to connect the dots.
+Tests that a dynamically generated catalog (produced by the GitHub Actions CI workflow) can be
+opened by intake-esm and returns a pandas DataFrame. The catalog JSON is downloaded as a
+workflow artifact before this test runs. The test is marked xfail because it depends on CI
+artifacts that may not be present in all environments.
 """
 
 __author__ = "A.Radhakrishnan"
@@ -18,7 +18,7 @@ import pathlib
 import pytest
 
 def load_cat(catspec=None):
-  """Checks if the json and associated csv can be opened by intake_esm""" 
+  """Opens the intake-esm datastore at catspec and returns the catalog object. Returns None if the catalog cannot be opened."""
   cat = None
   try:
     cat = intake.open_esm_datastore(catspec)

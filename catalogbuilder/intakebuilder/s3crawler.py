@@ -8,8 +8,9 @@ import logging
 logger = logging.getLogger(__name__
 
 '''
-s3 crawler crawls through the S3 bucket, passes the bucket path to the helper functions to getinfo.
-Finally it returns a list of dictionaries. 
+s3crawler lists objects in an S3 bucket, passes each object path to getinfo helper functions
+to extract catalog metadata, and returns a list of dictionaries — one per file — containing
+the catalog column values for that file.
 '''
 def sss_crawler(projectdir,dictFilter,project_root):
     region = 'us-west-2'

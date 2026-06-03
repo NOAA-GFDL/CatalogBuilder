@@ -9,14 +9,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 '''
-localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
-It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
+gfdlcrawler walks a local GFDL post-processing directory tree, calls helper functions in
+getinfo to extract metadata from each NetCDF file path and filename, and returns a list of
+dictionaries — one per file — containing the catalog column values for that file.
 '''
 def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
     '''
-    crawl through the local directory and run through the getInfo.. functions
-    :param projectdir:
-    :return:listfiles which has a dictionary of all key/value pairs for each file to be added to the csv
+    Walks the directory tree rooted at projectdir, filters NetCDF files according to dictFilter
+    (realm, frequency, chunk_freq) and configyaml templates, extracts metadata from each file
+    path and filename using getinfo helper functions, and returns a list of dictionaries. Each
+    dictionary contains the catalog column values for one file. When slow is True, the
+    standard_name is read directly from each NetCDF file instead of from a lookup table.
     '''
     listfiles = []
     pat = None
