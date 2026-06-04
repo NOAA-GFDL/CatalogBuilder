@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Version bump level to simulate (dry-run only — nothing is committed or pushed)"
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - none
+        default: minor
 
 permissions:
   contents: write
@@ -26,41 +37,63 @@ jobs:
 
       - name: Get PR information
         id: pr
+        if: github.event_name == 'push'
         uses: 8BitJonny/gh-get-current-pr@4.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract version bump type
+      - name: Resolve bump type
         id: bump
-        if: steps.pr.outputs.pr_number != ''
+        if: github.event_name == 'workflow_dispatch' || steps.pr.outputs.pr_number != ''
         run: |
-          python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}"
-          BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
-          echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BUMP_TYPE="${{ inputs.bump_type }}"
+          else
+            BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
+          fi
+          echo "type=$BUMP_TYPE" >> "$GITHUB_OUTPUT"
           echo "Version bump type: $BUMP_TYPE"
 
       - name: Install bump-my-version
-        if: steps.pr.outputs.pr_number != ''
+        if: steps.bump.outputs.type != ''
         run: pip install bump-my-version
 
+      # Manual (workflow_dispatch) dry-run steps — no commit, tag, or push
+
+      - name: Dry run major bump
+        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type == 'major'
+        run: bump-my-version bump --config-file pyproject.toml --dry-run --verbose major
+
+      - name: Dry run minor bump
+        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type == 'minor'
+        run: bump-my-version bump --config-file pyproject.toml --dry-run --verbose minor
+
+      - name: Dry run no bump
+        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type == 'none'
+        run: echo "No version bump requested (none selected)"
+
+      # Push-to-main steps — real bump, commit, tag, and push
+
       - name: Configure git
-        if: steps.pr.outputs.pr_number != ''
+        if: github.event_name == 'push' && steps.bump.outputs.type != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version (No bump)
-        if: steps.bump.outputs.type == 'none'
+        if: github.event_name == 'push' && steps.bump.outputs.type == 'none'
         run: echo "No version bump requested"
 
       - name: Bump version (Major)
-        if: steps.bump.outputs.type == 'major'
+        if: github.event_name == 'push' && steps.bump.outputs.type == 'major'
         run: |
           bump-my-version bump --config-file pyproject.toml --commit --tag major
+          git diff --name-only HEAD^ HEAD | grep -q pyproject.toml || { echo "ERROR: pyproject.toml was not modified by version bump"; exit 1; }
           git push --follow-tags
 
       - name: Bump version (Minor)
-        if: steps.bump.outputs.type == 'minor'
+        if: github.event_name == 'push' && steps.bump.outputs.type == 'minor'
         run: |
           bump-my-version bump --config-file pyproject.toml --commit --tag minor
+          git diff --name-only HEAD^ HEAD | grep -q pyproject.toml || { echo "ERROR: pyproject.toml was not modified by version bump"; exit 1; }
           git push --follow-tags
