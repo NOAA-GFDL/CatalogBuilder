@@ -1,9 +1,11 @@
 name: publish_conda
 on:
   push:
-    branches:
-    # only upload upon MR acceptance.
-    - main
+    # Conda publishes only on version tags, never on branch pushes.
+    # This decouples package release from branch merges and prevents
+    # accidental publishes when bumping fails.
+    tags:
+      - '*'
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -11,9 +13,10 @@ jobs:
       image: continuumio/miniconda3:latest
     steps:
     - name: Checkout Files
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Run Docker to Build and Upload
       run: |
+        set -euo pipefail
         conda config --append channels conda-forge
         conda config --append channels noaa-gfdl
         conda install conda-build anaconda-client conda-verify

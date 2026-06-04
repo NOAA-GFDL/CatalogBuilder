@@ -1,9 +1,8 @@
 name: Auto Version Bump
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [opened, edited, synchronize, reopened, closed]
   workflow_dispatch:
     inputs:
       bump_type:
@@ -21,12 +20,35 @@ permissions:
   pull-requests: read
 
 jobs:
+  validate-bump:
+    # This job validates PR checkbox state early, before merge. It fails fast
+    # if multiple or no version bumps are selected, preventing invalid merges.
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Validate bump selection
+        run: |
+          set -euo pipefail
+          python .github/scripts/determine_bump.py "${{ github.event.pull_request.body }}"
+
   version-bump:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -35,65 +57,74 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Get PR information
-        id: pr
-        if: github.event_name == 'push'
-        uses: 8BitJonny/gh-get-current-pr@4.0.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Resolve bump type
         id: bump
-        if: github.event_name == 'workflow_dispatch' || steps.pr.outputs.pr_number != ''
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             BUMP_TYPE="${{ inputs.bump_type }}"
           else
-            BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ steps.pr.outputs.pr_body }}")
+            BUMP_TYPE=$(python .github/scripts/determine_bump.py "${{ github.event.pull_request.body }}")
           fi
           echo "type=$BUMP_TYPE" >> "$GITHUB_OUTPUT"
           echo "Version bump type: $BUMP_TYPE"
 
       - name: Install bump-my-version
-        if: steps.bump.outputs.type != ''
-        run: pip install bump-my-version
+        run: |
+          set -euo pipefail
+          pip install bump-my-version
 
-      # Manual (workflow_dispatch) dry-run steps — no commit, tag, or push
+      # --- Dry-run path (workflow_dispatch only) ---
 
-      - name: Dry run major bump
-        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type == 'major'
-        run: bump-my-version bump --config-file pyproject.toml --dry-run --verbose major
+      - name: Dry-run bump
+        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type != 'none'
+        run: |
+          set -euo pipefail
+          echo "::notice::Dry-run/simulation mode — no commits, tags, or pushes will be made."
+          bump-my-version bump --config-file pyproject.toml --dry-run --verbose ${{ steps.bump.outputs.type }}
 
-      - name: Dry run minor bump
-        if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type == 'minor'
-        run: bump-my-version bump --config-file pyproject.toml --dry-run --verbose minor
-
-      - name: Dry run no bump
+      - name: Dry-run no bump
         if: github.event_name == 'workflow_dispatch' && steps.bump.outputs.type == 'none'
-        run: echo "No version bump requested (none selected)"
+        run: |
+          set -euo pipefail
+          echo "::notice::Dry-run/simulation mode — no version bump requested (none selected)."
+          echo "No version bump requested"
 
-      # Push-to-main steps — real bump, commit, tag, and push
+      # --- Merged-PR real bump path ---
+
+      - name: No version bump
+        if: github.event_name == 'pull_request' && steps.bump.outputs.type == 'none'
+        run: |
+          set -euo pipefail
+          echo "No version bump requested"
 
       - name: Configure git
-        if: github.event_name == 'push' && steps.bump.outputs.type != ''
+        if: github.event_name == 'pull_request' && steps.bump.outputs.type != 'none'
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Bump version (No bump)
-        if: github.event_name == 'push' && steps.bump.outputs.type == 'none'
-        run: echo "No version bump requested"
-
-      - name: Bump version (Major)
-        if: github.event_name == 'push' && steps.bump.outputs.type == 'major'
+      - name: Bump version and push
+        if: github.event_name == 'pull_request' && steps.bump.outputs.type != 'none'
         run: |
-          bump-my-version bump --config-file pyproject.toml --commit --tag major
-          git diff --name-only HEAD^ HEAD | grep -q pyproject.toml || { echo "ERROR: pyproject.toml was not modified by version bump"; exit 1; }
+          set -euo pipefail
+          bump-my-version bump --config-file pyproject.toml --commit --tag ${{ steps.bump.outputs.type }}
+
+          # Critical: Verify that bump-my-version actually modified the version file.
+          # We've observed cases where bump claims success but pyproject.toml was untouched,
+          # leading to released packages with stale versions.
+          if ! git diff-tree --no-commit-id --name-only -r HEAD | grep -qx 'pyproject.toml'; then
+            echo "::error::Version bump commit did not update pyproject.toml. Aborting tag push."
+            exit 1
+          fi
+
           git push --follow-tags
 
-      - name: Bump version (Minor)
-        if: github.event_name == 'push' && steps.bump.outputs.type == 'minor'
-        run: |
-          bump-my-version bump --config-file pyproject.toml --commit --tag minor
-          git diff --name-only HEAD^ HEAD | grep -q pyproject.toml || { echo "ERROR: pyproject.toml was not modified by version bump"; exit 1; }
-          git push --follow-tags
+          # Paranoia check: verify the tag actually reached the remote.
+          # Prevents 'tag disappeared' incidents.
+          git fetch origin --tags
+          if ! git describe --tags --exact-match $(git rev-parse HEAD); then
+            echo "::error::Tag push verification failed — tag not found on remote."
+            exit 1
+          fi
