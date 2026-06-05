@@ -93,7 +93,7 @@ jobs:
         run: |
           set -euo pipefail
           bump-my-version bump --config-file pyproject.toml --commit --tag major
-          git diff-tree --no-commit-id --name-only -r HEAD | grep -qx 'pyproject.toml' || {
+          git diff-tree --no-commit-id --name-only -r HEAD | grep -Fqx -- 'pyproject.toml' || {
             echo "::error::Version bump commit did not update pyproject.toml."
             exit 1
           }
@@ -104,7 +104,7 @@ jobs:
         run: |
           set -euo pipefail
           bump-my-version bump --config-file pyproject.toml --commit --tag minor
-          git diff-tree --no-commit-id --name-only -r HEAD | grep -qx 'pyproject.toml' || {
+          git diff-tree --no-commit-id --name-only -r HEAD | grep -Fqx -- 'pyproject.toml' || {
             echo "::error::Version bump commit did not update pyproject.toml."
             exit 1
           }

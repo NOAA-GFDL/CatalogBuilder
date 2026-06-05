@@ -1,6 +1,5 @@
 """Tests for .github/scripts/determine_bump.py"""
 
-import sys
 import os
 import importlib.util
 
