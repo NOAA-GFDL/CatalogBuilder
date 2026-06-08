@@ -7,7 +7,7 @@ import pytest
 
 # Load the script as a module without requiring a package structure
 _script_path = os.path.join(
-    os.path.dirname(__file__), "..", ".github", "scripts", "determine_bump.py"
+    os.path.dirname(__file__), "..", "..", ".github", "scripts", "determine_bump.py"
 )
 _spec = importlib.util.spec_from_file_location("determine_bump", _script_path)
 _module = importlib.util.module_from_spec(_spec)
