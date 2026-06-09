@@ -260,7 +260,7 @@ Flags
 - --config - Allows for catalogs to be generated with a custom configuration. Requires path to YAML configuration file. (Ex. "--config custom_config.yaml")  
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
-- --slow - Activates slow mode which retrieves standard_name (or long_name) where possible. **"Standard_name" must be in your input_path_template**
+- --slow - Activates slow mode which retrieves standard_name by opening files. For entries where file retrieval fails, the system will attempt to populate standard_name using an offline lookup table (MDTF GFDL-to-CMIP variable mappings). This provides better coverage of standard_name values compared to relying on files alone. **"Standard_name" must be in your input_path_template**
 - --strict - Activates strict mode which validates catalog vocabulary during generation
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
 - --i - Optional method for passing input path

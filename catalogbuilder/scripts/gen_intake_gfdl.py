@@ -188,6 +188,38 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
                 mask = df['variable_id'] == k
                 df.loc[mask, 'standard_name'] = v
 
+    elif slow and 'standard_name' in headers:
+        # For slow mode, attempt offline lookup for entries where file retrieval failed
+        logger.info("Attempting to populate standard_name using offline lookup for entries that could not be retrieved from files")
+
+        if df is None:
+            df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0, index_col=False)
+
+        if df['standard_name'].dtype != 'object':
+            df['standard_name'] = df['standard_name'].astype(object)
+
+        # Find rows where standard_name is 'na' or 'NA' (indicating failed file retrieval)
+        mask_missing = (df['standard_name'] == 'na') | (df['standard_name'] == 'NA')
+
+        if mask_missing.any() and 'variable_id' in df.columns:
+            missing_var_ids = df.loc[mask_missing, 'variable_id'].unique().tolist()
+
+            try:
+                dictVarCF = getinfo.getStandardName(missing_var_ids)
+
+                updated_count = 0
+                for var_id, standard_name in dictVarCF.items():
+                    if var_id is not None:
+                        mask = (df['variable_id'] == var_id) & mask_missing
+                        df.loc[mask, 'standard_name'] = standard_name
+                        updated_count += mask.sum()
+
+                if updated_count > 0:
+                    logger.info(f"Updated {updated_count} entries with standard_name from offline lookup table")
+            except Exception as e:
+                logger.warning(f"Offline lookup table query failed: {e}. Entries will retain 'NA' values.")
+                raise
+
     if fill:
         # Replace NaN values and blank/whitespace-only strings with 'NA' so that
         # the output CSV has no truly empty cells
