@@ -89,20 +89,21 @@ def test_slow_mode_offline_lookup_failure():
     def mock_get_info(path, var_id, dictInfo):
         pass
 
-    with patch('catalogbuilder.intakebuilder.getinfo.getInfoFromVarAtts', side_effect=mock_get_info):
-        with patch('catalogbuilder.intakebuilder.getinfo.getStandardName', side_effect=Exception("Lookup failed")):
-            with pytest.raises(Exception, match="Lookup failed"):
-                gen_intake_gfdl.create_catalog(
-                    input_path=input_path,
-                    output_path="test-slow-offline-lookup-fail",
-                    config=configyaml,
-                    fill=False,
-                    filter_realm=None,
-                    filter_freq=None,
-                    filter_chunk=None,
-                    overwrite=True,
-                    append=False,
-                    slow=True,
-                    strict=False,
-                    verbose=False,
-                )
+    with patch('catalogbuilder.scripts.gen_intake_gfdl.time.sleep', return_value=None):
+        with patch('catalogbuilder.intakebuilder.getinfo.getInfoFromVarAtts', side_effect=mock_get_info):
+            with patch('catalogbuilder.intakebuilder.getinfo.getStandardName', side_effect=Exception("Lookup failed")):
+                with pytest.raises(Exception, match="Lookup failed"):
+                    gen_intake_gfdl.create_catalog(
+                        input_path=input_path,
+                        output_path="test-slow-offline-lookup-fail",
+                        config=configyaml,
+                        fill=False,
+                        filter_realm=None,
+                        filter_freq=None,
+                        filter_chunk=None,
+                        overwrite=True,
+                        append=False,
+                        slow=True,
+                        strict=False,
+                        verbose=False,
+                    )
