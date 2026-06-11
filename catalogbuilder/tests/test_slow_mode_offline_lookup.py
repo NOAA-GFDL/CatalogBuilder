@@ -32,23 +32,24 @@ def test_slow_mode_offline_lookup_fallback():
         # Do nothing - leave standard_name as 'na' to simulate failure
         pass
 
-    with patch('catalogbuilder.intakebuilder.getinfo.getInfoFromVarAtts', side_effect=mock_get_info):
-        with patch('catalogbuilder.intakebuilder.getinfo.getStandardName', return_value=mock_lookup_dict) as mock_get:
-            # Generate catalog with slow mode enabled
-            csv_slow, _ = gen_intake_gfdl.create_catalog(
-                input_path=input_path,
-                output_path="test-slow-offline-lookup",
-                config=configyaml,
-                fill=False,
-                filter_realm=None,
-                filter_freq=None,
-                filter_chunk=None,
-                overwrite=True,
-                append=False,
-                slow=True,
-                strict=False,
-                verbose=False,
-            )
+    with patch('catalogbuilder.scripts.gen_intake_gfdl.time.sleep', return_value=None):
+        with patch('catalogbuilder.intakebuilder.getinfo.getInfoFromVarAtts', side_effect=mock_get_info):
+            with patch('catalogbuilder.intakebuilder.getinfo.getStandardName', return_value=mock_lookup_dict) as mock_get:
+                # Generate catalog with slow mode enabled
+                csv_slow, _ = gen_intake_gfdl.create_catalog(
+                    input_path=input_path,
+                    output_path="test-slow-offline-lookup",
+                    config=configyaml,
+                    fill=False,
+                    filter_realm=None,
+                    filter_freq=None,
+                    filter_chunk=None,
+                    overwrite=True,
+                    append=False,
+                    slow=True,
+                    strict=False,
+                    verbose=False,
+                )
 
             # Verify the offline lookup was called (the fallback path was hit)
             mock_get.assert_called_once()
