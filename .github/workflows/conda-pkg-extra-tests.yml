@@ -26,7 +26,7 @@ jobs:
         /opt/conda/envs/catalogbuildertest/bin/pytest catalogbuilder/tests/test_create_catalog.py
         #we will save the output from following alone as manifest
     - name: upload-artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
           name: workflow-artifacts1 
           path: |
