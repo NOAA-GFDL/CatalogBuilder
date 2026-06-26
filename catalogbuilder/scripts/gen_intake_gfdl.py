@@ -193,17 +193,17 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         logger.info("Attempting to populate standard_name using offline lookup for entries that could not be retrieved from files")
 
         if df is None:
-            df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0, index_col=False)
+            df = pd.read_csv(os.path.abspath(csv_path), sep=",", header=0, index_col=False, keep_default_na=False)
 
         if df['standard_name'].dtype != 'object':
             df['standard_name'] = df['standard_name'].astype(object)
 
-        # Find rows where standard_name is 'na' or 'NA' (indicating failed file retrieval)
-        mask_missing = (df['standard_name'] == 'na') | (df['standard_name'] == 'NA')
+        # Find rows where standard_name is missing/placeholder (indicating failed file retrieval)
+        standard_name_norm = df['standard_name'].astype(str).str.strip()
+        mask_missing = df['standard_name'].isna() | standard_name_norm.eq('') | standard_name_norm.str.lower().eq('na')
 
         if mask_missing.any() and 'variable_id' in df.columns:
-            missing_var_ids = df.loc[mask_missing, 'variable_id'].unique().tolist()
-
+            missing_var_ids = df.loc[mask_missing, 'variable_id'].dropna().unique().tolist()
             try:
                 dictVarCF = getinfo.getStandardName(missing_var_ids)
 
