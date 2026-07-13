@@ -216,8 +216,8 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 
                 if updated_count > 0:
                     logger.info(f"Updated {updated_count} entries with standard_name from offline lookup table")
-            except Exception as e:
-                logger.warning(f"Offline lookup table query failed: {e}. Entries will retain 'NA' values.")
+            except Exception:
+                logger.exception("Offline lookup table query failed; re-raising")
                 raise
 
     if fill:
