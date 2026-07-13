@@ -14,7 +14,8 @@ build:
 requirements:
   host: 
     - python
-    - pip 
+    - pip
+    - setuptools 
   run:
     - python
     - pytest
