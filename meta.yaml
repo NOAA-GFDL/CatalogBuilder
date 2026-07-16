@@ -1,6 +1,6 @@
 package:
   name: catalogbuilder
-  version: 2026.01.01
+  version: 2026.02.01
 
 source:
   path: .
@@ -14,7 +14,8 @@ build:
 requirements:
   host: 
     - python
-    - pip 
+    - pip
+    - setuptools 
   run:
     - python
     - pytest
