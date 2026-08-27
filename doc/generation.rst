@@ -261,6 +261,7 @@ Flags
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name by opening files. For entries where file retrieval fails, the system will attempt to populate standard_name using an offline lookup table (MDTF GFDL-to-CMIP variable mappings). This provides better coverage of standard_name values compared to relying on files alone. **`standard_name` must be included in your config's `headerlist` (CSV columns)**
+- --zarr / -z - Crawls Zarr stores instead of NetCDF files and writes a catalog whose asset format is ``zarr``
 - --strict - Activates strict mode which validates catalog vocabulary during generation
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
 - --i - Optional method for passing input path

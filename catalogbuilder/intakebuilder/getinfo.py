@@ -13,6 +13,19 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import logging
 logger = logging.getLogger(__name__)
 
+
+def _strip_supported_suffix(filename):
+    for suffix in (".nc", ".zarr"):
+        if filename.endswith(suffix):
+            return filename[:-len(suffix)]
+    return filename
+
+
+def _open_dataset(fname):
+    if fname.endswith(".zarr"):
+        return xr.open_zarr(fname)
+    return xr.open_dataset(fname)
+
 '''
 getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
 '''
@@ -69,8 +82,8 @@ def getStem(dirpath,projectdir):
 
 def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
-    if filename.endswith(".nc"):
-        ncfilename = filename.split(".")[0].split("_")
+    if filename.endswith((".nc", ".zarr")):
+        ncfilename = _strip_supported_suffix(filename).split("_")
         varname = ncfilename[0]
         dictInfo["variable_id"] = varname
         table_id = ncfilename[1]
@@ -95,7 +108,7 @@ def getInfoFromFilename(filename,dictInfo):
 #adding this back to trace back some old errors
 def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-  if filename.endswith(".nc"): 
+  if filename.endswith((".nc", ".zarr")): 
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -218,7 +231,7 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
     dictInfo["version"] = version
     return dictInfo
 def return_xr(fname):
-    filexr = (xr.open_dataset(fname))
+    filexr = (_open_dataset(fname))
     filexra = filexr.attrs
     return filexr,filexra
 def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
@@ -233,7 +246,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     if filexra is not None:
         filexr = filexra
     else:
-        filexr = xr.open_dataset(fname)
+        filexr = _open_dataset(fname)
         close_filexr = True
     try:
         if (dictInfo[att] == "na"):
