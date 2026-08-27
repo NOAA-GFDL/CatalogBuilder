@@ -47,6 +47,8 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         slow (bool): When ``True``, ``standard_name`` (or ``long_name``) is
             read directly from each input dataset's metadata instead of being
             looked up in an offline table.
+        zarr (bool): When ``True``, crawl for Zarr stores instead of NetCDF
+            files and emit a catalog with ``assets.format = "zarr"``.
         strict (bool): When ``True``, the finished catalog is validated against
             the CV vocabulary embedded in the JSON schema; generation fails if
             any violations are found.
@@ -276,5 +278,3 @@ def create_catalog_cli(**kwargs):
 
 if __name__ == '__main__':
     create_catalog_cli()
-        zarr (bool): When ``True``, crawl for Zarr stores instead of NetCDF
-            files and emit a catalog with ``assets.format = "zarr"``.
