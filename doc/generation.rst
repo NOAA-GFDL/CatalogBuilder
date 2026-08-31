@@ -266,3 +266,14 @@ Flags
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
+
+Zarr Mode
+---------
+
+Passing ``--zarr`` / ``-z`` opts into crawling ``.zarr`` directories as dataset assets instead of the default NetCDF (``.nc``) files. When a ``.zarr`` directory is encountered, it is treated as a single dataset asset; the internals of the Zarr store (its chunk files and metadata) are not recursively traversed.
+
+The generated intake JSON reflects this by setting ``assets.format`` to ``zarr``. Without the flag, the existing NetCDF behavior is unchanged and ``assets.format`` remains ``netcdf``.
+
+.. code-block:: console
+
+   gen_intake_gfdl /path/to/data /path/to/output --zarr
