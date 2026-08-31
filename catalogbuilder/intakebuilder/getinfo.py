@@ -153,7 +153,9 @@ def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
           dictInfo["table_id"] = "Ofx"
         else:
           dictInfo["table_id"] = "fx"
-    return dictInfo
+  else:
+    logger.debug("Filename not compatible with this version of the builder:"+filename)
+  return dictInfo
 
 def getRealm(dictInfo):
      realm = ""
