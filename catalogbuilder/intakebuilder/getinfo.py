@@ -9,6 +9,7 @@ pd.options.mode.chained_assignment = None
 import csv
 from csv import writer
 import os
+import re
 import xarray as xr
 from . import configparser
 import yaml 
@@ -27,9 +28,14 @@ def strip_suffix(filename):
     return filename
 
 
+def is_version_zarr_store(path):
+    """Return True when *path* is a directory named like a versioned Zarr store."""
+    return os.path.isdir(path) and re.fullmatch(r"v\d{8}", os.path.basename(path)) is not None
+
+
 def open_dataset(fname):
     """Open a NetCDF file or Zarr store with the matching xarray reader."""
-    if fname.endswith(".zarr"):
+    if fname.endswith(".zarr") or is_version_zarr_store(fname):
         return xr.open_zarr(fname)
     return xr.open_dataset(fname)
 

@@ -12,6 +12,13 @@ logger = logging.getLogger(__name__)
 localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
 It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
 '''
+
+
+def is_supported_zarr_store(dirname):
+    """Return True for supported Zarr store directory names."""
+    return dirname.endswith(".zarr") or re.fullmatch(r"v\d{8}", dirname) is not None
+
+
 def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=False):
     '''
     crawl through the local directory and run through the getInfo.. functions
@@ -58,8 +65,6 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
     #The values are lists tracking var_id,realm,etc.. and the keys are the standard names
     unique_datasets = {'':''}
  
-    expected_suffix = ".zarr" if zarr else ".nc"
-
     #TODO INCLUDE filter in traversing through directories at the top
     for dirpath, dirs, files in os.walk(projectdir):
         searchpath = dirpath
@@ -68,16 +73,20 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
         if pat is not None:
             m = re.search(pat, searchpath)
             if zarr:
-               entries = [dirname for dirname in list(dirs) if dirname.endswith(expected_suffix)]
-               dirs[:] = [dirname for dirname in dirs if not dirname.endswith(expected_suffix)]
+               entries = [dirname for dirname in list(dirs) if is_supported_zarr_store(dirname)]
+               dirs[:] = [dirname for dirname in dirs if not is_supported_zarr_store(dirname)]
             else:
                entries = files
             for filename in entries:
                # get info from filename
                filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
 
-               if not filename.endswith(expected_suffix):
-                   logger.debug("FILE does not end with %s. Skipping %s", expected_suffix, filepath)
+               if zarr:
+                   if not is_supported_zarr_store(filename):
+                       logger.debug("Directory is not a supported Zarr store. Skipping %s", filepath)
+                       continue
+               elif not filename.endswith(".nc"):
+                   logger.debug("FILE does not end with .nc. Skipping %s", filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if "static" not in filename:
@@ -92,17 +101,18 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
                dictInfo["path"]=filepath
+               if zarr and getinfo.is_version_zarr_store(filepath):
+                   dictInfo["version_id"] = filename
 
                if op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
                    dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
 
+               variable_id = ""
                if "variable_id" in dictInfo.keys():
                    if dictInfo["variable_id"] is not None:
                        variable_id = dictInfo["variable_id"] 
-                   else: 
-                       variable_id = ""
 
                dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
