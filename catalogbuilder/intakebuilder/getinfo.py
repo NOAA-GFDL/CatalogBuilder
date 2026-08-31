@@ -1,3 +1,8 @@
+"""
+getinfo.py provides helper functions to get information (from filename, DRS,
+file/global attributes) needed to populate the catalog.
+"""
+
 import sys
 import pandas as pd
 pd.options.mode.chained_assignment = None
@@ -14,21 +19,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _strip_supported_suffix(filename):
+def strip_suffix(filename):
+    """Remove a supported dataset suffix from a filename or store name."""
     for suffix in (".nc", ".zarr"):
         if filename.endswith(suffix):
             return filename[:-len(suffix)]
     return filename
 
 
-def _open_dataset(fname):
+def open_dataset(fname):
+    """Open a NetCDF file or Zarr store with the matching xarray reader."""
     if fname.endswith(".zarr"):
         return xr.open_zarr(fname)
     return xr.open_dataset(fname)
 
-'''
-getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
-'''
+
 def getProject(projectdir,dictInfo):
     '''
     return Project name from the project directory input
@@ -83,7 +88,7 @@ def getStem(dirpath,projectdir):
 def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
     if filename.endswith((".nc", ".zarr")):
-        ncfilename = _strip_supported_suffix(filename).split("_")
+        ncfilename = strip_suffix(filename).split("_")
         varname = ncfilename[0]
         dictInfo["variable_id"] = varname
         table_id = ncfilename[1]
@@ -231,7 +236,7 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
     dictInfo["version"] = version
     return dictInfo
 def return_xr(fname):
-    filexr = (_open_dataset(fname))
+    filexr = (open_dataset(fname))
     filexra = filexr.attrs
     return filexr,filexra
 def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
@@ -246,7 +251,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     if filexra is not None:
         filexr = filexra
     else:
-        filexr = _open_dataset(fname)
+        filexr = open_dataset(fname)
         close_filexr = True
     try:
         if (dictInfo[att] == "na"):

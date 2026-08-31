@@ -115,6 +115,16 @@ Output path argumment should end with the desired output filename WITHOUT a file
 
 This would create a catalog.csv and catalog.json in the user's home directory.
 
+To generate a catalog from Zarr stores instead of NetCDF files, use the ``--zarr`` flag:
+
+.. code-block:: console
+
+ gen_intake_gfdl.py --zarr /archive/path_to_zarr_data $HOME/catalog-zarr
+
+When ``--zarr`` is enabled, the builder crawls ``.zarr`` stores, preserves the
+existing path and filename parsing rules, and writes a JSON catalog whose
+``assets.format`` is set to ``zarr``.
+
 .. image:: _static/ezgif-4-786144c287.gif
  :width: 1000px
  :alt: Catalog generation demonstration
@@ -266,3 +276,12 @@ Flags
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
+
+Zarr catalogs
+=============
+
+The ``--zarr`` / ``-z`` flag is intended for datasets stored as ``.zarr``
+directories. The same configuration file structure is used, including
+``headerlist``, ``input_path_template``, and ``input_file_template``. The main
+difference is that the crawler looks for Zarr stores rather than ``.nc`` files,
+and metadata reads in slow mode use xarray's Zarr reader.
