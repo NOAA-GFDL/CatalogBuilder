@@ -6,8 +6,8 @@ Data catalogs simplify data discovery by creating customizable, extendable, and 
 
 CatalogBuilder can generate catalogs for NetCDF inputs and, with the
 ``--zarr`` / ``-z`` CLI flag, for Zarr stores detected by Zarr metadata files
-such as ``.zgroup``, ``.zattrs``, or ``.zmetadata``, while preserving the
-existing catalog-building workflow.
+such as ``.zgroup``, ``.zattrs``, or ``.zmetadata`` regardless of the store
+directory name, while preserving the existing catalog-building workflow.
 
 To use the catalog builder, install the pip package by running **pip install git+https://github.com/NOAA-GFDL/CatalogBuilder.git**, clone the [github repository](https://github.com/NOAA-GFDL/CatalogBuilder), or use the [FRE command line interface](https://github.com/NOAA-GFDL/fre-cli).
 

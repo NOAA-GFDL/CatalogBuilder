@@ -13,16 +13,6 @@ localcrawler crawls through the local file path, then calls helper functions in 
 It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
 '''
 
-def is_zarr_store(path):
-    """Return True when *path* is a directory containing Zarr metadata files."""
-    if not os.path.isdir(path):
-        return False
-    return any(
-        os.path.isfile(os.path.join(path, metadata_file))
-        for metadata_file in (".zgroup", ".zattrs", ".zmetadata")
-    )
-
-
 def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=False):
     '''
     crawl through the local directory and run through the getInfo.. functions
@@ -77,8 +67,8 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
         if pat is not None:
             m = re.search(pat, searchpath)
             if zarr:
-               entries = [dirname for dirname in list(dirs) if is_zarr_store(os.path.join(dirpath, dirname))]
-               dirs[:] = [dirname for dirname in dirs if not is_zarr_store(os.path.join(dirpath, dirname))]
+               entries = [dirname for dirname in list(dirs) if getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
+               dirs[:] = [dirname for dirname in dirs if not getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
             else:
                entries = files
             for filename in entries:
@@ -101,12 +91,17 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
                dictInfo["path"]=filepath
-               if zarr and "version_id" in headerlist and "version_id" not in set_ptemplate and "version_id" not in set_ftemplate:
-                   dictInfo["version_id"] = getinfo.strip_suffix(filename)
 
                if zarr:
                    parse_path = getinfo.strip_suffix(filepath)
                    dictInfo = getinfo.getInfoFromGFDLDRS(parse_path, projectdir, dictInfo,configyaml,'')
+                   version_name = getinfo.strip_suffix(filename)
+                   if (
+                       "version_id" in headerlist
+                       and "version_id" not in dictInfo
+                       and re.fullmatch(r"v\d{8}", version_name) is not None
+                   ):
+                       dictInfo["version_id"] = version_name
                elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
