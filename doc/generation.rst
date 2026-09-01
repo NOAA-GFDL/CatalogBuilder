@@ -121,10 +121,9 @@ To generate a catalog from Zarr stores instead of NetCDF files, use the ``--zarr
 
  gen_intake_gfdl.py --zarr /archive/path_to_zarr_data $HOME/catalog-zarr
 
-When ``--zarr`` is enabled, the builder crawls ``.zarr`` stores and also
-version-named stores such as ``v20260831``, preserves the existing path and
-filename parsing rules, and writes a JSON catalog whose ``assets.format`` is
-set to ``zarr``.
+When ``--zarr`` is enabled, the builder crawls directories that contain Zarr
+metadata files such as ``.zgroup``, ``.zattrs``, or ``.zmetadata`` and writes
+a JSON catalog whose ``assets.format`` is set to ``zarr``.
 
 .. image:: _static/ezgif-4-786144c287.gif
  :width: 1000px
@@ -281,9 +280,9 @@ Flags
 Zarr catalogs
 =============
 
-The ``--zarr`` / ``-z`` flag is intended for datasets stored as ``.zarr``
-directories or version-named directories matching ``v########``. The same
-configuration file structure is used, including
+The ``--zarr`` / ``-z`` flag is intended for datasets stored in directories
+that contain Zarr metadata files such as ``.zgroup``, ``.zattrs``, or
+``.zmetadata``. The same configuration file structure is used, including
 ``headerlist``, ``input_path_template``, and ``input_file_template``. The main
 difference is that the crawler looks for Zarr stores rather than ``.nc`` files,
 and metadata reads in slow mode use xarray's Zarr reader.
