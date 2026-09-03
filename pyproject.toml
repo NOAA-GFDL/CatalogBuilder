@@ -14,6 +14,7 @@ dependencies = [
     "pytest",
     "click",
     "xarray",
+    "zarr",
     "pandas",
     "jsondiff",
     "intake-esm ==2025.12.12",

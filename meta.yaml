@@ -21,6 +21,7 @@ requirements:
     - pytest
     - click
     - xarray
+    - zarr
     - pandas
     - jsondiff
     - conda-forge::intake-esm

@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
 It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
 '''
-def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
+
+def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=False):
     '''
     crawl through the local directory and run through the getInfo.. functions
     :param projectdir:
@@ -65,15 +66,20 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
             pat = dirpath  #we assume matching entire path
         if pat is not None:
             m = re.search(pat, searchpath)
-            for filename in files:
+            if zarr:
+               entries = [dirname for dirname in list(dirs) if getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
+               dirs[:] = [dirname for dirname in dirs if not getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
+            else:
+               entries = files
+            for filename in entries:
                # get info from filename
                filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
-
-               if not filename.endswith(".nc"):
-                   logger.debug("FILE does not end with .nc. Skipping "+ filepath)
+ 
+               if not zarr and not filename.endswith(".nc"):
+                   logger.debug("FILE does not end with .nc. Skipping %s", filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
-               if "static" not in filename:
+               if not zarr and "static" not in filename:
                    if (len(filename.split('.'))-1 != len(set_ftemplate) 
                    and len(filename.split('_')) > 2 
                    and len(filename.split('_')) != len(set_ftemplate)):
@@ -86,18 +92,30 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                # get info from filename
                dictInfo["path"]=filepath
 
-               if op.countOf(filename,".") == 1:
+               if zarr:
+                   parse_path = getinfo.strip_suffix(filepath)
+                   dictInfo = getinfo.getInfoFromGFDLDRS(parse_path, projectdir, dictInfo,configyaml,'')
+                   store_name = getinfo.strip_suffix(filename)
+                   if re.fullmatch(r"v\d{8}", store_name) is not None:
+                       #directory named zarr stores carry the version, not file metadata
+                       if "version_id" in headerlist and "version_id" not in dictInfo:
+                           dictInfo["version_id"] = store_name
+                   elif op.countOf(filename,".") == 1:
+                       dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
+                   else:
+                       dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
+               elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
                    dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
 
+               variable_id = ""
                if "variable_id" in dictInfo.keys():
                    if dictInfo["variable_id"] is not None:
                        variable_id = dictInfo["variable_id"] 
-                   else: 
-                       variable_id = ""
 
-               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
+               if not zarr:
+                   dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
 

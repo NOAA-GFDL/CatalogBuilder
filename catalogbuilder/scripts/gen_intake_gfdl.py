@@ -16,10 +16,10 @@ from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, g
 logger = logging.getLogger(__name__)
 
 
-def create_catalog(input_path, output_path, config, fill, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+def create_catalog(input_path, output_path, config, fill, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose, zarr=False):
     """Generate an intake-ESM-compatible data catalog (CSV + JSON) from a local directory tree.
 
-    Crawls *input_path* for NetCDF files, assembles catalog rows according to the
+    Crawls *input_path* for NetCDF files or Zarr stores, assembles catalog rows according to the
     supplied (or default) YAML configuration, writes a CSV catalog file and a
     matching intake-ESM JSON descriptor to *output_path*.
 
@@ -45,8 +45,10 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         append (bool): When ``True``, new rows are appended to an existing CSV
             (without re-writing the header row).
         slow (bool): When ``True``, ``standard_name`` (or ``long_name``) is
-            read directly from each NetCDF file's metadata instead of being
+            read directly from each input dataset's metadata instead of being
             looked up in an offline table.
+        zarr (bool): When ``True``, crawl for Zarr stores instead of NetCDF
+            files and emit a catalog with ``assets.format = "zarr"``.
         strict (bool): When ``True``, the finished catalog is validated against
             the CV vocabulary embedded in the JSON schema; generation fails if
             any violations are found.
@@ -155,11 +157,13 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.debug("Calling gfdlcrawler.crawlLocal")
-    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, configyaml,slow)
+    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, configyaml, slow, zarr=zarr)
     #Grabbing data from template JSON, changing CSV path to match output path, and dumping data in new JSON
     with open(template_path, "r") as jsonTemplate:
         data = json.load(jsonTemplate)
         data["catalog_file"] = os.path.abspath(csv_path)
+        if zarr:
+            data["assets"]["format"] = "zarr"
     jsonFile = open(json_path, "w")
     json.dump(data, jsonFile, indent=2)
     jsonFile.close()
@@ -265,6 +269,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 @click.option('--overwrite', is_flag=True, default=False, help='Overwrite existing catalog CSV file')
 @click.option('--append', is_flag=True, default=False, help='Append to existing catalog CSV file (without headers)')
 @click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
+@click.option('--zarr', '-z', is_flag=True, default=False, help='Crawl Zarr stores instead of NetCDF files and generate a Zarr intake catalog')
 @click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
 @click.option('--verbose/--silent','-v', default=False, is_flag=True, help='Enables detailed logging') #default has silent option. Use --verbose for detailed logging
 

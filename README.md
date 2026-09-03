@@ -4,6 +4,11 @@ The GFDL Catalog Builder is a python community package ecosystem that allows use
 
 Data catalogs simplify data discovery by creating customizable, extendable, and queryable catalogs.
 
+CatalogBuilder can generate catalogs for NetCDF inputs and, with the
+``--zarr`` / ``-z`` CLI flag, for Zarr stores detected by Zarr metadata files
+such as ``.zgroup``, ``.zattrs``, or ``.zmetadata`` regardless of the store
+directory name, while preserving the existing catalog-building workflow.
+
 To use the catalog builder, install the pip package by running **pip install git+https://github.com/NOAA-GFDL/CatalogBuilder.git**, clone the [github repository](https://github.com/NOAA-GFDL/CatalogBuilder), or use the [FRE command line interface](https://github.com/NOAA-GFDL/fre-cli).
 
 For detailed information regarding the Catalog Builder, see our [project documentation site ](https://noaa-gfdl.github.io/CatalogBuilder/).
