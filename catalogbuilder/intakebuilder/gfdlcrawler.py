@@ -95,13 +95,15 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                if zarr:
                    parse_path = getinfo.strip_suffix(filepath)
                    dictInfo = getinfo.getInfoFromGFDLDRS(parse_path, projectdir, dictInfo,configyaml,'')
-                   version_name = getinfo.strip_suffix(filename)
-                   if (
-                       "version_id" in headerlist
-                       and "version_id" not in dictInfo
-                       and re.fullmatch(r"v\d{8}", version_name) is not None
-                   ):
-                       dictInfo["version_id"] = version_name
+                   store_name = getinfo.strip_suffix(filename)
+                   if re.fullmatch(r"v\d{8}", store_name) is not None:
+                       #directory named zarr stores carry the version, not file metadata
+                       if "version_id" in headerlist and "version_id" not in dictInfo:
+                           dictInfo["version_id"] = store_name
+                   elif op.countOf(filename,".") == 1:
+                       dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
+                   else:
+                       dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
                elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
