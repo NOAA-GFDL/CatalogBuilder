@@ -33,7 +33,7 @@ def is_zarr_store(path):
         return False
     return any(
         os.path.isfile(os.path.join(path, metadata_file))
-        for metadata_file in (".zgroup", ".zattrs", ".zmetadata")
+        for metadata_file in (".zgroup", ".zattrs", ".zmetadata", "zarr.json")
     )
 
 
