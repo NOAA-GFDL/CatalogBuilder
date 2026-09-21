@@ -134,6 +134,20 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
     csv_path = "{0}.csv".format(output_path)
     json_path = "{0}.json".format(output_path)
 
+    # In append mode, validate the existing descriptor and reject cross-format appends
+    # so that pre-existing rows are not opened with the wrong backend
+    if append and os.path.isfile(json_path):
+        requested_format = "zarr" if zarr else "netcdf"
+        with open(json_path, "r") as existing_json:
+            existing_format = json.load(existing_json).get("assets", {}).get("format")
+        if existing_format is not None and existing_format != requested_format:
+            logger.warning("Cannot append '%s' entries to an existing '%s' catalog: %s. "
+                           "Cross-format appends are rejected because consumers would open "
+                           "some assets with the wrong backend.",
+                           requested_format, existing_format, json_path)
+            raise ValueError("Cannot append '{0}' entries to an existing '{1}' catalog: {2}"
+                             .format(requested_format, existing_format, json_path))
+
     ######### SEARCH FILTERS ###########################
 
     dictFilter = {}
