@@ -67,8 +67,14 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
         if pat is not None:
             m = re.search(pat, searchpath)
             if zarr:
-               entries = [dirname for dirname in list(dirs) if getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
-               dirs[:] = [dirname for dirname in dirs if not getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
+               if getinfo.is_zarr_store(dirpath):
+                   #the crawled directory itself is a zarr store; emit it and do not walk its internals
+                   dirs[:] = []
+                   dirpath, store_basename = os.path.split(os.path.normpath(dirpath))
+                   entries = [store_basename]
+               else:
+                   entries = [dirname for dirname in list(dirs) if getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
+                   dirs[:] = [dirname for dirname in dirs if not getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
             else:
                entries = files
             for filename in entries:
