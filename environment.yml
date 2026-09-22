@@ -9,9 +9,9 @@ dependencies:
   - setuptools
   - click
   - xarray
+  - zarr
   - pandas
   - jsondiff
   - intake-esm
   - boto3
   - importlib_resources
-

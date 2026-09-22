@@ -115,6 +115,17 @@ Output path argumment should end with the desired output filename WITHOUT a file
 
 This would create a catalog.csv and catalog.json in the user's home directory.
 
+To generate a catalog from Zarr stores instead of NetCDF files, use the ``--zarr`` flag:
+
+.. code-block:: console
+
+ gen_intake_gfdl.py --zarr /archive/path_to_zarr_data $HOME/catalog-zarr
+
+When ``--zarr`` is enabled, the builder crawls directories that contain Zarr
+metadata files such as ``.zgroup``, ``.zattrs``, or ``.zmetadata``, regardless
+of the directory name, and writes a JSON catalog whose ``assets.format`` is set
+to ``zarr``.
+
 .. image:: _static/ezgif-4-786144c287.gif
  :width: 1000px
  :alt: Catalog generation demonstration
@@ -261,7 +272,19 @@ Flags
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name by opening files. For entries where file retrieval fails, the system will attempt to populate standard_name using an offline lookup table (MDTF GFDL-to-CMIP variable mappings). This provides better coverage of standard_name values compared to relying on files alone. **`standard_name` must be included in your config's `headerlist` (CSV columns)**
+- --zarr / -z - Crawls Zarr stores instead of NetCDF files and writes a catalog whose asset format is ``zarr``
 - --strict - Activates strict mode which validates catalog vocabulary during generation
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
+
+Zarr catalogs
+=============
+
+The ``--zarr`` / ``-z`` flag is intended for datasets stored in directories
+that contain Zarr metadata files such as ``.zgroup``, ``.zattrs``, or
+``.zmetadata``. Store detection is based on those metadata files rather than
+the directory name. The same configuration file structure is used, including
+``headerlist``, ``input_path_template``, and ``input_file_template``. The main
+difference is that the crawler looks for Zarr stores rather than ``.nc`` files,
+and metadata reads in slow mode use xarray's Zarr reader.

@@ -1,3 +1,8 @@
+"""
+getinfo.py provides helper functions to get information (from filename, DRS,
+file/global attributes) needed to populate the catalog.
+"""
+
 import sys
 import pandas as pd
 pd.options.mode.chained_assignment = None
@@ -13,9 +18,32 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import logging
 logger = logging.getLogger(__name__)
 
-'''
-getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
-'''
+
+def strip_suffix(filename):
+    """Remove a supported dataset suffix from a filename or store name."""
+    for suffix in (".nc", ".zarr"):
+        if filename.endswith(suffix):
+            return filename[:-len(suffix)]
+    return filename
+
+
+def is_zarr_store(path):
+    """Return True when *path* is a directory containing Zarr metadata files."""
+    if not os.path.isdir(path):
+        return False
+    return any(
+        os.path.isfile(os.path.join(path, metadata_file))
+        for metadata_file in (".zgroup", ".zattrs", ".zmetadata", "zarr.json")
+    )
+
+
+def open_dataset(fname):
+    """Open a NetCDF file or Zarr store with the matching xarray reader."""
+    if is_zarr_store(fname):
+        return xr.open_zarr(fname)
+    return xr.open_dataset(fname)
+
+
 def getProject(projectdir,dictInfo):
     '''
     return Project name from the project directory input
@@ -69,8 +97,8 @@ def getStem(dirpath,projectdir):
 
 def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
-    if filename.endswith(".nc"):
-        ncfilename = filename.split(".")[0].split("_")
+    if filename.endswith((".nc", ".zarr")):
+        ncfilename = strip_suffix(filename).split("_")
         varname = ncfilename[0]
         dictInfo["variable_id"] = varname
         table_id = ncfilename[1]
@@ -95,7 +123,7 @@ def getInfoFromFilename(filename,dictInfo):
 #adding this back to trace back some old errors
 def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-  if filename.endswith(".nc"): 
+  if filename.endswith((".nc", ".zarr")): 
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -129,7 +157,9 @@ def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
           dictInfo["table_id"] = "Ofx"
         else:
           dictInfo["table_id"] = "fx"
-    return dictInfo
+  else:
+    logger.debug("Filename not compatible with this version of the builder:"+filename)
+  return dictInfo
 
 def getRealm(dictInfo):
      realm = ""
@@ -218,7 +248,7 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
     dictInfo["version"] = version
     return dictInfo
 def return_xr(fname):
-    filexr = (xr.open_dataset(fname))
+    filexr = (open_dataset(fname))
     filexra = filexr.attrs
     return filexr,filexra
 def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
@@ -233,7 +263,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     if filexra is not None:
         filexr = filexra
     else:
-        filexr = xr.open_dataset(fname)
+        filexr = open_dataset(fname)
         close_filexr = True
     try:
         if (dictInfo[att] == "na"):
