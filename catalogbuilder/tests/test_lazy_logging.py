@@ -4,7 +4,10 @@ from pathlib import Path
 
 LOGGER_METHODS = {"debug", "info", "warning", "error", "critical", "exception"}
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_DIRS = (PACKAGE_ROOT / "intakebuilder", PACKAGE_ROOT / "scripts")
+SOURCE_DIRS = tuple(
+    path for path in PACKAGE_ROOT.iterdir() if path.is_dir() and path.name != "tests"
+)
+SOURCE_FILES = tuple(PACKAGE_ROOT.glob("*.py"))
 
 
 def _is_eager_logging_message(message):
@@ -19,6 +22,21 @@ def _is_eager_logging_message(message):
 
 def test_logger_calls_use_lazy_formatting():
     violations = []
+
+    for path in SOURCE_FILES:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if not isinstance(node.func, ast.Attribute) or node.func.attr not in LOGGER_METHODS:
+                continue
+            if not isinstance(node.func.value, ast.Name) or node.func.value.id != "logger":
+                continue
+            if not node.args:
+                continue
+
+            if _is_eager_logging_message(node.args[0]):
+                violations.append(f"{path}:{node.lineno}")
 
     for source_dir in SOURCE_DIRS:
         for path in source_dir.rglob("*.py"):
