@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class DatasetOpenError(Exception):
-    """Raised when a dataset store cannot be opened for metadata inspection."""
+    """Raised when a dataset file or store cannot be opened for metadata inspection."""
 
 
 def strip_suffix(filename):
@@ -48,7 +48,10 @@ def open_dataset(fname):
             return xr.open_zarr(fname, consolidated=None)
         except (FileNotFoundError, OSError, ValueError) as exc:
             raise DatasetOpenError(f"Unable to open Zarr store: {fname}") from exc
-    return xr.open_dataset(fname)
+    try:
+        return xr.open_dataset(fname)
+    except (FileNotFoundError, OSError, ValueError) as exc:
+        raise DatasetOpenError(f"Unable to open dataset: {fname}") from exc
 
 
 def getProject(projectdir,dictInfo):
