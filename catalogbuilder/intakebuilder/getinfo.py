@@ -45,7 +45,7 @@ def open_dataset(fname):
     """Open a NetCDF file or Zarr store with the matching xarray reader."""
     if is_zarr_store(fname):
         try:
-            return xr.open_zarr(fname, consolidated=None)
+            return xr.open_zarr(fname)
         except (FileNotFoundError, OSError, ValueError) as exc:
             raise DatasetOpenError(f"Unable to open Zarr store: {fname}") from exc
     try:
