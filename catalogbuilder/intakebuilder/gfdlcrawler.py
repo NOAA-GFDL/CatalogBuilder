@@ -100,11 +100,10 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
 
                if zarr:
                    parse_path = getinfo.strip_suffix(filepath)
-                   store_name = getinfo.strip_suffix(filename)
                    dictInfo = getinfo.getInfoFromGFDLDRS(parse_path, projectdir, dictInfo,configyaml,'')
-                   if op.countOf(filename,".") == 1 and "_" in store_name:
+                   if op.countOf(filename,".") == 1:
                        dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
-                   elif "." in store_name:
+                   else:
                        dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
                elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
