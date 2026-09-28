@@ -19,6 +19,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class DatasetOpenError(Exception):
+    """Raised when a dataset store cannot be opened for metadata inspection."""
+
+
 def strip_suffix(filename):
     """Remove a supported dataset suffix from a filename or store name."""
     for suffix in (".nc", ".zarr"):
@@ -40,7 +44,10 @@ def is_zarr_store(path):
 def open_dataset(fname):
     """Open a NetCDF file or Zarr store with the matching xarray reader."""
     if is_zarr_store(fname):
-        return xr.open_zarr(fname, consolidated=None)
+        try:
+            return xr.open_zarr(fname, consolidated=None)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            raise DatasetOpenError(f"Unable to open Zarr store: {fname}") from exc
     return xr.open_dataset(fname)
 
 

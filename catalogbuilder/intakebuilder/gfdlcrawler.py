@@ -100,9 +100,12 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
 
                if zarr:
                    parse_path = getinfo.strip_suffix(filepath)
+                   store_name = getinfo.strip_suffix(filename)
                    dictInfo = getinfo.getInfoFromGFDLDRS(parse_path, projectdir, dictInfo,configyaml,'')
-                   if op.countOf(filename,".") == 1 and "_" in getinfo.strip_suffix(filename):
+                   if op.countOf(filename,".") == 1 and "_" in store_name:
                        dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
+                   elif "." in store_name:
+                       dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
                elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
@@ -157,7 +160,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                             logger.info("Retrieving standard_name from "+ (str)(filename))
                             try:
                                 getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
-                            except Exception:
+                            except getinfo.DatasetOpenError:
                                 logger.warning("Unable to retrieve standard_name from %s; continuing with offline lookup fallback", dictInfo["path"], exc_info=True)
                             unique_datasets.update({ qualities : dictInfo.get("standard_name", "na") })
 
