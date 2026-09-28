@@ -57,7 +57,7 @@ def crawlLocal(projectdir, dictFilter):
                    list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
 
                    if dictInfo["model"] in list_bad_modellabel:
-                      logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename %s %s", dictInfo["experiment"], filepath)
+                      logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename %s %s", dictInfo["model"], filepath)
                       continue
                    listfiles.append(dictInfo)
     return listfiles
