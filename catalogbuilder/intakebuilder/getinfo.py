@@ -40,7 +40,7 @@ def is_zarr_store(path):
 def open_dataset(fname):
     """Open a NetCDF file or Zarr store with the matching xarray reader."""
     if is_zarr_store(fname):
-        return xr.open_zarr(fname)
+        return xr.open_zarr(fname, consolidated=None)
     return xr.open_dataset(fname)
 
 

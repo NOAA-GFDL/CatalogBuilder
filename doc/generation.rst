@@ -287,4 +287,6 @@ that contain Zarr metadata files such as ``.zgroup``, ``.zattrs``, or
 the directory name. The same configuration file structure is used, including
 ``headerlist``, ``input_path_template``, and ``input_file_template``. The main
 difference is that the crawler looks for Zarr stores rather than ``.nc`` files,
-and metadata reads in slow mode use xarray's Zarr reader.
+and metadata reads in slow mode use xarray's Zarr reader. Slow mode works with
+``--zarr`` for both Zarr v2 and Zarr v3 stores. This requires
+``xarray>=2025.01.1`` together with ``zarr>=3``.
