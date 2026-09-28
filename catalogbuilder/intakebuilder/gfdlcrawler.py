@@ -159,7 +159,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                             logger.info("Retrieving standard_name from "+ (str)(filename))
                             try:
                                 getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
-                            except getinfo.DatasetOpenError:
+                            except (OSError, ValueError):
                                 logger.warning("Unable to retrieve standard_name from %s; continuing with offline lookup fallback", dictInfo["path"], exc_info=True)
                             unique_datasets.update({ qualities : dictInfo.get("standard_name", "na") })
 
