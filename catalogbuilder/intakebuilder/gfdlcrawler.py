@@ -161,7 +161,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                                 getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
                             except Exception:
                                 logger.warning("Unable to retrieve standard_name from %s; continuing with offline lookup fallback", dictInfo["path"], exc_info=True)
-                            unique_datasets.update({ qualities : dictInfo["standard_name"] })
+                            unique_datasets.update({ qualities : dictInfo.get("standard_name", "na") })
 
                #replace frequency as needed 
                if 'frequency' in dictInfo.keys():

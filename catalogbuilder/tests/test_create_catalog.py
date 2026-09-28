@@ -258,3 +258,36 @@ def test_create_catalog_zarr_slow_without_consolidated_metadata(tmp_path):
     df = pd.read_csv(csv_path, keep_default_na=False)
     assert len(df) == 1
     assert df.loc[0, "standard_name"] == "atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles"
+
+
+def test_create_catalog_zarr_slow_open_failure_falls_back_to_lookup(tmp_path):
+    input_path = tmp_path / "CMIP6"
+    zarr_store = input_path / "AerChemMIP" / "NOAA-GFDL" / "GFDL-ESM4" / "hist-piNTCF" / "r1i1p1f1" / "AERmon" / "abs550aer" / "gr1" / "v20260831.zarr"
+    write_real_zarr_store(zarr_store, zarr_format=3)
+
+    configyaml = tmp_path / "cmip-zarr-config.yaml"
+    write_cmip_zarr_config(configyaml, include_standard_name=True)
+    output_path = tmp_path / "zarr-catalog-open-failure"
+
+    with patch('catalogbuilder.scripts.gen_intake_gfdl.time.sleep', return_value=None):
+        with patch('catalogbuilder.intakebuilder.getinfo.xr.open_zarr', side_effect=OSError("broken zarr")):
+            with patch('catalogbuilder.intakebuilder.getinfo.getStandardName', return_value={"abs550aer": "offline_standard_name"}):
+                csv_path, _ = gen_intake_gfdl.create_catalog(
+                    input_path=str(input_path),
+                    output_path=str(output_path),
+                    config=configyaml,
+                    fill=False,
+                    filter_realm=None,
+                    filter_freq=None,
+                    filter_chunk=None,
+                    overwrite=True,
+                    append=False,
+                    slow=True,
+                    strict=False,
+                    verbose=False,
+                    zarr=True,
+                )
+
+    df = pd.read_csv(csv_path, keep_default_na=False)
+    assert len(df) == 1
+    assert df.loc[0, "standard_name"] == "offline_standard_name"
