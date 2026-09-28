@@ -109,7 +109,7 @@ def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
     if filename.endswith((".nc", ".zarr")):
         ncfilename = strip_suffix(filename).split("_")
-        if len(ncfilename) < 2:
+        if filename.endswith(".zarr") and len(ncfilename) < 2:
             return dictInfo
         varname = ncfilename[0]
         dictInfo["variable_id"] = varname
