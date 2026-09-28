@@ -10,11 +10,12 @@ version = "2026.02.00"
 description = "intake-esm Catalog Generation Utilities"
 readme = "README.md"
 license = "CC-BY-NC-SA-4.0"
+requires-python = ">=3.11"
 dependencies = [
     "pytest",
     "click",
-    "xarray",
-    "zarr",
+    "xarray>=2025.01.1",
+    "zarr>=3",
     "pandas",
     "jsondiff",
     "intake-esm ==2025.12.12",

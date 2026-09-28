@@ -100,6 +100,10 @@ def getInfoFromFilename(filename,dictInfo):
     if filename.endswith((".nc", ".zarr")):
         ncfilename = strip_suffix(filename).split("_")
         varname = ncfilename[0]
+        if not dictInfo.get("variable_id"):
+            dictInfo["variable_id"] = varname
+        if filename.endswith(".zarr") and len(ncfilename) < 2:
+            return dictInfo
         dictInfo["variable_id"] = varname
         table_id = ncfilename[1]
         dictInfo["table_id"] = table_id 

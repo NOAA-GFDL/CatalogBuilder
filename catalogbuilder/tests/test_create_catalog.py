@@ -1,6 +1,9 @@
 from pathlib import Path
 import json
+import numpy as np
 import pandas as pd
+import pytest
+import xarray as xr
 from catalogbuilder.scripts import gen_intake_gfdl, gen_intake_gfdl_runner_config, gen_intake_gfdl_runner, make_sample_data
 from unittest.mock import patch
 
@@ -9,6 +12,55 @@ def write_mock_zarr_store(path):
     path.mkdir(parents=True)
     (path / ".zgroup").write_text("{}")
     (path / ".zattrs").write_text("{}")
+
+
+def write_real_zarr_store(path, var="abs550aer", zarr_format=3, consolidated=None):
+    ds = xr.Dataset(
+        {
+            var: (
+                ("time", "lat", "lon"),
+                np.arange(8, dtype=np.float32).reshape(2, 2, 2),
+            )
+        },
+        coords={
+            "time": [0, 1],
+            "lat": [0.0, 1.0],
+            "lon": [0.0, 1.0],
+        },
+    )
+    ds[var].attrs.update(
+        {
+            "standard_name": "atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles",
+            "units": "1",
+        }
+    )
+    ds.to_zarr(path, mode="w", zarr_format=zarr_format, consolidated=consolidated)
+
+
+def write_cmip_zarr_config(path, include_standard_name=False):
+    headerlist = [
+        "activity_id",
+        "institution_id",
+        "source_id",
+        "experiment_id",
+        "member_id",
+        "table_id",
+        "variable_id",
+        "grid_label",
+        "version_id",
+        "path",
+    ]
+    if include_standard_name:
+        headerlist.insert(-1, "standard_name")
+    path.write_text(
+        "\n".join(
+            [
+                f"headerlist: {headerlist}",
+                'input_path_template: ["NA", "activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label", "version_id"]',
+                'input_file_template: ["NA"]',
+            ]
+        )
+    )
 
 
 def test_create_catalog():
@@ -68,15 +120,7 @@ def test_create_catalog_zarr(tmp_path):
     zarr_store = input_path / "AerChemMIP" / "NOAA-GFDL" / "GFDL-ESM4" / "hist-piNTCF" / "r1i1p1f1" / "AERmon" / "abs550aer" / "gr1" / "v20260831.zarr"
     write_mock_zarr_store(zarr_store)
     configyaml = tmp_path / "cmip-zarr-config.yaml"
-    configyaml.write_text(
-        "\n".join(
-            [
-                'headerlist: ["activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label", "version_id", "path"]',
-                'input_path_template: ["NA", "activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label", "version_id"]',
-                'input_file_template: ["NA"]',
-            ]
-        )
-    )
+    write_cmip_zarr_config(configyaml)
 
     output_path = tmp_path / "zarr-catalog"
 
@@ -115,15 +159,7 @@ def test_create_catalog_version_named_zarr_store(tmp_path):
     write_mock_zarr_store(zarr_store)
 
     configyaml = tmp_path / "cmip-zarr-config.yaml"
-    configyaml.write_text(
-        "\n".join(
-            [
-                'headerlist: ["activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label", "version_id", "path"]',
-                'input_path_template: ["NA", "activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label", "version_id"]',
-                'input_file_template: ["NA"]',
-            ]
-        )
-    )
+    write_cmip_zarr_config(configyaml)
 
     output_path = tmp_path / "version-zarr-catalog"
 
@@ -155,3 +191,103 @@ def test_create_catalog_version_named_zarr_store(tmp_path):
     with open(json_path) as f:
         catalog_json = json.load(f)
     assert catalog_json["assets"]["format"] == "zarr"
+
+
+@pytest.mark.parametrize("zarr_format", [2, 3])
+def test_create_catalog_zarr_slow_reads_standard_name(tmp_path, zarr_format):
+    input_path = tmp_path / "CMIP6"
+    zarr_store = input_path / "AerChemMIP" / "NOAA-GFDL" / "GFDL-ESM4" / "hist-piNTCF" / "r1i1p1f1" / "AERmon" / "abs550aer" / "gr1" / "v20260831.zarr"
+    write_real_zarr_store(zarr_store, zarr_format=zarr_format)
+
+    configyaml = tmp_path / "cmip-zarr-config.yaml"
+    write_cmip_zarr_config(configyaml, include_standard_name=True)
+    output_path = tmp_path / f"zarr-catalog-v{zarr_format}"
+
+    with patch('catalogbuilder.scripts.gen_intake_gfdl.time.sleep', return_value=None):
+        csv_path, json_path = gen_intake_gfdl.create_catalog(
+            input_path=str(input_path),
+            output_path=str(output_path),
+            config=configyaml,
+            fill=False,
+            filter_realm=None,
+            filter_freq=None,
+            filter_chunk=None,
+            overwrite=True,
+            append=False,
+            slow=True,
+            strict=False,
+            verbose=False,
+            zarr=True,
+        )
+
+    df = pd.read_csv(csv_path, keep_default_na=False)
+    assert len(df) == 1
+    assert df.loc[0, "standard_name"] == "atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles"
+
+    with open(json_path) as f:
+        catalog_json = json.load(f)
+    assert catalog_json["assets"]["format"] == "zarr"
+
+
+def test_create_catalog_zarr_slow_without_consolidated_metadata(tmp_path):
+    input_path = tmp_path / "CMIP6"
+    zarr_store = input_path / "AerChemMIP" / "NOAA-GFDL" / "GFDL-ESM4" / "hist-piNTCF" / "r1i1p1f1" / "AERmon" / "abs550aer" / "gr1" / "v20260831.zarr"
+    write_real_zarr_store(zarr_store, zarr_format=2, consolidated=False)
+
+    configyaml = tmp_path / "cmip-zarr-config.yaml"
+    write_cmip_zarr_config(configyaml, include_standard_name=True)
+    output_path = tmp_path / "zarr-catalog-unconsolidated"
+
+    with patch('catalogbuilder.scripts.gen_intake_gfdl.time.sleep', return_value=None):
+        csv_path, _ = gen_intake_gfdl.create_catalog(
+            input_path=str(input_path),
+            output_path=str(output_path),
+            config=configyaml,
+            fill=False,
+            filter_realm=None,
+            filter_freq=None,
+            filter_chunk=None,
+            overwrite=True,
+            append=False,
+            slow=True,
+            strict=False,
+            verbose=False,
+            zarr=True,
+        )
+
+    df = pd.read_csv(csv_path, keep_default_na=False)
+    assert len(df) == 1
+    assert df.loc[0, "standard_name"] == "atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles"
+
+
+def test_create_catalog_zarr_slow_open_failure_falls_back_to_lookup(tmp_path):
+    input_path = tmp_path / "CMIP6"
+    zarr_store = input_path / "AerChemMIP" / "NOAA-GFDL" / "GFDL-ESM4" / "hist-piNTCF" / "r1i1p1f1" / "AERmon" / "abs550aer" / "gr1" / "v20260831.zarr"
+    write_real_zarr_store(zarr_store, zarr_format=3)
+
+    configyaml = tmp_path / "cmip-zarr-config.yaml"
+    write_cmip_zarr_config(configyaml, include_standard_name=True)
+    output_path = tmp_path / "zarr-catalog-open-failure"
+
+    with patch('catalogbuilder.scripts.gen_intake_gfdl.time.sleep', return_value=None):
+        with patch('catalogbuilder.intakebuilder.getinfo.xr.open_zarr', side_effect=OSError("broken zarr")):
+            with patch('catalogbuilder.intakebuilder.getinfo.getStandardName', return_value={"abs550aer": "offline_standard_name"}):
+                csv_path, _ = gen_intake_gfdl.create_catalog(
+                    input_path=str(input_path),
+                    output_path=str(output_path),
+                    config=configyaml,
+                    fill=False,
+                    filter_realm=None,
+                    filter_freq=None,
+                    filter_chunk=None,
+                    overwrite=True,
+                    append=False,
+                    slow=True,
+                    strict=False,
+                    verbose=False,
+                    zarr=True,
+                )
+
+    df = pd.read_csv(csv_path, keep_default_na=False)
+    assert len(df) == 1
+    assert df.loc[0, "standard_name"] == "offline_standard_name"
