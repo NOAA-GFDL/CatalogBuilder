@@ -39,8 +39,9 @@ def test_logger_calls_use_lazy_formatting():
                 violations.append(f"{path}:{node.lineno}")
                 continue
 
+            format_args = node.args[1:]
             if (
-                len(node.args) > 1
+                format_args
                 and isinstance(message, ast.Constant)
                 and isinstance(message.value, str)
                 and "%" not in message.value
