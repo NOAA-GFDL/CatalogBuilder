@@ -38,15 +38,15 @@ def crawlLocal(projectdir, dictFilter):
                 m = re.search(pat, searchpath)
 
                 for filename in files:
-                   logger.info(dirpath+"/"+filename)
+                   # get info from filename
+                   filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
+                   logger.info("%s", filepath)
                    dictInfo = {}
                    dictInfo = getinfo.getProject(projectdir, dictInfo)
 
-                   # get info from filename
-                   filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
 
                    if not filename.endswith(".nc"):
-                        logger.debug("FILE does not end with .nc. Skipping", filepath)
+                        logger.debug("FILE does not end with .nc. Skipping %s", filepath)
                         continue
 
                    dictInfo["path"]=filepath
@@ -57,7 +57,7 @@ def crawlLocal(projectdir, dictFilter):
                    list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
 
                    if dictInfo["model"] in list_bad_modellabel:
-                      logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename", dictInfo["experiment"],filepath)
+                      logger.debug("Found experiment name in model column, skipping this possibly bad DRS filename %s %s", dictInfo["experiment"], filepath)
                       continue
                    listfiles.append(dictInfo)
     return listfiles

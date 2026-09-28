@@ -121,7 +121,7 @@ def getInfoFromFilename(filename,dictInfo):
            tsubset = "null" #For fx fields
         dictInfo["time_range"] = tsubset
     else:
-        logger.debug("Filename not compatible with this version of the builder:"+filename)
+        logger.debug("Filename not compatible with this version of the builder: %s", filename)
     return dictInfo
 
 #adding this back to trace back some old errors
@@ -162,7 +162,7 @@ def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
         else:
           dictInfo["table_id"] = "fx"
   else:
-    logger.debug("Filename not compatible with this version of the builder:"+filename)
+    logger.debug("Filename not compatible with this version of the builder: %s", filename)
   return dictInfo
 
 def getRealm(dictInfo):
@@ -274,18 +274,18 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
             try:
                 cfname = filexr[variable_id].attrs["standard_name"]
                 dictInfo["standard_name"] = cfname
-                logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+                logger.info("standard_name retrieved from netCDF file: %s", dictInfo["standard_name"])
             except KeyError:
                 cfname = "NA"
                 try:
                     long_name = filexr[variable_id].attrs["long_name"]
                     fname = long_name.replace(" ", "_")
                     dictInfo["standard_name"] = cfname
-                    logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+                    logger.info("standard_name retrieved from netCDF file: %s", dictInfo["standard_name"])
 
                 except KeyError:
                     dictInfo["standard_name"] = cfname
-                    logger.info(f"Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
+                    logger.info("Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
     finally:
         if close_filexr:
             filexr.close()
