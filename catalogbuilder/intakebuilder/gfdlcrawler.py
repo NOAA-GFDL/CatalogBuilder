@@ -54,7 +54,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
     if len(set_ftemplate) > 0:
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
-      logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
+      logger.debug("Missing cols from metadata sources: %s", missingcols)
     #Creating a dictionary to track the unique datasets we come across when using slow mode
     #The values are lists tracking var_id,realm,etc.. and the keys are the standard names
     unique_datasets = {'':''}
@@ -89,10 +89,10 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                    if (len(filename.split('.'))-1 != len(set_ftemplate) 
                    and len(filename.split('_')) > 2 
                    and len(filename.split('_')) != len(set_ftemplate)):
-                       logger.debug("Skipping "+filename)
+                       logger.debug("Skipping %s", filename)
                        continue
 
-               logger.debug(dirpath+"/"+filename)
+               logger.debug("%s/%s", dirpath, filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
@@ -122,11 +122,11 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
 
                if "source_id" in dictInfo: 
                    if dictInfo["source_id"] in list_bad_modellabel:
-                       logger.info("Found experiment name in model column, skipping this possibly bad DRS filename",filepath)
+                       logger.info("Found experiment name in model column, skipping this possibly bad DRS filename %s", filepath)
                        continue
                if "chunk_freq" in dictInfo:
                    if dictInfo["chunk_freq"] in list_bad_chunklabel:
-                       logger.info("Found bad chunk, skipping this possibly bad DRS filename",filepath)
+                       logger.info("Found bad chunk, skipping this possibly bad DRS filename %s", filepath)
                        continue     
                # remove those keys that are not CSV headers 
                # move it so its one time 
@@ -156,7 +156,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
                         else:
-                            logger.info("Retrieving standard_name from "+ (str)(filename))
+                            logger.info("Retrieving standard_name from %s", filename)
                             try:
                                 getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
                             except (OSError, ValueError):

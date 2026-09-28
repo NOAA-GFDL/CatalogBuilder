@@ -119,7 +119,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         template_path = _files('catalogbuilder').joinpath('cats/gfdl_template.json')
     else:
         template_path = configyaml.schema
-        logger.info("Using schema from config file", template_path)
+        logger.info("Using schema from config file %s", template_path)
 
     if not os.path.exists(input_path):
         logger.error("Input path does not exist. Adjust configuration.")
@@ -128,8 +128,8 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         logger.error("Output path parent directory does not exist. Adjust configuration.")
         raise ValueError("Output path parent directory does not exist. Adjust configuration.")
 
-    logger.info("input path: "+ input_path)
-    logger.info("output path: "+ output_path)
+    logger.info("input path: %s", input_path)
+    logger.info("output path: %s", output_path)
     project_dir = input_path
     csv_path = "{0}.csv".format(output_path)
     json_path = "{0}.json".format(output_path)
@@ -233,7 +233,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
                         updated_count += mask.sum()
 
                 if updated_count > 0:
-                    logger.info(f"Updated {updated_count} entries with standard_name from offline lookup table")
+                    logger.info("Updated %d entries with standard_name from offline lookup table", updated_count)
             except Exception:
                 logger.error("Offline lookup table query failed")
                 raise
@@ -250,7 +250,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
             df[column] = df[column].replace(r'^\s*$', 'NA', regex=True)
             if had_missing:
                 filled_count += 1
-        logger.info(f"Filled empty values in {filled_count} column(s) with 'NA'")
+        logger.info("Filled empty values in %d column(s) with 'NA'", filled_count)
 
     if df is not None and len(df) != 0:
         df.to_csv(csv_path, index=False)
@@ -264,8 +264,8 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         #Validate
         cv(json_path,'',vocab, proper_generation, test_failure)
 
-    logger.info("JSON generated at: " + os.path.abspath(json_path))
-    logger.info("CSV generated at: " + os.path.abspath(csv_path))
+    logger.info("JSON generated at: %s", os.path.abspath(json_path))
+    logger.info("CSV generated at: %s", os.path.abspath(csv_path))
     return(csv_path,json_path)
 
 #Setting up argument parsing/flags
