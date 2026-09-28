@@ -20,10 +20,10 @@ def test_logger_calls_use_lazy_formatting():
     violations = []
 
     for path in PACKAGE_ROOT.rglob("*.py"):
-        if path.name.startswith("test_"):
+        if "tests" in path.parts:
             continue
 
-        tree = ast.parse(path.read_text(), filename=str(path))
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
