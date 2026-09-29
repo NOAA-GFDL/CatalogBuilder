@@ -152,11 +152,14 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
         #Validate JSON against JSON template
         comp = (diff(j,json_template))
         for key in comp.keys():
-            if key != 'catalog_file':
-                if test_failure:
-                    logger.warning('%s section of JSON does not refect template', key)
-                else:
-                    raise ValueError(key + ' section of JSON does not refect template')
+            if key == 'catalog_file':
+                continue
+            if key == 'assets' and isinstance(comp['assets'], dict) and set(comp['assets'].keys()) <= {'format'} and j['assets'].get('format') in ('netcdf', 'zarr'):
+                continue
+            if test_failure:
+                logger.warning('%s section of JSON does not refect template', key)
+            else:
+                raise ValueError(key + ' section of JSON does not refect template')
 
         #Get CSV from JSON and open it
         csv_path = j["catalog_file"]

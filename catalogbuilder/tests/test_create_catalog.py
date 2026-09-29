@@ -56,8 +56,8 @@ def write_cmip_zarr_config(path, include_standard_name=False):
         "\n".join(
             [
                 f"headerlist: {headerlist}",
-                'input_path_template: ["NA", "activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label", "version_id"]',
-                'input_file_template: ["NA"]',
+                'input_path_template: ["NA", "activity_id", "institution_id", "source_id", "experiment_id", "member_id", "table_id", "variable_id", "grid_label"]',
+                'input_file_template: ["version_id"]',
             ]
         )
     )

@@ -73,8 +73,9 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                    dirpath, store_basename = os.path.split(os.path.normpath(dirpath))
                    entries = [store_basename]
                else:
-                   entries = [dirname for dirname in list(dirs) if getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
-                   dirs[:] = [dirname for dirname in dirs if not getinfo.is_zarr_store(os.path.join(dirpath, dirname))]
+                   store_flags = {d: getinfo.is_zarr_store(os.path.join(dirpath, d)) for d in dirs}
+                   entries = [d for d in dirs if store_flags[d]]
+                   dirs[:] = [d for d in dirs if not store_flags[d]]
             else:
                entries = files
             for filename in entries:
@@ -83,6 +84,9 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
  
                if not zarr and not filename.endswith(".nc"):
                    logger.debug("FILE does not end with .nc. Skipping %s", filepath)
+                   continue
+               if zarr and "static" in filename:
+                   logger.debug("Skipping static Zarr store %s", filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
                if not zarr and "static" not in filename:
@@ -99,12 +103,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                dictInfo["path"]=filepath
 
                if zarr:
-                   parse_path = getinfo.strip_suffix(filepath)
-                   dictInfo = getinfo.getInfoFromGFDLDRS(parse_path, projectdir, dictInfo,configyaml,'')
-                   if op.countOf(filename,".") == 1:
-                       dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
-                   else:
-                       dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
+                   dictInfo = getinfo.getInfoFromZarrFilename(filename,dictInfo,configyaml)
                elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
@@ -115,8 +114,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                    if dictInfo["variable_id"] is not None:
                        variable_id = dictInfo["variable_id"] 
 
-               if not zarr:
-                   dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
+               dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
                list_bad_chunklabel = ['DO_NOT_USE']
 
@@ -159,7 +157,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                             logger.info("Retrieving standard_name from %s", filename)
                             try:
                                 getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
-                            except (OSError, ValueError):
+                            except Exception:
                                 logger.warning("Unable to retrieve standard_name from %s; continuing with offline lookup fallback", dictInfo["path"], exc_info=True)
                             unique_datasets.update({ qualities : dictInfo.get("standard_name", "na") })
 

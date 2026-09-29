@@ -92,6 +92,10 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         logger.warning("!!!!! STRICT MODE IS ACTIVE. CATALOG GENERATION WILL FAIL IF ERRORS ARE FOUND !!!!!\n")
         time.sleep(10)
 
+    if zarr:
+        logger.warning("Statics are currently skipped in ZARR mode")
+        time.sleep(3)
+
     if config:
         configyaml = configparser.Config(config)
         if input_path is None:

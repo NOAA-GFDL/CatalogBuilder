@@ -19,21 +19,23 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def strip_suffix(filename):
-    """Remove a supported dataset suffix from a filename or store name."""
-    for suffix in (".nc", ".zarr"):
-        if filename.endswith(suffix):
-            return filename[:-len(suffix)]
-    return filename
+ZARR_METADATA_FILES = (".zgroup", ".zattrs", ".zmetadata", "zarr.json")
+
+
+def strip_zarr_suffix(filename):
+    """Remove a trailing ``.zarr`` suffix from a store name."""
+    return filename[:-len(".zarr")] if filename.endswith(".zarr") else filename
 
 
 def is_zarr_store(path):
-    """Return True when *path* is a directory containing Zarr metadata files."""
+    """Return True when *path* is a Zarr store (by name or metadata files)."""
+    if os.path.normpath(path).endswith(".zarr"):
+        return True
     if not os.path.isdir(path):
         return False
     return any(
         os.path.isfile(os.path.join(path, metadata_file))
-        for metadata_file in (".zgroup", ".zattrs", ".zmetadata", "zarr.json")
+        for metadata_file in ZARR_METADATA_FILES
     )
 
 
@@ -97,13 +99,9 @@ def getStem(dirpath,projectdir):
 
 def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
-    if filename.endswith((".nc", ".zarr")):
-        ncfilename = strip_suffix(filename).split("_")
+    if filename.endswith(".nc"):
+        ncfilename = filename[:-len(".nc")].split("_")
         varname = ncfilename[0]
-        if not dictInfo.get("variable_id"):
-            dictInfo["variable_id"] = varname
-        if filename.endswith(".zarr") and len(ncfilename) < 2:
-            return dictInfo
         dictInfo["variable_id"] = varname
         table_id = ncfilename[1]
         dictInfo["table_id"] = table_id 
@@ -127,7 +125,7 @@ def getInfoFromFilename(filename,dictInfo):
 #adding this back to trace back some old errors
 def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
     # 5 AR: get the following from the netCDF filename e.g. atmos.200501-200912.t_ref.nc
-  if filename.endswith((".nc", ".zarr")): 
+  if filename.endswith(".nc"): 
     stemdir = filename.split(".")
     #lets go backwards and match given input directory to the template, add things to dictInfo
     j = -2
@@ -164,6 +162,26 @@ def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
   else:
     logger.debug("Filename not compatible with this version of the builder: %s", filename)
   return dictInfo
+
+def getInfoFromZarrFilename(filename,dictInfo,configyaml):
+    '''
+    Parse a Zarr store name (without the .zarr suffix) against input_file_template
+    e.g. atmos.200501-200912.t_ref.zarr or v20260831.zarr
+    '''
+    if configyaml:
+        input_file_template = configyaml.input_file_template
+    else:
+        logger.debug("No input_file_template found. Check configuration.")
+        raise AttributeError("No input_file_template found. Check configuration.")
+    storename = strip_zarr_suffix(filename)
+    zarrfilename = storename.split(".")
+    if len(zarrfilename) != len(input_file_template):
+        logger.error("input_file_template is not configured correctly")
+        raise Exception("input_file_template is not configured correctly")
+    for key, value in zip(input_file_template, zarrfilename):
+        if key != "NA":
+            dictInfo[key] = value
+    return dictInfo
 
 def getRealm(dictInfo):
      realm = ""
