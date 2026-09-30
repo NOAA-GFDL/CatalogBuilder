@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 localcrawler crawls through the local file path, then calls helper functions in the package to getinfo.
 It finally returns a list of dict. eg {'project': 'CMIP6', 'path': '/uda/CMIP6/CDRMIP/NCC/NorESM2-LM/esm-pi-cdr-pulse/r1i1p1f1/Emon/zg/gn/v20191108/zg_Emon_NorESM2-LM_esm-pi-cdr-pulse_r1i1p1f1_gn_192001-192912.nc', 'variable': 'zg', 'mip_table': 'Emon', 'model': 'NorESM2-LM', 'experiment_id': 'esm-pi-cdr-pulse', 'ensemble_member': 'r1i1p1f1', 'grid_label': 'gn', 'temporal subset': '192001-192912', 'institute': 'NCC', 'version': 'v20191108'}
 '''
-def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
+
+def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=False):
     '''
     crawl through the local directory and run through the getInfo.. functions
     :param projectdir:
@@ -53,7 +54,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
     if len(set_ftemplate) > 0:
       missingcols = [col for col in diffcols if col not in set_ftemplate]
       missingcols.remove("path") #because we get this anyway
-      logger.debug("Missing cols from metadata sources:"+ (str)(missingcols))
+      logger.debug("Missing cols from metadata sources: %s", missingcols)
     #Creating a dictionary to track the unique datasets we come across when using slow mode
     #The values are lists tracking var_id,realm,etc.. and the keys are the standard names
     unique_datasets = {'':''}
@@ -65,37 +66,53 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
             pat = dirpath  #we assume matching entire path
         if pat is not None:
             m = re.search(pat, searchpath)
-            for filename in files:
+            if zarr:
+               if getinfo.is_zarr_store(dirpath):
+                   #the crawled directory itself is a zarr store; emit it and do not walk its internals
+                   dirs[:] = []
+                   dirpath, store_basename = os.path.split(os.path.normpath(dirpath))
+                   entries = [store_basename]
+               else:
+                   store_flags = {d: getinfo.is_zarr_store(os.path.join(dirpath, d)) for d in dirs}
+                   entries = [d for d in dirs if store_flags[d]]
+                   dirs[:] = [d for d in dirs if not store_flags[d]]
+            else:
+               entries = files
+            for filename in entries:
                # get info from filename
                filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
-
-               if not filename.endswith(".nc"):
-                   logger.debug("FILE does not end with .nc. Skipping "+ filepath)
+ 
+               if not zarr and not filename.endswith(".nc"):
+                   logger.debug("FILE does not end with .nc. Skipping %s", filepath)
+                   continue
+               if zarr and "static" in filename:
+                   logger.debug("Skipping static Zarr store %s", filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
-               if "static" not in filename:
+               if not zarr and "static" not in filename:
                    if (len(filename.split('.'))-1 != len(set_ftemplate) 
                    and len(filename.split('_')) > 2 
                    and len(filename.split('_')) != len(set_ftemplate)):
-                       logger.debug("Skipping "+filename)
+                       logger.debug("Skipping %s", filename)
                        continue
 
-               logger.debug(dirpath+"/"+filename)
+               logger.debug("%s/%s", dirpath, filename)
                dictInfo = {}
                dictInfo = getinfo.getProject(projectdir, dictInfo)
                # get info from filename
                dictInfo["path"]=filepath
 
-               if op.countOf(filename,".") == 1:
+               if zarr:
+                   dictInfo = getinfo.getInfoFromZarrFilename(filename,dictInfo,configyaml)
+               elif op.countOf(filename,".") == 1:
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
                    dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
 
+               variable_id = ""
                if "variable_id" in dictInfo.keys():
                    if dictInfo["variable_id"] is not None:
                        variable_id = dictInfo["variable_id"] 
-                   else: 
-                       variable_id = ""
 
                dictInfo = getinfo.getInfoFromGFDLDRS(dirpath, projectdir, dictInfo,configyaml,variable_id)
                list_bad_modellabel = ["","piControl","land-hist","piClim-SO2","abrupt-4xCO2","hist-piAer","hist-piNTCF","piClim-ghg","piClim-OC","hist-GHG","piClim-BC","1pctCO2"]
@@ -103,11 +120,11 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
 
                if "source_id" in dictInfo: 
                    if dictInfo["source_id"] in list_bad_modellabel:
-                       logger.info("Found experiment name in model column, skipping this possibly bad DRS filename",filepath)
+                       logger.info("Found experiment name in model column, skipping this possibly bad DRS filename %s", filepath)
                        continue
                if "chunk_freq" in dictInfo:
                    if dictInfo["chunk_freq"] in list_bad_chunklabel:
-                       logger.info("Found bad chunk, skipping this possibly bad DRS filename",filepath)
+                       logger.info("Found bad chunk, skipping this possibly bad DRS filename %s", filepath)
                        continue     
                # remove those keys that are not CSV headers 
                # move it so its one time 
@@ -137,9 +154,12 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                             standard_name=unique_datasets[qualities]
                             dictInfo["standard_name"]=standard_name
                         else:
-                            logger.info("Retrieving standard_name from "+ (str)(filename))
-                            getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
-                            unique_datasets.update({ qualities : dictInfo["standard_name"] })
+                            logger.info("Retrieving standard_name from %s", filename)
+                            try:
+                                getinfo.getInfoFromVarAtts(dictInfo["path"],dictInfo["variable_id"],dictInfo)
+                            except Exception:
+                                logger.warning("Unable to retrieve standard_name from %s; continuing with offline lookup fallback", dictInfo["path"], exc_info=True)
+                            unique_datasets.update({ qualities : dictInfo.get("standard_name", "na") })
 
                #replace frequency as needed 
                if 'frequency' in dictInfo.keys():

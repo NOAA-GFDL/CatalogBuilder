@@ -1,3 +1,8 @@
+"""
+getinfo.py provides helper functions to get information (from filename, DRS,
+file/global attributes) needed to populate the catalog.
+"""
+
 import sys
 import pandas as pd
 pd.options.mode.chained_assignment = None
@@ -13,9 +18,34 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import logging
 logger = logging.getLogger(__name__)
 
-'''
-getinfo.py provides helper functions to get information (from filename, DRS, file/global attributes) needed to populate the catalog
-'''
+
+ZARR_METADATA_FILES = (".zgroup", ".zattrs", ".zmetadata", "zarr.json")
+
+
+def strip_zarr_suffix(filename):
+    """Remove a trailing ``.zarr`` suffix from a store name."""
+    return filename[:-len(".zarr")] if filename.endswith(".zarr") else filename
+
+
+def is_zarr_store(path):
+    """Return True when *path* is a Zarr store (by name or metadata files)."""
+    if os.path.normpath(path).endswith(".zarr"):
+        return True
+    if not os.path.isdir(path):
+        return False
+    return any(
+        os.path.isfile(os.path.join(path, metadata_file))
+        for metadata_file in ZARR_METADATA_FILES
+    )
+
+
+def open_dataset(fname):
+    """Open a NetCDF file or Zarr store with the matching xarray reader."""
+    if is_zarr_store(fname):
+        return xr.open_zarr(fname)
+    return xr.open_dataset(fname)
+
+
 def getProject(projectdir,dictInfo):
     '''
     return Project name from the project directory input
@@ -70,7 +100,7 @@ def getStem(dirpath,projectdir):
 def getInfoFromFilename(filename,dictInfo):
     # 5 AR: WE need to rework this, not being used in gfdl set up  get the following from the netCDF filename e.g.rlut_Amon_GFDL-ESM4_histSST_r1i1p1f1_gr1_195001-201412.nc
     if filename.endswith(".nc"):
-        ncfilename = filename.split(".")[0].split("_")
+        ncfilename = filename[:-len(".nc")].split("_")
         varname = ncfilename[0]
         dictInfo["variable_id"] = varname
         table_id = ncfilename[1]
@@ -89,7 +119,7 @@ def getInfoFromFilename(filename,dictInfo):
            tsubset = "null" #For fx fields
         dictInfo["time_range"] = tsubset
     else:
-        logger.debug("Filename not compatible with this version of the builder:"+filename)
+        logger.debug("Filename not compatible with this version of the builder: %s", filename)
     return dictInfo
 
 #adding this back to trace back some old errors
@@ -129,6 +159,28 @@ def getInfoFromGFDLFilename(filename,dictInfo,configyaml):
           dictInfo["table_id"] = "Ofx"
         else:
           dictInfo["table_id"] = "fx"
+  else:
+    logger.debug("Filename not compatible with this version of the builder: %s", filename)
+  return dictInfo
+
+def getInfoFromZarrFilename(filename,dictInfo,configyaml):
+    '''
+    Parse a Zarr store name (without the .zarr suffix) against input_file_template
+    e.g. atmos.200501-200912.t_ref.zarr or v20260831.zarr
+    '''
+    if configyaml:
+        input_file_template = configyaml.input_file_template
+    else:
+        logger.debug("No input_file_template found. Check configuration.")
+        raise AttributeError("No input_file_template found. Check configuration.")
+    storename = strip_zarr_suffix(filename)
+    zarrfilename = storename.split(".")
+    if len(zarrfilename) != len(input_file_template):
+        logger.error("input_file_template is not configured correctly")
+        raise Exception("input_file_template is not configured correctly")
+    for key, value in zip(input_file_template, zarrfilename):
+        if key != "NA":
+            dictInfo[key] = value
     return dictInfo
 
 def getRealm(dictInfo):
@@ -218,7 +270,7 @@ def getInfoFromDRS(dirpath,projectdir,dictInfo):
     dictInfo["version"] = version
     return dictInfo
 def return_xr(fname):
-    filexr = (xr.open_dataset(fname))
+    filexr = (open_dataset(fname))
     filexra = filexr.attrs
     return filexr,filexra
 def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=None):
@@ -233,25 +285,25 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
     if filexra is not None:
         filexr = filexra
     else:
-        filexr = xr.open_dataset(fname)
+        filexr = open_dataset(fname)
         close_filexr = True
     try:
         if (dictInfo[att] == "na"):
             try:
                 cfname = filexr[variable_id].attrs["standard_name"]
                 dictInfo["standard_name"] = cfname
-                logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+                logger.info("standard_name retrieved from netCDF file: %s", dictInfo['standard_name'])
             except KeyError:
                 cfname = "NA"
                 try:
                     long_name = filexr[variable_id].attrs["long_name"]
                     fname = long_name.replace(" ", "_")
                     dictInfo["standard_name"] = cfname
-                    logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
+                    logger.info("standard_name retrieved from netCDF file: %s", dictInfo['standard_name'])
 
                 except KeyError:
                     dictInfo["standard_name"] = cfname
-                    logger.info(f"Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
+                    logger.info("Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
     finally:
         if close_filexr:
             filexr.close()

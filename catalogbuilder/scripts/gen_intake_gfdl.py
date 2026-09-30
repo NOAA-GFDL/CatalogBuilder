@@ -16,10 +16,10 @@ from catalogbuilder.intakebuilder import gfdlcrawler, CSVwriter, configparser, g
 logger = logging.getLogger(__name__)
 
 
-def create_catalog(input_path, output_path, config, fill, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose):
+def create_catalog(input_path, output_path, config, fill, filter_realm, filter_freq, filter_chunk, overwrite, append, slow, strict, verbose, zarr=False):
     """Generate an intake-ESM-compatible data catalog (CSV + JSON) from a local directory tree.
 
-    Crawls *input_path* for NetCDF files, assembles catalog rows according to the
+    Crawls *input_path* for NetCDF files or Zarr stores, assembles catalog rows according to the
     supplied (or default) YAML configuration, writes a CSV catalog file and a
     matching intake-ESM JSON descriptor to *output_path*.
 
@@ -45,8 +45,10 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         append (bool): When ``True``, new rows are appended to an existing CSV
             (without re-writing the header row).
         slow (bool): When ``True``, ``standard_name`` (or ``long_name``) is
-            read directly from each NetCDF file's metadata instead of being
+            read directly from each input dataset's metadata instead of being
             looked up in an offline table.
+        zarr (bool): When ``True``, crawl for Zarr stores instead of NetCDF
+            files and emit a catalog with ``assets.format = "zarr"``.
         strict (bool): When ``True``, the finished catalog is validated against
             the CV vocabulary embedded in the JSON schema; generation fails if
             any violations are found.
@@ -90,6 +92,10 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         logger.warning("!!!!! STRICT MODE IS ACTIVE. CATALOG GENERATION WILL FAIL IF ERRORS ARE FOUND !!!!!\n")
         time.sleep(10)
 
+    if zarr:
+        logger.warning("Statics are currently skipped in ZARR mode")
+        time.sleep(3)
+
     if config:
         configyaml = configparser.Config(config)
         if input_path is None:
@@ -117,7 +123,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         template_path = _files('catalogbuilder').joinpath('cats/gfdl_template.json')
     else:
         template_path = configyaml.schema
-        logger.info("Using schema from config file", template_path)
+        logger.info("Using schema from config file %s", template_path)
 
     if not os.path.exists(input_path):
         logger.error("Input path does not exist. Adjust configuration.")
@@ -126,11 +132,25 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         logger.error("Output path parent directory does not exist. Adjust configuration.")
         raise ValueError("Output path parent directory does not exist. Adjust configuration.")
 
-    logger.info("input path: "+ input_path)
-    logger.info("output path: "+ output_path)
+    logger.info("input path: %s", input_path)
+    logger.info("output path: %s", output_path)
     project_dir = input_path
     csv_path = "{0}.csv".format(output_path)
     json_path = "{0}.json".format(output_path)
+
+    # In append mode, validate the existing descriptor and reject cross-format appends
+    # so that pre-existing rows are not opened with the wrong backend
+    if append and os.path.isfile(json_path):
+        requested_format = "zarr" if zarr else "netcdf"
+        with open(json_path, "r") as existing_json:
+            existing_format = json.load(existing_json).get("assets", {}).get("format")
+        if existing_format is not None and existing_format != requested_format:
+            logger.warning("Cannot append '%s' entries to an existing '%s' catalog: %s. "
+                           "Cross-format appends are rejected because consumers would open "
+                           "some assets with the wrong backend.",
+                           requested_format, existing_format, json_path)
+            raise ValueError("Cannot append '{0}' entries to an existing '{1}' catalog: {2}"
+                             .format(requested_format, existing_format, json_path))
 
     ######### SEARCH FILTERS ###########################
 
@@ -155,11 +175,13 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
     dictInfo = {}
     project_dir = project_dir.rstrip("/")
     logger.debug("Calling gfdlcrawler.crawlLocal")
-    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, configyaml,slow)
+    list_files = gfdlcrawler.crawlLocal(project_dir, dictFilter, dictFilterIgnore, configyaml, slow, zarr=zarr)
     #Grabbing data from template JSON, changing CSV path to match output path, and dumping data in new JSON
     with open(template_path, "r") as jsonTemplate:
         data = json.load(jsonTemplate)
         data["catalog_file"] = os.path.abspath(csv_path)
+        if zarr:
+            data["assets"]["format"] = "zarr"
     jsonFile = open(json_path, "w")
     json.dump(data, jsonFile, indent=2)
     jsonFile.close()
@@ -215,7 +237,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
                         updated_count += mask.sum()
 
                 if updated_count > 0:
-                    logger.info(f"Updated {updated_count} entries with standard_name from offline lookup table")
+                    logger.info("Updated %d entries with standard_name from offline lookup table", updated_count)
             except Exception:
                 logger.error("Offline lookup table query failed")
                 raise
@@ -232,7 +254,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
             df[column] = df[column].replace(r'^\s*$', 'NA', regex=True)
             if had_missing:
                 filled_count += 1
-        logger.info(f"Filled empty values in {filled_count} column(s) with 'NA'")
+        logger.info("Filled empty values in %d column(s) with 'NA'", filled_count)
 
     if df is not None and len(df) != 0:
         df.to_csv(csv_path, index=False)
@@ -246,8 +268,8 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
         #Validate
         cv(json_path,'',vocab, proper_generation, test_failure)
 
-    logger.info("JSON generated at: " + os.path.abspath(json_path))
-    logger.info("CSV generated at: " + os.path.abspath(csv_path))
+    logger.info("JSON generated at: %s", os.path.abspath(json_path))
+    logger.info("CSV generated at: %s", os.path.abspath(csv_path))
     return(csv_path,json_path)
 
 #Setting up argument parsing/flags
@@ -265,6 +287,7 @@ def create_catalog(input_path, output_path, config, fill, filter_realm, filter_f
 @click.option('--overwrite', is_flag=True, default=False, help='Overwrite existing catalog CSV file')
 @click.option('--append', is_flag=True, default=False, help='Append to existing catalog CSV file (without headers)')
 @click.option('--slow','-s', is_flag=True, default=False, help='This option looks up standard names in netcdf file to fill up the standard name column if its present in the header specs. If standard_name is absent, long_name with space replaced by underscore is utilized')
+@click.option('--zarr', '-z', is_flag=True, default=False, help='Crawl Zarr stores instead of NetCDF files and generate a Zarr intake catalog')
 @click.option('--strict', is_flag=True, default=False, help='Strict catalog generation ensures catalogs are compliant with CV standards (as defined in vocabulary section of catalog schema)')
 @click.option('--verbose/--silent','-v', default=False, is_flag=True, help='Enables detailed logging') #default has silent option. Use --verbose for detailed logging
 
