@@ -91,7 +91,7 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
             try:
                 if 'chunk_freq' not in attribute["column_name"] and attribute["vocabulary"]:
                     cv_url = attribute["vocabulary"]
-                    logger.info("Validating " + attribute["column_name"] + " vocabulary")
+                    logger.info("Validating %s vocabulary", attribute["column_name"])
                 else:
                     continue
             except KeyError:
@@ -124,16 +124,16 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
                             urls.update({attribute['column_name']:cv_url})
 
         if nan_list:
-            logger.warning("WARNING: NaN's found in: " + str(nan_list))
+            logger.warning("WARNING: NaN's found in: %s", nan_list)
 
         if bad_vocab:
             for entry in bad_vocab:
                 if not entry == list(bad_vocab.keys())[-1]:
-                    logger.error("Inconsistent " + bad_vocab[entry] + " value: " + '"' + entry + '"')
+                    logger.error('Inconsistent %s value: "%s"', bad_vocab[entry], entry)
                     continue
-                logger.error("Inconsistent " + bad_vocab[entry] + " value: " + '"' + entry + '"\n')
+                logger.error('Inconsistent %s value: "%s"\n', bad_vocab[entry], entry)
             for entry in urls:
-                logger.info("Compliant " + entry + " vocabulary can be found here: " + urls[entry])
+                logger.info("Compliant %s vocabulary can be found here: %s", entry, urls[entry])
             if not test_failure:
                 raise ValueError("Found inconsistent value(s)")
             logger.warning("Found inconsistent value(s)\n")
@@ -152,11 +152,14 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
         #Validate JSON against JSON template
         comp = (diff(j,json_template))
         for key in comp.keys():
-            if key != 'catalog_file':
-                if test_failure:
-                    logger.warning(key + ' section of JSON does not refect template')
-                else:
-                    raise ValueError(key + ' section of JSON does not refect template')
+            if key == 'catalog_file':
+                continue
+            if key == 'assets' and isinstance(comp['assets'], dict) and set(comp['assets'].keys()) <= {'format'} and j['assets'].get('format') in ('netcdf', 'zarr'):
+                continue
+            if test_failure:
+                logger.warning('%s section of JSON does not refect template', key)
+            else:
+                raise ValueError(key + ' section of JSON does not refect template')
 
         #Get CSV from JSON and open it
         csv_path = j["catalog_file"]
@@ -175,17 +178,17 @@ def compval(json_path,json_template_path, vocab, proper_generation, test_failure
         errors = 0
         for column in req:
             if column not in catalog.columns:
-                logger.error("The required column '" + column + "' does not exist in the csv. In other words, there is some inconsistency between the json and the csv file. Please check out info listed under aggregation_control and groupby_attrs in your json file and verify if those columns show up in the csv as well.")
+                logger.error("The required column '%s' does not exist in the csv. In other words, there is some inconsistency between the json and the csv file. Please check out info listed under aggregation_control and groupby_attrs in your json file and verify if those columns show up in the csv as well.", column)
                 errors += 1
 
             if column in catalog.columns:
                 if catalog[column].isnull().values.any():
-                    logger.error("'" + column + "' contains empty values.")
+                    logger.error("'%s' contains empty values.", column)
                     errors += 1
 
         if errors > 0:
             if test_failure:
-                logger.warning("Found " + str(errors) + " errors.")
+                logger.warning("Found %s errors.", errors)
             else:
                 raise Exception("Found " + str(errors) + " errors.")
 

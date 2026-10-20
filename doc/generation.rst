@@ -115,6 +115,17 @@ Output path argumment should end with the desired output filename WITHOUT a file
 
 This would create a catalog.csv and catalog.json in the user's home directory.
 
+To generate a catalog from Zarr stores instead of NetCDF files, use the ``--zarr`` flag:
+
+.. code-block:: console
+
+ gen_intake_gfdl.py --zarr /archive/path_to_zarr_data $HOME/catalog-zarr
+
+When ``--zarr`` is enabled, the builder catalogs Zarr stores (directories
+whose name ends in ``.zarr`` or that contain Zarr metadata files) and writes
+a JSON catalog whose ``assets.format`` is set to ``zarr``. See the
+`Zarr catalogs`_ section for details.
+
 .. image:: _static/ezgif-4-786144c287.gif
  :width: 1000px
  :alt: Catalog generation demonstration
@@ -261,7 +272,52 @@ Flags
 - --overwrite - Overwrite an existing catalog at the given output path
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name by opening files. For entries where file retrieval fails, the system will attempt to populate standard_name using an offline lookup table (MDTF GFDL-to-CMIP variable mappings). This provides better coverage of standard_name values compared to relying on files alone. **`standard_name` must be included in your config's `headerlist` (CSV columns)**
+- --zarr / -z - Crawls Zarr stores instead of NetCDF files and writes a catalog whose asset format is ``zarr``
 - --strict - Activates strict mode which validates catalog vocabulary during generation
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
+
+Zarr catalogs
+=============
+
+The ``--zarr`` / ``-z`` flag catalogs Zarr stores instead of NetCDF files and
+writes a JSON catalog whose ``assets.format`` is set to ``zarr``.
+
+**Store detection.** A directory is treated as a Zarr store if its name ends
+in ``.zarr`` or if it contains Zarr metadata files (``.zgroup``, ``.zattrs``,
+``.zmetadata``, or ``zarr.json``). The crawler does not walk into a store's
+internal files.
+
+**Parsing.** The store's parent directories are matched to
+``input_path_template``, just as for NetCDF catalogs. The store name, without
+the ``.zarr`` suffix, is split on ``.`` and the parts are matched to
+``input_file_template``; a name with no periods counts as one part. If the
+number of parts does not match the number of entries in
+``input_file_template``, catalog generation fails with
+``input_file_template is not configured correctly``.
+
+For a GFDL post-processing layout such as
+``.../atmos/ts/monthly/5yr/atmos.200501-200912.t_ref.zarr``, configure:
+
+.. code-block:: yaml
+
+ input_file_template: ['realm','time_range','variable_id']
+
+For a CMIP-style layout such as
+``.../AERmon/abs550aer/gr1/v20260831.zarr``, configure
+``input_path_template`` ending at ``grid_label`` and:
+
+.. code-block:: yaml
+
+ input_file_template: ['version_id']
+
+**Limitations.** Statics are skipped in Zarr mode (a warning is shown at
+startup). A catalog can hold only one format: ``--append`` refuses to mix
+formats, and ``combine_cats`` will not combine a Zarr catalog with a NetCDF
+catalog.
+
+**Slow mode.** Metadata reads in slow mode use ``xarray.open_zarr`` and
+support both Zarr v2 and Zarr v3 stores (this requires ``xarray>=2025.01.1``
+together with ``zarr>=3``). If a store can't be read, the builder falls back
+to the offline lookup table.

@@ -31,6 +31,6 @@ def main():
         os.makedirs(os.path.dirname(csvfile), exist_ok=True)
     CSVwriter.listdict_to_csv(list_files, headers, csvfile)
     print("CSV generated at:", os.path.abspath(csvfile))
-    logger.info("CSV generated at"+ os.path.abspath(csvfile))
+    logger.info("CSV generated at %s", os.path.abspath(csvfile))
 if __name__ == '__main__':
     main()
