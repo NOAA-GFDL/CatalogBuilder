@@ -292,18 +292,18 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
             try:
                 cfname = filexr[variable_id].attrs["standard_name"]
                 dictInfo["standard_name"] = cfname
-                logger.info("standard_name retrieved from netCDF file: %s", dictInfo['standard_name'])
+                logger.info("standard_name retrieved from file: %s", dictInfo['standard_name'])
             except KeyError:
                 cfname = "NA"
                 try:
                     long_name = filexr[variable_id].attrs["long_name"]
                     fname = long_name.replace(" ", "_")
                     dictInfo["standard_name"] = cfname
-                    logger.info("standard_name retrieved from netCDF file: %s", dictInfo['standard_name'])
+                    logger.info("standard_name retrieved from file: %s", dictInfo['standard_name'])
 
                 except KeyError:
                     dictInfo["standard_name"] = cfname
-                    logger.info("Standard_name could not be retrieved from netCDF file and has been labeled 'NA'.")
+                    logger.info("Standard_name could not be retrieved from file and has been labeled 'NA'.")
     finally:
         if close_filexr:
             filexr.close()

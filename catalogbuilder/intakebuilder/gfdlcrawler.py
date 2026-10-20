@@ -69,6 +69,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
             if zarr:
                if getinfo.is_zarr_store(dirpath):
                    #the crawled directory itself is a zarr store; emit it and do not walk its internals
+                   logger.debug("%s detected as zarr store", projectdir) 
                    dirs[:] = []
                    dirpath, store_basename = os.path.split(os.path.normpath(dirpath))
                    entries = [store_basename]
