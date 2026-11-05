@@ -87,6 +87,11 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                dictInfo["path"]=filepath
 
                if op.countOf(filename,".") == 1:
+                   stem, extension = os.path.splitext(filename)
+                   if extension.lower() == ".nc" and len(stem.split("_")) < 6:
+                       logger.warning("Skipping filename that does not match the CMIP format: %s", filename)
+                       continue
+
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
                    dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
