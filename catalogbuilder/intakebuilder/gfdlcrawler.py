@@ -69,7 +69,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
                # get info from filename
                filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
 
-               if not filename.endswith(".nc"):
+               if not filename.lower().endswith(".nc"):
                    logger.debug("FILE does not end with .nc. Skipping "+ filepath)
                    continue
                #if our filename expectations are not met compared to the output_file_path_template in config, skip the loop. TODO revisit for statics
@@ -88,8 +88,15 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow):
 
                if op.countOf(filename,".") == 1:
                    stem, extension = os.path.splitext(filename)
-                   if extension.lower() == ".nc" and len(stem.split("_")) < 6:
-                       logger.warning("Skipping filename that does not match the CMIP format: %s", filename)
+                   if len(stem.split("_")) < 6:
+                       # When the filename stem doesn't have sections delimited by a dot
+                       # (NOT: <stem>.<with>.<dots>.nc; RATHER: <stemwithoutdots>.nc),
+                       # the code expects that the stem has the following format:
+                       # <varname>_<table_id>_<modelname>_<expname>_<ens>_<grid>.nc
+                       # Without this check, getinfo.getInfoFromFilename() may throw an IndexError
+                       # if those 6 sections aren't there.
+                       # TODO: Determine if this is really how we should be handling this case.
+                       logger.warning("Skipping filename with unexpected format: %s ", filename)
                        continue
 
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
