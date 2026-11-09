@@ -36,8 +36,8 @@ Tests live in [`catalogbuilder/tests/`](catalogbuilder/tests). The default test 
 | File | What it tests |
 |------|---------------|
 | `test_import.py` | The `catalogbuilder` package and `intakebuilder` modules import correctly. |
-| `test_ingestion.py` | A json/csv pair can be opened by intake_esm |
-| `test_create_catalog.py` | End-to-end catalog generation from sample data, both from a config file and from the default config (`configs/config_default.yaml`), and the `--fill` / `--no-fill` behavior for missing values. |
+| `test_ingestion.py` | A json/csv pair can be opened by intake_esm. |
+| `test_create_catalog.py` | End-to-end catalog generation from sample data, both from a config file and from the default config (`catalogbuilder/intakebuilder/config_default.yaml`), and the `--fill` / `--no-fill` behavior for missing values. |
 | `test_slow_mode_offline_lookup.py` | Slow mode falls back to the offline `standard_name` lookup when reading file attributes fails (uses `unittest.mock`). |
 | `test_determine_bump.py` | `.github/scripts/determine_bump.py`, which reads the version-bump checkbox from PR descriptions. |
 | `test_ci_dynamic.py` | Opens a catalog generated during the CI run (see below). Marked `xfail`. |
