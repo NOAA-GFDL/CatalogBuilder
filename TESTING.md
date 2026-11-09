@@ -1,13 +1,16 @@
 # Testing CatalogBuilder
 This guide explains how to run the CatalogBuilder test suite locally, what each test covers, and how the tests are run in CI.
+
 ## Prerequisites
 Set up a development environment as described in the [developer documentation](doc/developers.rst), then install the package and the extra test dependency from the root of the repository:
 ```bash
 pip install -e .
 pip install netcdf4
 ```
+
 `pytest` is installed automatically as a dependency of the package.
 > **Note:** Run all commands below from the **root of the repository**. Several tests use relative paths (e.g. `archive/...`) and write output files to the current working directory.
+
 ## Quick start
 ```bash
 # 1. Create the sample (empty) netCDF files under ./archive
@@ -22,6 +25,7 @@ A successful run ends with something like:
 15 passed, 1 xfailed
 ```
 The single `xfailed` test is expected locally; see [CI-only test](#ci-only-test-test_ci_dynamicpy).
+
 ### Running a subset of tests
 ```bash
 # A single file
@@ -44,8 +48,10 @@ Tests live in [`catalogbuilder/tests/`](catalogbuilder/tests). The default test 
 Supporting config files:
 - `test_config.yaml` — config used to generate `catalogbuilder/cats/gfdl_autotest_from_yaml.{csv,json}`.
 - `fill-test-config.yaml` — config with an extra `test_empty` column, used to exercise `--fill` / `--no-fill`.
+
 ### Sample data
 `catalogbuilder/scripts/make_sample_data.py` creates empty netCDF files under `./archive/am5/...` that mimic a GFDL post-processing directory tree. Tests that build catalogs call `make_sample_data()` themselves, so you only need to run the script manually before step 2 of the quick start or when running the CLI by hand.
+
 ### CI-only test (`test_ci_dynamic.py`)
 This test reads `workflow-artifacts1/gfdl_autotest_from_yaml.json`, which CI produces by uploading and re-downloading the catalog generated from `test_config.yaml`. It is marked `@pytest.mark.xfail`, so it shows as `xfailed` locally. CI runs pytest with `--runxfail` to make it a real test.
 To reproduce the CI behavior locally:
@@ -63,6 +69,7 @@ python catalogbuilder/scripts/compval.py --proper_generation -tf gfdl_autotest.j
 python catalogbuilder/scripts/compval.py --proper_generation -tf catalogbuilder/cats/gfdl_autotest_from_yaml.json
 ```
 The `-tf` (`--test-failure`) flag prints errors instead of raising. Because the sample data does not populate every required column, errors such as `'member_id' contains empty values` are expected and the command still exits successfully. See `python catalogbuilder/scripts/compval.py --help` and [`doc/validation.rst`](doc/validation.rst) for details.
+
 ## Continuous integration
 These GitHub Actions workflows run on pull requests:
 | Workflow | What it does |
@@ -78,6 +85,7 @@ pip install codespell pylint
 codespell --ignore-words-list="nd,te" --skip="doc/_build/*" doc/
 pylint catalogbuilder --exit-zero
 ```
+
 ## Conda package build
 The conda recipe is [`meta.yaml`](meta.yaml). The conda package is tested at two levels:
 1. **Recipe tests (during `conda build`)** — the `test: imports:` section of `meta.yaml` checks that these modules import from the built package:
@@ -99,6 +107,7 @@ conda install -y -n catalogbuildertest catalogbuilder --use-local
 conda run -n catalogbuildertest pytest catalogbuilder/tests/test_create_catalog.py
 ```
 When you add a runtime dependency, update `meta.yaml` (`requirements: run:`), `pyproject.toml`, and `environment.yml` together, or the conda build and tests may fail even though the pip-based workflow passes.
+
 ## Cleaning up
 Tests and scripts write catalogs (`*.csv`, `*.json`) to the repository root and sample data to `archive/`. These are ignored by `.gitignore`, but `workflow-artifacts1/` and `catalogbuilder/cats/gfdl_autotest_from_yaml.{csv,json}` are not, so take care not to commit them. To remove all generated files:
 ```bash
