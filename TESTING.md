@@ -79,6 +79,7 @@ These GitHub Actions workflows run on pull requests:
 | [`conda-pkg-extra-tests.yml`](.github/workflows/conda-pkg-extra-tests.yml) | Builds the conda package, installs it into a clean environment, and runs `test_create_catalog.py` with that environment's `pytest`. (PRs to `main` only.) See [Conda package build](#conda-package-build). |
 | [`validate-pr.yml`](.github/workflows/validate-pr.yml) | Checks that exactly one version-bump checkbox is ticked in the PR description. |
 `publish-conda.yml` also builds the package, but it runs on pushes to `main` and uploads to the `noaa-gfdl` Anaconda channel. It is a release step, not a test.
+
 To run the same lint checks locally:
 ```bash
 pip install codespell pylint
@@ -109,7 +110,7 @@ conda run -n catalogbuildertest pytest catalogbuilder/tests/test_create_catalog.
 When you add a runtime dependency, update `meta.yaml` (`requirements: run:`), `pyproject.toml`, and `environment.yml` together, or the conda build and tests may fail even though the pip-based workflow passes.
 
 ## Cleaning up
-Tests and scripts write catalogs (`*.csv`, `*.json`) to the repository root and sample data to `archive/`. These are ignored by `.gitignore`, but `workflow-artifacts1/` and `catalogbuilder/cats/gfdl_autotest_from_yaml.{csv,json}` are not, so take care not to commit them. To remove all generated files:
+Tests and scripts write catalogs (`*.csv`, `*.json`) to the repository root and sample data to `archive/`. These are ignored by `.gitignore`, but `workflow-artifacts1/` and `catalogbuilder/cats/gfdl_autotest_from_yaml.{csv,json}` are not, so be sure not to commit them! To remove all generated files:
 ```bash
 rm -rf archive/ workflow-artifacts1/ ./*.csv ./*.json
 rm -f catalogbuilder/cats/gfdl_autotest_from_yaml.{csv,json}
