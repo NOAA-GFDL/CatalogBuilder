@@ -1,4 +1,5 @@
-========================
+=g
+=======================
 Generating data catalogs
 ========================
 
@@ -213,7 +214,7 @@ Setup FRE-CLI through Lmod following `their setup documentation <https://noaa-gf
   # find the most recent version of fre
   module avail fre
   # load the fre module. replace <NN> with the latest version
-  module load fre/2025.<NN>
+  module load fre/2026.<NN>
 
 **2. Call the builder**
 
@@ -262,6 +263,8 @@ Flags
 - --append - Append (without headerlist) to an existing catalog at the given output path
 - --slow - Activates slow mode which retrieves standard_name by opening files. For entries where file retrieval fails, the system will attempt to populate standard_name using an offline lookup table (MDTF GFDL-to-CMIP variable mappings). This provides better coverage of standard_name values compared to relying on files alone. **`standard_name` must be included in your config's `headerlist` (CSV columns)**
 - --strict - Activates strict mode which validates catalog vocabulary during generation
+- --zarr / -z Enables ZARR mode
 - --fill / --no-fill - Fills all empty CSV column values with "NA". Enabled by default. Use ``--no-fill`` to disable filling.
+- -- verbose / -v - Enables verbose output
 - --i - Optional method for passing input path
 - --o - Optional method for passing output path
