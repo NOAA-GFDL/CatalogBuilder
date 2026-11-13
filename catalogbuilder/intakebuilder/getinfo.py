@@ -245,8 +245,7 @@ def getInfoFromVarAtts(fname,variable_id,dictInfo,att="standard_name",filexra=No
                 cfname = "NA"
                 try:
                     long_name = filexr[variable_id].attrs["long_name"]
-                    fname = long_name.replace(" ", "_")
-                    dictInfo["standard_name"] = cfname
+                    dictInfo["standard_name"] = long_name.replace(" ", "_")
                     logger.info(f"standard_name retrieved from netCDF file: {dictInfo['standard_name']}")
 
                 except KeyError:
