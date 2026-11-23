@@ -83,7 +83,7 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                # get info from filename
                filepath = os.path.join(dirpath,filename)  # 1 AR: Bugfix: this needs to join dirpath and filename to get the full path to the file
  
-               if not zarr and not filename.endswith(".nc"):
+               if not zarr and not filename.lower().endswith(".nc"):
                    logger.debug("FILE does not end with .nc. Skipping %s", filepath)
                    continue
                if zarr and "static" in filename:
@@ -106,6 +106,18 @@ def crawlLocal(projectdir, dictFilter,dictFilterIgnore,configyaml,slow, zarr=Fal
                if zarr:
                    dictInfo = getinfo.getInfoFromZarrFilename(filename,dictInfo,configyaml)
                elif op.countOf(filename,".") == 1:
+                   stem, extension = os.path.splitext(filename)
+                   if len(stem.split("_")) < 6:
+                       # When the filename stem doesn't have sections delimited by a dot
+                       # (NOT: <stem>.<with>.<dots>.nc; RATHER: <stemwithoutdots>.nc),
+                       # the code expects that the stem has the following format:
+                       # <varname>_<table_id>_<modelname>_<expname>_<ens>_<grid>.nc
+                       # Without this check, getinfo.getInfoFromFilename() may throw an IndexError
+                       # if those 6 sections aren't there.
+                       # TODO: Determine if this is really how we should be handling this case.
+                       logger.warning("Skipping filename with unexpected format: %s ", filename)
+                       continue
+
                    dictInfo = getinfo.getInfoFromFilename(filename,dictInfo)
                else:
                    dictInfo = getinfo.getInfoFromGFDLFilename(filename,dictInfo,configyaml)
