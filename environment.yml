@@ -4,14 +4,14 @@ channels:
   - noaa-gfdl
   - defaults
 dependencies:
-  - python
+  - python>=3.11
   - pytest
   - setuptools
   - click
-  - xarray
+  - xarray>=2025.01.1
+  - zarr>=3
   - pandas
   - jsondiff
   - intake-esm
   - boto3
   - importlib_resources
-

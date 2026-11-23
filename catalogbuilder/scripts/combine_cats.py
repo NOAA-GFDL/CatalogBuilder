@@ -32,10 +32,10 @@ def combine_cats(inputfiles,output_path):
        raise IndexError("cannot parse output_path")
     p1 = pathlib.PurePath(json1)
     csv1 =  p1.with_suffix('.csv')
-    logger.debug(f"{csv1}")
+    logger.debug("%s", csv1)
     p2 = pathlib.Path(json2)
     csv2 = p2.with_suffix('.csv')
-    logger.debug(f"{csv2}")
+    logger.debug("%s", csv2)
 
     cat_csvs = [csv1,csv2] #TODO check for valid paths, pass it with cmd line if necessary 
 
@@ -45,7 +45,7 @@ def combine_cats(inputfiles,output_path):
         json_obj2 = json.load(f2) 
     differ = diff(json_obj1, json_obj2) 
     logger.info("Schema differs")
-    logger.info("{differ}")
+    logger.info("%s", differ)
     if len(differ.keys()) == 1:
         if "catalog_file" in differ.keys():
             logger.info("We can combine since the catalog_file is the only difference")
@@ -72,8 +72,8 @@ def combine_cats(inputfiles,output_path):
         outfile.write(json_data)
 
     #Print pointers 
-    logger.info("Combined catalog specification: {combined_json}")
-    logger.info("Combined csv/catalog: {combined_csv}")
+    logger.info("Combined catalog specification: %s", combined_json)
+    logger.info("Combined csv/catalog: %s", combined_csv)
 
 def combine_cats_cli(**kwargs):
     return combine_cats(**kwargs)

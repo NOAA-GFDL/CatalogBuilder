@@ -23,22 +23,22 @@ class Config:
             pass 
         try:
             self.headerlist = configfile['headerlist']
-            logger.debug("headerlist :"+(str)(self.headerlist))
+            logger.debug("headerlist : %s", self.headerlist)
         except:
             raise KeyError("headerlist does not exist in config")
         try:
             self.input_path_template = configfile['input_path_template']
-            logger.debug("input_path_template :"+(str)(self.input_path_template))
+            logger.debug("input_path_template : %s", self.input_path_template)
         except:
             raise KeyError("input_path_template does not exist in config")
         try:
             self.input_file_template = configfile['input_file_template']
-            logger.debug("input_file_template :"+ (str)(self.input_file_template))
+            logger.debug("input_file_template : %s", self.input_file_template)
         except:
             raise KeyError("input_file_template does not exist in config")
         try:
             self.schema = configfile['schema']
-            logger.info("schema:"+ self.schema)
+            logger.info("schema: %s", self.schema)
         except:
             self.schema = None
             pass

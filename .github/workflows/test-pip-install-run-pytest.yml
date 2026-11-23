@@ -23,7 +23,7 @@ jobs:
     - name: Spellcheck with codespell
       run: |
         pip install codespell
-        codespell --ignore-words-list="nd,te" --skip="doc/_build/*" doc/
+        codespell --ignore-words-list="nd,te,statics" --skip="doc/_build/*" doc/
 
     - name: Install and use pylint
       run: |
